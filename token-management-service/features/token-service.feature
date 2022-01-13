@@ -12,7 +12,7 @@ Scenario: Customer tries to request tokens while having more than 1
 	Given customer id "id1"
 	And has 2 tokens
 	When 5 tokens are requested then too many are requested
-	Then exception "Request denied - you can only request tokens when you have 1 token" is returned
+	Then too many exception "Request denied - you can only request between one and 5 tokens at a time" is returned
 
 #Scenario: Generate tokens for a new user
 #	Given a new customer requests tokens from the service

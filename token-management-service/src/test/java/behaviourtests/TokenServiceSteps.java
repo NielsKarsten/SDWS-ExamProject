@@ -14,13 +14,15 @@ import messaging.MessageQueue;
 import org.junit.After;
 import tokenmanagement.service.TokenLimitException;
 import tokenmanagement.service.TokenManagementService;
+import tokenmanagement.service.TooManyTokenRequestException;
 
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
 	private TokenManagementService tokenService = new TokenManagementService();
 
 	private String _customerId;
-	private TokenLimitException exception;
+	private TokenLimitException tokenLimitException;
+	private TooManyTokenRequestException tooManyTokenRequestException;
 
 	public TokenServiceSteps() {
 	}
@@ -31,18 +33,18 @@ public class TokenServiceSteps {
 	}
 
 	@Given("has {int} tokens")
-	public void hasTokens(int tokenAmount) throws TokenLimitException {
+	public void hasTokens(int tokenAmount) throws TokenLimitException, TooManyTokenRequestException {
 		tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
 	@When("{int} tokens are requested")
-	public void costumerRequestsNewTokens(int tokenAmount) throws TokenLimitException {
+	public void costumerRequestsNewTokens(int tokenAmount) throws TokenLimitException, TooManyTokenRequestException {
 		tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
 	@When("{int} tokens are requested then too many are requested")
-	public void costumerRequestsNewTokensTooMany(int tokenAmount) throws TokenLimitException {
-		exception = assertThrows(TokenLimitException.class, () -> {
+	public void costumerRequestsNewTokensTooMany(int tokenAmount) throws TooManyTokenRequestException {
+		tooManyTokenRequestException = assertThrows(TooManyTokenRequestException.class, () -> {
 			tokenService.requestTokens(_customerId, tokenAmount);
 		});
 	}
@@ -52,9 +54,9 @@ public class TokenServiceSteps {
 		assertEquals(tokenAmount, tokenService.findCustomersTokens(_customerId).size());
 	}
 
-	@Then("exception {string} is returned")
-	public void tokensAreGenerated(String errorMsg) {
-		assertEquals(exception.getErrorMsg(), errorMsg);
+	@Then("too many exception {string} is returned")
+	public void tooManyTokensAreGenerated(String errorMsg) {
+		assertEquals(tooManyTokenRequestException.getErrorMsg(), errorMsg);
 	}
 
 	@After

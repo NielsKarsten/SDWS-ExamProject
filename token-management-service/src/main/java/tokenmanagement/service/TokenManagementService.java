@@ -15,16 +15,17 @@ public class TokenManagementService {
         this.tokens = new HashMap<>();
     }
 
-    public void requestTokens(String customerId, int tokenAmount) throws TokenLimitException {
+    public void requestTokens(String customerId, int tokenAmount) throws TokenLimitException, TooManyTokenRequestException {
         if (tokenAmount > 5 || tokenAmount < 1) {
             throw new TokenLimitException();
+        }
+        if (findCustomersTokens(customerId) != null && findCustomersTokens(customerId).size() > 1) {
+            throw new TooManyTokenRequestException();
         }
 
         if (findCustomersTokens(customerId) == null) {
             List<Token> tokenList = new ArrayList<>();
             generateTokens(customerId, tokenAmount, tokenList);
-        } else if (findCustomersTokens(customerId).size() > 1) {
-            throw new TokenLimitException();
         } else {
             List<Token> localList = tokens.get(customerId);
             generateTokens(customerId, tokenAmount, localList);
