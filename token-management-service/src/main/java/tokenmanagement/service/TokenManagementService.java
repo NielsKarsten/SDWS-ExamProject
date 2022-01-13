@@ -4,9 +4,13 @@
 
 package tokenmanagement.service;
 
+import tokenmanagement.service.exceptions.TokenLimitException;
+import tokenmanagement.service.exceptions.TooManyTokenRequestException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TokenManagementService {
     private HashMap<String, List<Token>> tokens;
@@ -32,7 +36,13 @@ public class TokenManagementService {
     }
 
     public String findCustomerId(Token token) {
-        return "implement";
+        String customerIdResult = "";
+        for (Map.Entry<String,List<Token>> entry : tokens.entrySet()) {
+            if (entry.getValue().contains(token)) {
+                customerIdResult = entry.getKey();
+            }
+        }
+        return customerIdResult;
     }
 
     private void generateTokens(String customerId, int tokenAmount, List<Token> tokenList) throws TokenLimitException {

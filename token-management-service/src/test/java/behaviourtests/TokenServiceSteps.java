@@ -13,9 +13,9 @@ import io.cucumber.java.en.When;
 import messaging.MessageQueue;
 import org.junit.After;
 import tokenmanagement.service.Token;
-import tokenmanagement.service.TokenLimitException;
+import tokenmanagement.service.exceptions.TokenLimitException;
 import tokenmanagement.service.TokenManagementService;
-import tokenmanagement.service.TooManyTokenRequestException;
+import tokenmanagement.service.exceptions.TooManyTokenRequestException;
 
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
@@ -65,7 +65,7 @@ public class TokenServiceSteps {
 
 	@Then("customer id {string} is returned")
 	public void customerIdReturned(String testingId) {
-		assertEquals(result, testingId);
+		assertEquals(testingId, result);
 	}
 
 	@Then("customer has {int} tokens")
@@ -75,7 +75,7 @@ public class TokenServiceSteps {
 
 	@Then("exception {string} is returned")
 	public void tooManyTokensAreGenerated(String errorMsg) {
-		assertEquals(exception.getMessage(), errorMsg);
+		assertEquals(errorMsg, exception.getMessage());
 	}
 
 	@After
