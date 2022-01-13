@@ -16,12 +16,7 @@ public class TokenManagementService {
     }
 
     public void requestTokens(String customerId, int tokenAmount) throws TokenLimitException, TooManyTokenRequestException {
-        if (tokenAmount > 5 || tokenAmount < 1) {
-            throw new TokenLimitException();
-        }
-        if (findCustomersTokens(customerId) != null && findCustomersTokens(customerId).size() > 1) {
-            throw new TooManyTokenRequestException();
-        }
+        verifyRequestTokenInput(customerId, tokenAmount);
 
         if (findCustomersTokens(customerId) == null) {
             List<Token> tokenList = new ArrayList<>();
@@ -32,6 +27,14 @@ public class TokenManagementService {
         }
     }
 
+    public List<Token> findCustomersTokens(String customerId) {
+        return tokens.get(customerId);
+    }
+
+    public String findCustomerId(Token token) {
+        return "implement";
+    }
+
     private void generateTokens(String customerId, int tokenAmount, List<Token> tokenList) throws TokenLimitException {
         for (int i = 0; i < tokenAmount; i++) {
             tokenList.add(new Token());
@@ -39,7 +42,12 @@ public class TokenManagementService {
         tokens.put(customerId, tokenList);
     }
 
-    public List<Token> findCustomersTokens(String customerId) {
-        return tokens.get(customerId);
+    private void verifyRequestTokenInput(String customerId, int tokenAmount) throws TooManyTokenRequestException, TokenLimitException {
+        if (tokenAmount > 5 || tokenAmount < 1) {
+            throw new TokenLimitException("Request denied - you can only request between one and 5 tokens at a time");
+        }
+        if (findCustomersTokens(customerId) != null && findCustomersTokens(customerId).size() > 1) {
+            throw new TooManyTokenRequestException("Request denied - you can only request tokens when you have 1 token");
+        }
     }
 }

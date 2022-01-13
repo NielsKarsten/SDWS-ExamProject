@@ -1,13 +1,7 @@
 package tokenmanagement.service;
 
-public class TooManyTokenRequestException extends Throwable {
-    private final String errorMsg = "Request denied - you can only request between one and 5 tokens at a time";
-
-
-    public TooManyTokenRequestException() {
-    }
-
-    public String getErrorMsg() {
-        return errorMsg;
+public class TooManyTokenRequestException extends Exception {
+    public TooManyTokenRequestException(String msg) {
+        super(msg);
     }
 }

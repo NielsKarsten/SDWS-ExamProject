@@ -12,6 +12,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import messaging.MessageQueue;
 import org.junit.After;
+import tokenmanagement.service.Token;
 import tokenmanagement.service.TokenLimitException;
 import tokenmanagement.service.TokenManagementService;
 import tokenmanagement.service.TooManyTokenRequestException;
@@ -21,8 +22,8 @@ public class TokenServiceSteps {
 	private TokenManagementService tokenService = new TokenManagementService();
 
 	private String _customerId;
-	private TokenLimitException tokenLimitException;
-	private TooManyTokenRequestException tooManyTokenRequestException;
+	private Exception exception;
+	private String result;
 
 	public TokenServiceSteps() {
 	}
@@ -42,21 +43,39 @@ public class TokenServiceSteps {
 		tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
-	@When("{int} tokens are requested then too many are requested")
-	public void costumerRequestsNewTokensTooMany(int tokenAmount) throws TooManyTokenRequestException {
-		tooManyTokenRequestException = assertThrows(TooManyTokenRequestException.class, () -> {
+	@When("{int} tokens are requested then customer has too many tokens")
+	public void costumerHasTooManyTokensWhenRequesting(int tokenAmount) {
+		exception = assertThrows(TooManyTokenRequestException.class, () -> {
 			tokenService.requestTokens(_customerId, tokenAmount);
 		});
 	}
 
-	@Then("{int} tokens are generated")
+	@When("{int} tokens are requested then token limit exceeds")
+	public void requestingTokensExceedsLimit(int tokenAmount) {
+		exception = assertThrows(TokenLimitException.class, () -> {
+			tokenService.requestTokens(_customerId, tokenAmount);
+		});
+	}
+
+	@When("get customer id from token")
+	public void getCustomerIdFromToken() {
+		Token token = tokenService.findCustomersTokens(_customerId).get(0);
+		result = tokenService.findCustomerId(token);
+	}
+
+	@Then("customer id {string} is returned")
+	public void customerIdReturned(String testingId) {
+		assertEquals(result, testingId);
+	}
+
+	@Then("customer has {int} tokens")
 	public void tokensAreGenerated(int tokenAmount) {
 		assertEquals(tokenAmount, tokenService.findCustomersTokens(_customerId).size());
 	}
 
-	@Then("too many exception {string} is returned")
+	@Then("exception {string} is returned")
 	public void tooManyTokensAreGenerated(String errorMsg) {
-		assertEquals(tooManyTokenRequestException.getErrorMsg(), errorMsg);
+		assertEquals(exception.getMessage(), errorMsg);
 	}
 
 	@After

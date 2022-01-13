@@ -3,20 +3,40 @@
 # Main: Christian Gernsøe s163552
 
 Feature: Token Service
-Scenario: Generate tokens
+Scenario: Generate tokens for customer that does not have tokens
 	Given customer id "id1"
 	When 4 tokens are requested
-	Then 4 tokens are generated
+	Then customer has 4 tokens
+
+Scenario: Generate tokens for customer with one token
+	Given customer id "id1"
+	And has 1 tokens
+	When 4 tokens are requested
+	Then customer has 5 tokens
 
 Scenario: Customer tries to request tokens while having more than 1
 	Given customer id "id1"
 	And has 2 tokens
-	When 5 tokens are requested then too many are requested
-	Then too many exception "Request denied - you can only request between one and 5 tokens at a time" is returned
+	When 5 tokens are requested then customer has too many tokens
+	Then exception "Request denied - you can only request tokens when you have 1 token" is returned
 
-#Scenario: Generate tokens for a new user
-#	Given a new customer requests tokens from the service
-#	Then the tokens are generated
+Scenario: Customer tries to request 6 tokens
+	Given customer id "id1"
+	And has 1 tokens
+	When 6 tokens are requested then token limit exceeds
+	Then exception "Request denied - you can only request between one and 5 tokens at a time" is returned
+
+Scenario: Customer tries to request 0 tokens
+	Given customer id "id1"
+	And has 1 tokens
+	When 0 tokens are requested then token limit exceeds
+	Then exception "Request denied - you can only request between one and 5 tokens at a time" is returned
+
+Scenario: Return user id from token
+	Given customer id "id1"
+	And has 1 tokens
+	When get customer id from token
+	Then customer id "id1" is returned
 
 #Scenario: Generate tokens for a user
 #	Given a customer requests tokens from the service
