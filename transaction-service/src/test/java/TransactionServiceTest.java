@@ -1,3 +1,6 @@
+import dk.dtu.sdws.group3.TransactionService;
+import dtu.ws.fastmoney.BankService;
+import dtu.ws.fastmoney.BankServiceService;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -17,6 +20,9 @@ import io.cucumber.junit.CucumberOptions.SnippetType;
 )
 
 public class TransactionServiceTest {
+
+    TransactionService transactionService = new TransactionService();
+    BankService bank = new BankServiceService().getBankServicePort();;
 
     @Given("a merchant with merchant id {string} and a account with balance of {int}")
     public void a_merchant_with_merchant_id_and_a_account_with_balance_of(String string, Integer int1) {

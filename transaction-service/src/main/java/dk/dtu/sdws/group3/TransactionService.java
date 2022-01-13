@@ -1,26 +1,26 @@
 package dk.dtu.sdws.group3;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.HashMap;
 import java.util.UUID;
 import dtu.ws.fastmoney.*;
 
 public class TransactionService {
 
-    private BankService bank;
-    public void pay(UUID merchantId, UUID token, BigDecimal amount) {
+    BankService bank = new BankServiceService().getBankServicePort();
+    private HashMap<String, BigDecimal> transactions = new HashMap<>();
+
+    public void pay(UUID merchantId, UUID token, BigDecimal amount, String description) throws BankServiceException_Exception {
 
 
         String merchantAccount = AccountService.getAccount(merchantId);
         token = TokenService.validateToken(token);
         String customerAccount = AccountService.getAccount(token);
-        if (checkBalance(amount, merchantAccount) == true) {
-            bank.transferMoneyFromTo
+
+        if (checkBalance(amount, customerAccount)) {
+            bank.transferMoneyFromTo(customerAccount, merchantAccount, amount, description);
+            saveTransaction(merchantAccount, customerAccount, amount);
         } return;
-
-        // Transaction transaction = new Transaction(merchantAccount, customerAccount, amount);
-        // saveTransaction(transaction);
-
 
 
 
@@ -31,6 +31,11 @@ public class TransactionService {
         // 5. Return result to caller
     }
 
+    private void saveTransaction(String merchantAccount, String customerAccount, BigDecimal amount) {
+        String key = merchantAccount+customerAccount;
+        transactions.put(key, amount);
+    }
+
     public boolean checkBalance(BigDecimal amount, String customerAccount) {
         BigDecimal accountBalance = AccountService.getBalance(customerAccount);
         if (amount.intValue() < accountBalance.intValue()) {
@@ -38,9 +43,6 @@ public class TransactionService {
         } return false;
     }
 
-    public void saveTransaction(Transaction transaction){
-
-    }
 
    // public Account getBankAccount(UUID merchantId) throws BankServiceException_Exception {
     //  Account account = null;
@@ -49,8 +51,8 @@ public class TransactionService {
     //   return account;
     // }
 
-    public List<Transaction> getTransactions () {
-
-    }
+    public HashMap<String, BigDecimal> getTransactions () {
+        return transactions;
+   }
 
 }
