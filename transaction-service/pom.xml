@@ -71,7 +71,18 @@
             <version>2.0.2-beta</version>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>hubert.dtu.dk</groupId>
+            <artifactId>messaging-utilities</artifactId>
+            <version>3.2</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
