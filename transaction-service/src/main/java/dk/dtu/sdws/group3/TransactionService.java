@@ -8,20 +8,22 @@ import dtu.ws.fastmoney.*;
 public class TransactionService {
 
     BankService bank = new BankServiceService().getBankServicePort();
+    AccountService accountService = new AccountService();
+    TokenService tokenService = new TokenService();
     private HashMap<String, BigDecimal> transactions = new HashMap<>();
     String errorMessage;
 
     public void pay(UUID merchantId, UUID token, BigDecimal amount, String description) throws BankServiceException_Exception {
 
 
-        String merchantAccount = AccountService.getAccount(merchantId);
-        token = TokenService.validateToken(token);
-        String customerAccount = AccountService.getAccount(token);
+        String merchantAccount = accountService.getAccountId(merchantId);
+        UUID customerId = tokenService.validateToken(token);
+        String customerAccount = accountService.getAccountToken(customerId);
 
         if (checkBalance(amount, customerAccount)) {
             bank.transferMoneyFromTo(customerAccount, merchantAccount, amount, description);
             saveTransaction(merchantAccount, customerAccount, amount);
-        } return;
+         } return;
         }
 
 
@@ -30,7 +32,7 @@ public class TransactionService {
         // 3. Get bank account from account service associated with user account
         // 4. Make payment in bank
         // 5. Return result to caller
-    }
+
 
     private void saveTransaction(String merchantAccount, String customerAccount, BigDecimal amount) {
         String key = merchantAccount+customerAccount;
@@ -38,7 +40,7 @@ public class TransactionService {
     }
 
     public boolean checkBalance(BigDecimal amount, String customerAccount) {
-        BigDecimal accountBalance = AccountService.getBalance(customerAccount);
+        BigDecimal accountBalance = accountService.getBalance(customerAccount);
         if (amount.intValue() < accountBalance.intValue()) {
             return true;
         }
