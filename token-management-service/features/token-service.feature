@@ -47,7 +47,7 @@ Scenario: Consume token from customer
 
 Scenario: Consume token from customer with 0 tokens
 	Given customer id "id1"
-	And has 0 tokens
+	And has 1 tokens
 	When customer consumes token with expected
 	When customer consumes token
 	Then customer has 0 tokens
