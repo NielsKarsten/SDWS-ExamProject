@@ -4,10 +4,15 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/transaction-service/pom.xml" />
+        <option value="$PROJECT_DIR$/simple_rest_demo/SimpleDTUPay/DTUClient/pom.xml" />
+        <option value="$PROJECT_DIR$/simple_rest_demo/SimpleDTUPay/SimpleDTUPay/pom.xml" />
+        <option value="$PROJECT_DIR$/student-registration-service/pom.xml" />
+        <option value="$PROJECT_DIR$/student-registration-service/rest-client-pom.xml" />
+        <option value="$PROJECT_DIR$/messaging-utilities-3.2/pom.xml" />
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
