@@ -1,0 +1,6 @@
+version: '3'
+services:
+  account-registration-service:
+    image: accounts 
+    build: .
+ 

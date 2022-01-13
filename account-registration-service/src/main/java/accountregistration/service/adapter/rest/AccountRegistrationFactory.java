@@ -1,12 +1,13 @@
-package tokenmanagement.service.adapter.rest;
+package accountregistration.service.adapter.rest;
 
 import messaging.implementations.RabbitMqQueue;
-import tokenmanagement.service.StudentRegistrationService;
 
-public class StudentRegistrationFactory {
-	static StudentRegistrationService service = null;
+import accountregistration.service.AccountRegistrationService;
 
-	public StudentRegistrationService getService() {
+public class AccountRegistrationFactory {
+	private AccountRegistrationService service = null;
+
+	public AccountRegistrationService getService() {
 		// The singleton pattern.
 		// Ensure that there is at most
 		// one instance of a PaymentService
@@ -23,7 +24,7 @@ public class StudentRegistrationFactory {
 		// At the end, we can use the PaymentService in tests
 		// without sending actual messages to RabbitMq.
 		var mq = new RabbitMqQueue("rabbitMq");
-		service = new StudentRegistrationService(mq);
+		service = new AccountRegistrationService(mq);
 //		new StudentRegistrationServiceAdapter(service, mq);
 		return service;
 	}

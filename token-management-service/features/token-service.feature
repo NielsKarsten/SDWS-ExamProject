@@ -32,11 +32,26 @@ Scenario: Customer tries to request 0 tokens
 	When 0 tokens are requested then token limit exceeds
 	Then exception "Request denied - you can only request between one and 5 tokens at a time" is returned
 
-#Scenario: Return user id from token
-#	Given customer id "id1"
-#	And has 1 tokens
-#	When get customer id from token
-#	Then customer id "id1" is returned
+Scenario: Return customer id from token
+	Given customer id "id1"
+	And has 1 tokens
+	When get customer id from token
+	Then customer id "id1" is returned
+
+Scenario: Consume token from customer
+	Given customer id "id1"
+	And has 1 tokens
+	When customer consumes token with expected
+	Then customer has 0 tokens
+	And consumed token matches token
+
+Scenario: Consume token from customer with 0 tokens
+	Given customer id "id1"
+	And has 1 tokens
+	When customer consumes token with expected
+	When customer consumes token
+	Then customer has 0 tokens
+	And exception "Customer does not have any tokens" is returned
 
 #Scenario: Generate tokens for a user
 #	Given a customer requests tokens from the service
@@ -65,12 +80,6 @@ Scenario: Customer tries to request 0 tokens
 #Scenario: Validate wrong token
 #	Given a token with no owner
 #	Then the token is validated not succesfully
-
-#Scenario: Consume token
-#	Given a customer requests tokens from the service
-#	When a token is parsed to the service
-#	Then the token is removed from active tokens
-#	And the token is added to the list of used tokens
 
 #Scenario: Consume invalid token
 #	Given a token with no owner
