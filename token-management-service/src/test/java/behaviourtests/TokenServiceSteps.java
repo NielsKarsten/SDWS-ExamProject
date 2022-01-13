@@ -16,15 +16,18 @@ import tokenmanagement.service.Token;
 import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
 
+import java.util.List;
+
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
-	private TokenManagementService tokenService = new TokenManagementService();
+	private TokenManagementService tokenService = new TokenManagementService(q);
 
 	private String _customerId;
 	private Exception exception;
 	private String result;
 	private Token tokenResult;
 	private Token expectedToken;
+	private List<Token> tokenList;
 
 	public TokenServiceSteps() {
 	}
@@ -36,12 +39,12 @@ public class TokenServiceSteps {
 
 	@Given("has {int} tokens")
 	public void hasTokens(int tokenAmount) throws TokenException {
-		tokenService.requestTokens(_customerId, tokenAmount);
+		tokenList = tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
 	@When("{int} tokens are requested")
 	public void costumerRequestsNewTokens(int tokenAmount) throws TokenException {
-		tokenService.requestTokens(_customerId, tokenAmount);
+		tokenList = tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
 	@When("{int} tokens are requested then customer has too many tokens")
@@ -84,7 +87,7 @@ public class TokenServiceSteps {
 
 	@Then("customer has {int} tokens")
 	public void tokensAreGenerated(int tokenAmount) {
-		assertEquals(tokenAmount, tokenService.findCustomersTokens(_customerId).size());
+		assertEquals(tokenAmount, tokenList.size());
 	}
 
 	@Then("exception {string} is returned")
@@ -99,7 +102,7 @@ public class TokenServiceSteps {
 
 	@After
 	public void deleteTokens() {
-		tokenService = new TokenManagementService();
+		tokenService = new TokenManagementService(q);
 	}
 	//@Given("there is a student with empty id")
 	//public void thereIsAStudentWithEmptyId() {
