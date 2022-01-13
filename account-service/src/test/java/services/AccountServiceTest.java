@@ -38,7 +38,21 @@ public class AccountServiceTest {
 				obj = userId;
 				break;
 			case "UserAccountInfoResponse":
-				obj = user.getAccountId();
+				if (userId == null) {
+					obj = null;
+				} else {
+					obj = user.getAccountId();
+				}
+				break;
+			case "AccountClosedRequested":
+				obj = userId;
+				break;
+			case "AccountClosedResponse":
+				if (userId == null) {
+					obj = false;
+				} else {
+					obj = true;
+				}
 				break;
 			default:
 				System.out.println("No event object found for " + eventName);
@@ -57,6 +71,9 @@ public class AccountServiceTest {
 				break;
 			case "UserAccountInfoRequested":
 				accountService.handleUserAccountInfoRequested(event);
+				break;
+			case "AccountClosedRequested":
+				accountService.handleUserAccountClosedRequested(event);
 				break;
 			default:
 				break;
