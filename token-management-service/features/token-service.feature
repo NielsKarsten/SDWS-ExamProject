@@ -81,12 +81,6 @@ Scenario: Consume token from customer with 0 tokens
 #	Given a token with no owner
 #	Then the token is validated not succesfully
 
-#Scenario: Consume token
-#	Given a customer requests tokens from the service
-#	When a token is parsed to the service
-#	Then the token is removed from active tokens
-#	And the token is added to the list of used tokens
-
 #Scenario: Consume invalid token
 #	Given a token with no owner
 #	Then the service returns an error with message "Invalid token"
