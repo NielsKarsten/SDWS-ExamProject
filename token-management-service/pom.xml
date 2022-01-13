@@ -4,7 +4,7 @@
 	xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>dk.dtu.compute</groupId>
+	<groupId>dk.dtu.compute.sdws.group3</groupId>
 	<artifactId>token-management-service</artifactId>
 	<name>token-management-service</name>
 	<version>1.0.0</version>
