@@ -18,8 +18,8 @@ import io.cucumber.junit.CucumberOptions.SnippetType;
 
 public class TransactionServiceTest {
 
-    @Given("a merchant with merchant id {string}")
-    public void a_merchant_with_merchant_id(String string) {
+    @Given("a merchant with merchant id {string} and a account with balance of {int}")
+    public void a_merchant_with_merchant_id_and_a_account_with_balance_of(String string, Integer int1) {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }
@@ -53,6 +53,7 @@ public class TransactionServiceTest {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }
+
 
     @Then("the transaction is successful")
     public void the_transaction_is_successful() {
