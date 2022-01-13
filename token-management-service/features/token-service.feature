@@ -5,13 +5,14 @@
 Feature: Token Service
 Scenario: Generate tokens
 	Given customer id "id1"
-	When 5 tokens are requested
-	Then 5 tokens are generated
+	When 4 tokens are requested
+	Then 4 tokens are generated
 
-Scenario: Customer has too many tokens
+Scenario: Customer tries to request tokens while having more than 1
 	Given customer id "id1"
-	When 5 tokens are requested
-	Then 5 tokens are generated
+	And has 2 tokens
+	When 5 tokens are requested then too many are requested
+	Then exception "Request denied - you can only request tokens when you have 1 token" is returned
 
 #Scenario: Generate tokens for a new user
 #	Given a new customer requests tokens from the service

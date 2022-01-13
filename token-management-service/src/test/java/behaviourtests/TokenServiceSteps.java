@@ -4,20 +4,23 @@ package behaviourtests;
 // Main: Theodor Guttesen s185121
 // Christian Gernsøe s163552
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import messaging.MessageQueue;
-import studentregistration.service.TokenManagementService;
+import org.junit.After;
+import tokenmanagement.service.TokenLimitException;
+import tokenmanagement.service.TokenManagementService;
 
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
 	private TokenManagementService tokenService = new TokenManagementService();
 
 	private String _customerId;
+	private TokenLimitException exception;
 
 	public TokenServiceSteps() {
 	}
@@ -27,9 +30,21 @@ public class TokenServiceSteps {
 		_customerId = customerId;
 	}
 
+	@Given("has {int} tokens")
+	public void hasTokens(int tokenAmount) throws TokenLimitException {
+		tokenService.requestTokens(_customerId, tokenAmount);
+	}
+
 	@When("{int} tokens are requested")
-	public void costumerRequestsNewTokens(int tokenAmount) {
-		tokenService.generateTokens(_customerId, tokenAmount);
+	public void costumerRequestsNewTokens(int tokenAmount) throws TokenLimitException {
+		tokenService.requestTokens(_customerId, tokenAmount);
+	}
+
+	@When("{int} tokens are requested then too many are requested")
+	public void costumerRequestsNewTokensTooMany(int tokenAmount) throws TokenLimitException {
+		exception = assertThrows(TokenLimitException.class, () -> {
+			tokenService.requestTokens(_customerId, tokenAmount);
+		});
 	}
 
 	@Then("{int} tokens are generated")
@@ -37,6 +52,15 @@ public class TokenServiceSteps {
 		assertEquals(tokenAmount, tokenService.findCustomersTokens(_customerId).size());
 	}
 
+	@Then("exception {string} is returned")
+	public void tokensAreGenerated(String errorMsg) {
+		assertEquals(exception.getErrorMsg(), errorMsg);
+	}
+
+	@After
+	public void deleteTokens() {
+		tokenService = new TokenManagementService();
+	}
 	//@Given("there is a student with empty id")
 	//public void thereIsAStudentWithEmptyId() {
 	//	student = new Student();

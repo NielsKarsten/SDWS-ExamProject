@@ -1,4 +1,4 @@
-package studentregistration.service;
+package tokenmanagement.service;
 
 import java.util.concurrent.CompletableFuture;
 

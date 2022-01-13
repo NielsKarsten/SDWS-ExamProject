@@ -1,7 +1,7 @@
-package studentregistration.service.adapter.rest;
+package tokenmanagement.service.adapter.rest;
 
 import messaging.implementations.RabbitMqQueue;
-import studentregistration.service.StudentRegistrationService;
+import tokenmanagement.service.StudentRegistrationService;
 
 public class StudentRegistrationFactory {
 	static StudentRegistrationService service = null;

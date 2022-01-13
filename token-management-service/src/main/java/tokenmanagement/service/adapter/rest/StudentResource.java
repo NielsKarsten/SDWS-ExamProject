@@ -1,12 +1,12 @@
-package studentregistration.service.adapter.rest;
+package tokenmanagement.service.adapter.rest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import studentregistration.service.Student;
-import studentregistration.service.StudentRegistrationService;
+import tokenmanagement.service.Student;
+import tokenmanagement.service.StudentRegistrationService;
 
 @Path("/students")
 public class StudentResource {

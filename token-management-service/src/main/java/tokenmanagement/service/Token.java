@@ -2,7 +2,7 @@
 // Main: Theodor Guttesen s185121
 // Christian Gernsøe s163552
 
-package studentregistration.service;
+package tokenmanagement.service;
 
 import java.util.UUID;
 
@@ -11,9 +11,5 @@ public class Token {
 
     public Token() {
         this.token = UUID.randomUUID();
-    }
-
-    protected UUID getToken() {
-        return token;
     }
 }
