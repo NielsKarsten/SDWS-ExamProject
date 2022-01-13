@@ -32,11 +32,11 @@ Scenario: Customer tries to request 0 tokens
 	When 0 tokens are requested then token limit exceeds
 	Then exception "Request denied - you can only request between one and 5 tokens at a time" is returned
 
-Scenario: Return user id from token
-	Given customer id "id1"
-	And has 1 tokens
-	When get customer id from token
-	Then customer id "id1" is returned
+#Scenario: Return user id from token
+#	Given customer id "id1"
+#	And has 1 tokens
+#	When get customer id from token
+#	Then customer id "id1" is returned
 
 #Scenario: Generate tokens for a user
 #	Given a customer requests tokens from the service

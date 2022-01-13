@@ -10,6 +10,7 @@
         <option value="$PROJECT_DIR$/student-registration-service/rest-client-pom.xml" />
         <option value="$PROJECT_DIR$/token-management-service/rest-client-pom.xml" />
         <option value="$PROJECT_DIR$/messaging-utilities-3.2/pom.xml" />
+        <option value="$PROJECT_DIR$/token-management-service/pom.xml" />
       </list>
     </option>
   </component>
