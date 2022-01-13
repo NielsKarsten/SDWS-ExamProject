@@ -73,4 +73,9 @@ public class TransactionServiceTest {
         throw new io.cucumber.java.PendingException();
     }
 
+    @Then("the transaction is unsuccessful and a error message {string} is returned")
+    public void the_transaction_is_unsuccessful_insufficient(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
 }

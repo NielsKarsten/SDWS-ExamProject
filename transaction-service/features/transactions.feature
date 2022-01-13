@@ -25,4 +25,4 @@ Feature: Transaction Service
     And a customer with a invalid token
     And an amount of 100
     When the transactions is initiated
-    Then the transaction is unsuccessful
+    Then the transaction is unsuccessful and a error message "Insufficient Funds" is returned

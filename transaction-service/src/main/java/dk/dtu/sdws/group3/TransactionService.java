@@ -9,6 +9,7 @@ public class TransactionService {
 
     BankService bank = new BankServiceService().getBankServicePort();
     private HashMap<String, BigDecimal> transactions = new HashMap<>();
+    String errorMessage;
 
     public void pay(UUID merchantId, UUID token, BigDecimal amount, String description) throws BankServiceException_Exception {
 
@@ -21,7 +22,7 @@ public class TransactionService {
             bank.transferMoneyFromTo(customerAccount, merchantAccount, amount, description);
             saveTransaction(merchantAccount, customerAccount, amount);
         } return;
-
+        }
 
 
         // 1. Contact account service to get bank account associated with merchant id
@@ -40,7 +41,13 @@ public class TransactionService {
         BigDecimal accountBalance = AccountService.getBalance(customerAccount);
         if (amount.intValue() < accountBalance.intValue()) {
             return true;
-        } return false;
+        }
+        errorMessage = "Insufficient Funds";
+        return false;
+    }
+
+    public HashMap<String, BigDecimal> getTransactions () {
+        return transactions;
     }
 
 
@@ -51,8 +58,6 @@ public class TransactionService {
     //   return account;
     // }
 
-    public HashMap<String, BigDecimal> getTransactions () {
-        return transactions;
-   }
+
 
 }
