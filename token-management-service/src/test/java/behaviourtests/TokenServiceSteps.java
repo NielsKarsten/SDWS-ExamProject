@@ -13,9 +13,8 @@ import io.cucumber.java.en.When;
 import messaging.MessageQueue;
 import org.junit.After;
 import tokenmanagement.service.Token;
-import tokenmanagement.service.TokenLimitException;
+import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
-import tokenmanagement.service.TooManyTokenRequestException;
 
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
@@ -24,6 +23,8 @@ public class TokenServiceSteps {
 	private String _customerId;
 	private Exception exception;
 	private String result;
+	private Token tokenResult;
+	private Token expectedToken;
 
 	public TokenServiceSteps() {
 	}
@@ -34,25 +35,25 @@ public class TokenServiceSteps {
 	}
 
 	@Given("has {int} tokens")
-	public void hasTokens(int tokenAmount) throws TokenLimitException, TooManyTokenRequestException {
+	public void hasTokens(int tokenAmount) throws TokenException {
 		tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
 	@When("{int} tokens are requested")
-	public void costumerRequestsNewTokens(int tokenAmount) throws TokenLimitException, TooManyTokenRequestException {
+	public void costumerRequestsNewTokens(int tokenAmount) throws TokenException {
 		tokenService.requestTokens(_customerId, tokenAmount);
 	}
 
 	@When("{int} tokens are requested then customer has too many tokens")
 	public void costumerHasTooManyTokensWhenRequesting(int tokenAmount) {
-		exception = assertThrows(TooManyTokenRequestException.class, () -> {
+		exception = assertThrows(TokenException.class, () -> {
 			tokenService.requestTokens(_customerId, tokenAmount);
 		});
 	}
 
 	@When("{int} tokens are requested then token limit exceeds")
 	public void requestingTokensExceedsLimit(int tokenAmount) {
-		exception = assertThrows(TokenLimitException.class, () -> {
+		exception = assertThrows(TokenException.class, () -> {
 			tokenService.requestTokens(_customerId, tokenAmount);
 		});
 	}
@@ -63,9 +64,22 @@ public class TokenServiceSteps {
 		result = tokenService.findCustomerId(token);
 	}
 
+	@When("customer consumes token with expected")
+	public void customerConsumesTokenExpected() throws TokenException {
+		expectedToken = tokenService.findCustomersTokens(_customerId).get(0);
+		tokenResult = tokenService.consumeCustomerToken(_customerId);
+	}
+
+	@When("customer consumes token")
+	public void customerConsumesToken() {
+		exception = assertThrows(TokenException.class, () -> {
+			tokenService.consumeCustomerToken(_customerId);
+		});
+	}
+
 	@Then("customer id {string} is returned")
 	public void customerIdReturned(String testingId) {
-		assertEquals(result, testingId);
+		assertEquals(testingId, result);
 	}
 
 	@Then("customer has {int} tokens")
@@ -75,7 +89,12 @@ public class TokenServiceSteps {
 
 	@Then("exception {string} is returned")
 	public void tooManyTokensAreGenerated(String errorMsg) {
-		assertEquals(exception.getMessage(), errorMsg);
+		assertEquals(errorMsg, exception.getMessage());
+	}
+
+	@Then("consumed token matches token")
+	public void consumedTokenMatches() {
+		assertEquals(expectedToken, tokenResult);
 	}
 
 	@After
