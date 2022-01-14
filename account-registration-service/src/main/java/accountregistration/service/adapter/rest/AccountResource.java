@@ -7,6 +7,12 @@ import javax.ws.rs.*;
 import accountregistration.service.AccountRegistrationService;
 import accountregistration.service.User;
 
+/**
+* @authors Thomas Rathsach Strange (s153390), 
+* 		   Simon Pontoppidan (s144213), 
+* 		   Niels Karsten Bisgaard-Bohr (s202745)
+*/
+
 @Path("/users")
 public class AccountResource {
 	AccountRegistrationFactory factory = new AccountRegistrationFactory();

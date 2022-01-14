@@ -14,6 +14,12 @@ import messaging.MessageQueue;
 
 import static org.junit.Assert.*;
 
+/**
+* @authors Thomas Rathsach Strange (s153390), 
+* 		   Simon Pontoppidan (s144213), 
+* 		   Niels Karsten Bisgaard-Bohr (s202745)
+*/
+
 public class AccountRegistrationServiceTest {
 	private MessageQueue queue;
 	private AccountRegistrationService accountRegistrationService;

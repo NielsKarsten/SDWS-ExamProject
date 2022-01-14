@@ -9,6 +9,12 @@ import io.netty.util.concurrent.CompleteFuture;
 import messaging.Event;
 import messaging.MessageQueue;
 
+/**
+* @authors Thomas Rathsach Strange (s153390), 
+* 		   Simon Pontoppidan (s144213), 
+* 		   Niels Karsten Bisgaard-Bohr (s202745)
+*/
+
 public class AccountRegistrationService {
 
 	private MessageQueue queue;

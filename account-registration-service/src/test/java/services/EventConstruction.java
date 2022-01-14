@@ -6,10 +6,18 @@ import accountregistration.service.AccountRegistrationService;
 import accountregistration.service.User;
 import messaging.Event;
 
+/**
+* @authors Thomas Rathsach Strange (s153390), 
+* 		   Simon Pontoppidan (s144213), 
+* 		   Niels Karsten Bisgaard-Bohr (s202745)
+*/
+
 public class EventConstruction {
+	
 	private AccountRegistrationService accountRegistrationService;
 	private User user;
 	private UUID userId;
+	
 
 	public EventConstruction(AccountRegistrationService accountRegistrationService) {
 		this.accountRegistrationService = accountRegistrationService;
