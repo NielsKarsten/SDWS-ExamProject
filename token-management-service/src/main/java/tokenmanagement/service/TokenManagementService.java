@@ -49,17 +49,22 @@ public class TokenManagementService {
         return tokens.get(customerId);
     }
 
-    public String findCustomerId(Token token) {
+    public String findCustomerId(Token token) throws TokenException {
         String customerIdResult = "";
         for (Map.Entry<String,List<Token>> entry : tokens.entrySet()) {
             if (entry.getValue().contains(token)) {
                 customerIdResult = entry.getKey();
+                consumeCustomerToken(customerIdResult);
+                break;
             }
+        }
+        if(customerIdResult.equals("")){
+            throw new TokenException("Request denied - invalid token");
         }
         return customerIdResult;
     }
 
-    public Token consumeCustomerToken(String customerId) throws TokenException {
+    public void consumeCustomerToken(String customerId) throws TokenException {
         List<Token> tokenList = findCustomersTokens(customerId);
         if (tokenList.size() == 0) {
             throw new TokenException(NoTokenExceptionMsg);
@@ -67,10 +72,9 @@ public class TokenManagementService {
         Token token = tokenList.remove(0);
         tokens.put(customerId, tokenList);
         addToArchive(customerId, token);
-        return token;
     }
 
-    public void handleTokensRequested(Event e)  {
+    public void handleTokensRequested(Event e){
         var customerId = e.getArgument(0, String.class);
         var tokenAmount = e.getArgument(1, int.class);
         List<Token> tokenList = null;

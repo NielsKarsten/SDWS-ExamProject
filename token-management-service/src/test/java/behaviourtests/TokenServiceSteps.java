@@ -40,6 +40,7 @@ public class TokenServiceSteps {
 	@Given("has {int} tokens")
 	public void hasTokens(int tokenAmount) throws TokenException {
 		tokenList = tokenService.requestTokens(_customerId, tokenAmount);
+		tokenResult = tokenList.get(0);
 	}
 
 	@When("{int} tokens are requested")
@@ -62,15 +63,19 @@ public class TokenServiceSteps {
 	}
 
 	@When("get customer id from token")
-	public void getCustomerIdFromToken() {
-		Token token = tokenService.findCustomersTokens(_customerId).get(0);
-		result = tokenService.findCustomerId(token);
+	public void getCustomerIdFromToken() throws TokenException {
+		result = tokenService.findCustomerId(tokenResult);
 	}
 
+	@When("get customer id from token then invalid token")
+	public void getCustomerIdFromTokenInvalid() throws TokenException {
+		exception = assertThrows(TokenException.class, () -> {
+			result = tokenService.findCustomerId(tokenResult);
+		});
+	}
 	@When("customer consumes token with expected")
 	public void customerConsumesTokenExpected() throws TokenException {
-		expectedToken = tokenService.findCustomersTokens(_customerId).get(0);
-		tokenResult = tokenService.consumeCustomerToken(_customerId);
+		tokenService.findCustomerId(tokenList.get(0));
 	}
 
 	@When("customer consumes token")
@@ -93,11 +98,6 @@ public class TokenServiceSteps {
 	@Then("exception {string} is returned")
 	public void tooManyTokensAreGenerated(String errorMsg) {
 		assertEquals(errorMsg, exception.getMessage());
-	}
-
-	@Then("consumed token matches token")
-	public void consumedTokenMatches() {
-		assertEquals(expectedToken, tokenResult);
 	}
 
 	@After
