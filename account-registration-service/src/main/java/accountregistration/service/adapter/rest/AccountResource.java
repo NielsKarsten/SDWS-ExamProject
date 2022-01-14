@@ -12,12 +12,13 @@ import accountregistration.service.User;
 
 @Path("/users")
 public class AccountResource {
-	// TODO make as response
+	AccountRegistrationFactory factory = new AccountRegistrationFactory();
+
 	@POST
 	@Consumes("application/json")
 	@Produces("application/json")
 	public UUID registerStudent(User user) {
-		AccountRegistrationService service = new AccountRegistrationFactory().getService();
+		AccountRegistrationService service = factory.getService();
 		return service.registerAsyncUserAccount(user);
 	}
 }

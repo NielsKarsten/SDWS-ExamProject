@@ -47,9 +47,9 @@ public class EventConstruction {
 		return obj;
 	}
 
-	public void handleEventReceived(String eventName) {
+	public void handleEventReceived(String eventName, UUID correlationID) {
 		Object eventObject = getEventObject(eventName);
-		Event event = new Event(eventName, new Object[] { eventObject });
+		Event event = new Event(correlationID, eventName, new Object[] { eventObject });
 		switch (eventName) {
 			case "UserAccountRegistered":
 				accountRegistrationService.handleUserAccountAssigned(event);
