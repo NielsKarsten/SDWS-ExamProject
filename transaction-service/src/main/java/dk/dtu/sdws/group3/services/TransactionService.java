@@ -17,11 +17,13 @@ import messaging.MessageQueue;
 
 public class TransactionService {
 
-    BankService bank;
-    MessageQueue queue;
-    TokenServiceConnector tokenServiceConnector;
-    AccountServiceConnector accountServiceConnector;
+    private BankService bank;
+    private MessageQueue queue;
+    private TokenServiceConnector tokenServiceConnector;
+    private AccountServiceConnector accountServiceConnector;
     private final HashMap<Integer, Transaction> transactions = new HashMap<>();
+
+    private String errorMessage;
 
     public TransactionService(MessageQueue queue, BankService bank) {
         this(queue, bank, new TokenServiceConnector(queue), new AccountServiceConnector(queue));
@@ -41,6 +43,7 @@ public class TransactionService {
         try {
             bank.transferMoneyFromTo(merchant.getAccount().getId(), customer.getAccount().getId(), amount, description);
         } catch (BankServiceException_Exception e) {
+            errorMessage = e.getMessage();
             System.out.println(e.getMessage());
             return false;
         }
@@ -58,6 +61,7 @@ public class TransactionService {
 
         TransactionRequestResponse trxReqResp = new TransactionRequestResponse();
         trxReqResp.setSuccessful(this.pay(merchant, customer, request.getAmount()));
+        if (errorMessage != null) trxReqResp.setErrorMessage(errorMessage);
         Event outgoingEvent = new Event("TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(outgoingEvent);
     }
