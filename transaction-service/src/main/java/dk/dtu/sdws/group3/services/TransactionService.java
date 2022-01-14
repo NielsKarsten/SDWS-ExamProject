@@ -6,10 +6,8 @@ import java.util.UUID;
 
 import dk.dtu.sdws.group3.connector.AccountServiceConnector;
 import dk.dtu.sdws.group3.connector.TokenServiceConnector;
-import dk.dtu.sdws.group3.models.Transaction;
-import dk.dtu.sdws.group3.models.TransactionRequest;
-import dk.dtu.sdws.group3.models.TransactionRequestResponse;
-import dk.dtu.sdws.group3.models.User;
+import dk.dtu.sdws.group3.models.*;
+import dk.dtu.sdws.group3.persistance.TransactionStore;
 import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import messaging.Event;
@@ -21,7 +19,6 @@ public class TransactionService {
     private MessageQueue queue;
     private TokenServiceConnector tokenServiceConnector;
     private AccountServiceConnector accountServiceConnector;
-    private final HashMap<Integer, Transaction> transactions = new HashMap<>();
 
     private String errorMessage;
 
@@ -49,7 +46,7 @@ public class TransactionService {
         }
 
         Transaction t = new Transaction(merchant, customer, amount, description);
-        transactions.put(t.hashCode(), t);
+        TransactionStore.getInstance().addTransaction(t);
         return true;
     }
 
@@ -64,9 +61,5 @@ public class TransactionService {
         if (errorMessage != null) trxReqResp.setErrorMessage(errorMessage);
         Event outgoingEvent = new Event("TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(outgoingEvent);
-    }
-
-    public HashMap<Integer, Transaction> getTransactions () {
-        return transactions;
     }
 }

@@ -2,6 +2,7 @@ import dk.dtu.sdws.group3.connector.AccountServiceConnector;
 import dk.dtu.sdws.group3.connector.TokenServiceConnector;
 import dk.dtu.sdws.group3.models.TransactionRequest;
 import dk.dtu.sdws.group3.models.TransactionRequestResponse;
+import dk.dtu.sdws.group3.persistance.TransactionStore;
 import dk.dtu.sdws.group3.services.TransactionService;
 import dk.dtu.sdws.group3.models.Transaction;
 import dk.dtu.sdws.group3.models.User;
@@ -87,7 +88,7 @@ public class TransactionServiceTest {
     @And("the transaction is saved")
     public void theTransactionIsSaved() {
         Transaction t = new Transaction(merchant, customer, BigDecimal.valueOf(amount), description);
-        assertTrue(transactionService.getTransactions().containsKey(t.hashCode()));
+        assertTrue(TransactionStore.getInstance().getTransactions().containsKey(customer.getId()));
     }
 
     @When("a {string} event is received")
