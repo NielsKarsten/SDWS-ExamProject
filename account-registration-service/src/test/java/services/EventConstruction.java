@@ -13,6 +13,7 @@ public class EventConstruction {
 
 	public EventConstruction(AccountRegistrationService accountRegistrationService) {
 		this.accountRegistrationService = accountRegistrationService;
+		this.userId = UUID.randomUUID();
 	}
 
 	public User getUser() {
@@ -21,6 +22,12 @@ public class EventConstruction {
 
 	public void setUser(User user) {
 		this.user = user;
+		user.assignUserId();
+		this.userId = user.getUserId();
+	}
+
+	public UUID getUserId() {
+		return user.getUserId();
 	}
 
 	public Object getEventObject(String eventName) {
@@ -30,7 +37,6 @@ public class EventConstruction {
 				obj = user;
 				break;
 			case "UserAccountRegistered":
-				userId = UUID.randomUUID();
 				obj = userId;
 				break;
 			case "UserAccountInfoRequested":
@@ -53,6 +59,9 @@ public class EventConstruction {
 		switch (eventName) {
 			case "UserAccountRegistered":
 				accountRegistrationService.handleUserAccountAssigned(event);
+				break;
+			case "UserAccountInfoResponse":
+				accountRegistrationService.handleUserAccountInfoResponse(event);
 				break;
 			default:
 				System.out.println("No event handler found for " + eventName);

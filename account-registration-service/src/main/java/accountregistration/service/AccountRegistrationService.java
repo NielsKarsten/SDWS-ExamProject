@@ -18,6 +18,7 @@ public class AccountRegistrationService {
 	public AccountRegistrationService(MessageQueue q) {
 		queue = q;
 		queue.addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
+		queue.addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
 	}
 
 	public UUID registerAsyncUserAccount(User user) {
@@ -31,10 +32,28 @@ public class AccountRegistrationService {
 		return (UUID) userAccountToRegister.join();
 	}
 
+	public String requestAsyncUserAccountInfo(UUID userId) {
+		CompletableFuture<Object> userAccountInfoToRequest = new CompletableFuture<Object>();
+
+		UUID correlationId = UUID.randomUUID();
+		Event event = new Event(correlationId, "UserAccountInfoRequested", new Object[] { userId });
+
+		completableFutures.put(correlationId, userAccountInfoToRequest);
+		queue.publish(event);
+		return (String) userAccountInfoToRequest.join();
+	}
+
 	public void handleUserAccountAssigned(Event e) {
 		UUID correlationId = e.getCorrelationId();
 		UUID userId = e.getArgument(0, UUID.class);
 		CompletableFuture<Object> registeredUserAccount = completableFutures.get(correlationId);
 		registeredUserAccount.complete(userId);
+	}
+
+	public void handleUserAccountInfoResponse(Event e) {
+		UUID correlationId = e.getCorrelationId();
+		String userAccountId = e.getArgument(0, String.class);
+		CompletableFuture<Object> userAccountInfo = completableFutures.get(correlationId);
+		userAccountInfo.complete(userAccountId);
 	}
 }
