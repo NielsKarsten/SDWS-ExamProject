@@ -24,30 +24,33 @@ public class AccountService {
 	}
 
 	public void handleUserAccountRegistration(Event e) {
+		UUID correlationId = e.getCorrelationId();
 		User user = e.getArgument(0, User.class);
 		UUID userId = user.assignUserId();
 		users.put(userId, user);
-		Event event = new Event("UserAccountRegistered", new Object[] { userId });
+		Event event = new Event(correlationId, "UserAccountRegistered", new Object[] { userId });
 		queue.publish(event);
 	}
 
 	public void handleUserAccountInfoRequested(Event e) {
 		Event event;
+		UUID correlationId = e.getCorrelationId();
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
 			String userAccountId = users.get(userId).getAccountId();
-			event = new Event("UserAccountInfoResponse", new Object[] { userAccountId });
+			event = new Event(correlationId, "UserAccountInfoResponse", new Object[] { userAccountId });
 		} catch (NullPointerException ex) {
 			System.out.println(ex.getMessage());
-			event = new Event("UserAccountInfoResponse", new Object[] { null });
+			event = new Event(correlationId, "UserAccountInfoResponse", new Object[] { null });
 		}
 		queue.publish(event);
 	}
 
 	public void handleUserAccountClosedRequested(Event e) {
+		UUID correlationId = e.getCorrelationId();
 		UUID userId = e.getArgument(0, UUID.class);
 		boolean success = users.remove(userId) != null;
-		Event event = new Event("AccountClosedResponse", new Object[] { success });
+		Event event = new Event(correlationId, "AccountClosedResponse", new Object[] { success });
 		queue.publish(event);
 	}
 
