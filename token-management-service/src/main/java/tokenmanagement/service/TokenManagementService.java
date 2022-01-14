@@ -2,7 +2,7 @@
 // Theodor Guttesen s185121
 // Main: Christian Gernsøe s163552
 
-// Lav IssueTokenService og flyt tokenmanagement service til (student id service)
+// Handle events fra transaction. tilføj author tags i issuetokenservice. Sende response efter consume.
 
 package tokenmanagement.service;
 
