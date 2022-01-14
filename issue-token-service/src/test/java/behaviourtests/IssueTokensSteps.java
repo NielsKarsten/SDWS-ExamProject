@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import com.google.gson.Gson;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -59,12 +60,14 @@ public class IssueTokensSteps {
         assertEquals(event,publishedEvent.join());
     }
     @When ("the {string} event is sent")
-    public void issueEvent(){
+    public void issueEvent(String issueEvent){
+        Gson gson= new Gson();
         var tokens = new ArrayList<Token>();
         for(int i = 0; i<3; i++){
             tokens.add(new Token());
         }
-        service.handleTokensIssued(new Event("..",new Object[] {tokens}));
+        String tokenString = gson.toJson(tokens);
+        service.handleTokensIssued(new Event("..",new Object[] {tokenString}));
     }
     @Then ("the customer has received {int} tokens")
     public void customerReceivedtokens(int tokenAmount){

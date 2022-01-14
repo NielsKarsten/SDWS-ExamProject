@@ -23,6 +23,7 @@ public class IssueTokenService {
 	public List<Token> issue(String customerId, int amount) {
 		issuedTokens = new CompletableFuture<>();
 		Event event = new Event("TokensRequested", new Object[] { customerId,amount });
+		System.out.println("TEST"+event.getArgument(1,int.class));
 		queue.publish(event);
 		return issuedTokens.join();
 	}
