@@ -14,19 +14,9 @@ Scenario: user accountInfo is requested
     When the "UserAccountInfoResponse" event is received
     Then the account information is returned
 
-# Scenario: Non-existing user accountInfo is requested
-#     Given a user "Johnny" "Bravo" with bank account "1337"
-#     When the "UserAccountInfoRequested" event is received
-#     Then the "UserAccountInfoResponse" event is sent
-
-# Scenario: customer closing existing account
-#     Given a user "Johnny" "Bravo" with bank account "1337"
-#     When the "AccountRegistrationRequested" event is received 
-#     Then the "UserAccountRegistered" event is sent  
-#     When the "AccountClosedRequested" event is received
-#     Then the "AccountClosedResponse" event is sent
-
-# Scenario: customer closing non-existing account
-#     Given a user "Johnny" "Bravo" with bank account "1337"
-#     When the "AccountClosedRequested" event is received
-#     Then the "AccountClosedResponse" event is sent
+ Scenario: customer closing existing account
+     Given a user "Johnny" "Bravo" with bank account "1337"
+     When the user account is closed
+     When the "AccountClosedRequested" event is sent
+     Then the "AccountClosedResponse" event is received
+     Then the account is closed

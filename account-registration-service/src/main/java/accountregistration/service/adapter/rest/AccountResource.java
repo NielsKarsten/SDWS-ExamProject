@@ -2,10 +2,7 @@ package accountregistration.service.adapter.rest;
 
 import java.util.UUID;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 
 import accountregistration.service.AccountRegistrationService;
 import accountregistration.service.User;
@@ -17,8 +14,14 @@ public class AccountResource {
 	@POST
 	@Consumes("application/json")
 	@Produces("application/json")
-	public UUID registerStudent(User user) {
+	public UUID registerUserAcount(User user) {
 		AccountRegistrationService service = factory.getService();
 		return service.registerAsyncUserAccount(user);
+	}
+
+	@DELETE
+	public boolean deleteUserAccount(@QueryParam("userId") UUID userId) {
+		AccountRegistrationService service = factory.getService();
+		return service.requestAsyncUserAccountDeletion(userId);
 	}
 }

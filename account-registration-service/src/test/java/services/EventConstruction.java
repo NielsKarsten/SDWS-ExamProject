@@ -45,6 +45,12 @@ public class EventConstruction {
 			case "UserAccountInfoResponse":
 				obj = user.getAccountId();
 				break;
+			case "AccountClosedRequested":
+				obj = userId;
+				break;
+			case "AccountClosedResponse":
+				obj = true;
+				break;
 			default:
 				System.out.println("No event object found for " + eventName);
 				obj = null;
@@ -62,6 +68,9 @@ public class EventConstruction {
 				break;
 			case "UserAccountInfoResponse":
 				accountRegistrationService.handleUserAccountInfoResponse(event);
+				break;
+			case "AccountClosedResponse":
+				accountRegistrationService.handleUserAccountClosedResponse(event);
 				break;
 			default:
 				System.out.println("No event handler found for " + eventName);

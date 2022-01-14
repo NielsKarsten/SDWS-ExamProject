@@ -19,6 +19,7 @@ public class AccountRegistrationService {
 		queue = q;
 		queue.addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
 		queue.addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
+		queue.addHandler("AccountClosedResponse", this::handleUserAccountClosedResponse);
 	}
 
 	public UUID registerAsyncUserAccount(User user) {
@@ -43,6 +44,17 @@ public class AccountRegistrationService {
 		return (String) userAccountInfoToRequest.join();
 	}
 
+	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
+		CompletableFuture<Object> userAccountToDelete = new CompletableFuture<Object>();
+
+		UUID correlationId = UUID.randomUUID();
+		Event event = new Event(correlationId, "AccountClosedRequested", new Object[] { userId });
+
+		completableFutures.put(correlationId, userAccountToDelete);
+		queue.publish(event);
+		return (Boolean) userAccountToDelete.join();
+	}
+
 	public void handleUserAccountAssigned(Event e) {
 		UUID correlationId = e.getCorrelationId();
 		UUID userId = e.getArgument(0, UUID.class);
@@ -55,5 +67,12 @@ public class AccountRegistrationService {
 		String userAccountId = e.getArgument(0, String.class);
 		CompletableFuture<Object> userAccountInfo = completableFutures.get(correlationId);
 		userAccountInfo.complete(userAccountId);
+	}
+
+	public void handleUserAccountClosedResponse(Event e) {
+		UUID correlationId = e.getCorrelationId();
+		Boolean userAccountDeletedResponse = e.getArgument(0, Boolean.class);
+		CompletableFuture<Object> userAccountDeleted = completableFutures.get(correlationId);
+		userAccountDeleted.complete(userAccountDeletedResponse);
 	}
 }

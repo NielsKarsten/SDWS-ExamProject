@@ -12,14 +12,14 @@ import io.cucumber.java.en.*;
 import messaging.Event;
 import messaging.MessageQueue;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class AccountRegistrationServiceTest {
 	private MessageQueue queue;
 	private AccountRegistrationService accountRegistrationService;
 	private CompletableFuture<UUID> registeredUser;
 	private CompletableFuture<String> userAccountId;
+	private CompletableFuture<Boolean> userAccountDeleted;
 	private EventConstruction eventConstruction;
 	private CompletableFuture<Event> publishedEvent;
 	private UUID correlationID;
@@ -40,6 +40,8 @@ public class AccountRegistrationServiceTest {
 
 		accountRegistrationService = new AccountRegistrationService(queue);
 		registeredUser = new CompletableFuture<>();
+		userAccountId = new CompletableFuture<>();
+		userAccountDeleted = new CompletableFuture<>();
 		eventConstruction = new EventConstruction(accountRegistrationService);
 		publishedEvent = new CompletableFuture<>();
 	}
@@ -86,6 +88,15 @@ public class AccountRegistrationServiceTest {
 		eventConstruction.handleEventReceived(eventName, correlationID);
 	}
 
+	@When("the user account is closed")
+	public void theUserAccountIsClosed() {
+		new Thread(() -> {
+			Boolean accountClosed = accountRegistrationService
+					.requestAsyncUserAccountDeletion(eventConstruction.getUserId());
+			userAccountDeleted.complete(accountClosed);
+		}).start();
+	}
+
 	@Then("the account is registered")
 	public void theAccountIsRegistered() {
 		assertNotNull(registeredUser.join());
@@ -93,6 +104,11 @@ public class AccountRegistrationServiceTest {
 
 	@Then("the account information is returned")
 	public void theAccountInformationIsReturned() {
-		assertEquals(eventConstruction.getUser().getAccountId(), userAccountId.join());
+		assertNotNull(userAccountId.join());
+	}
+
+	@Then("the account is closed")
+	public void theAccountIsClosed() {
+		assertTrue(userAccountDeleted.join());
 	}
 }
