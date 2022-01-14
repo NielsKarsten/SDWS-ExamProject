@@ -1,11 +1,11 @@
 package behaviourtests;
 
 import static org.junit.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -39,6 +39,7 @@ public class IssueTokensSteps {
     private CompletableFuture<List<Token>> issuedTokens = new CompletableFuture<>();
     private String customerId;
     private int NTokens;
+    private UUID correlationId;
 
     public IssueTokensSteps() {
     }
@@ -48,6 +49,7 @@ public class IssueTokensSteps {
     }
     @When ("the customer requests {int} tokens")
     public void customerRequestsTokens(int tokenAmount){
+
         NTokens=tokenAmount;
         new Thread(() -> {
             var result = service.issue(customerId,tokenAmount);
@@ -56,8 +58,10 @@ public class IssueTokensSteps {
     }
     @Then ("the {string} event is sent from issuetoken")
     public void requestEvent(String requestEvent){
-        Event event = new Event(requestEvent, new Object[] { customerId,NTokens });
-        assertEquals(event,publishedEvent.join());
+        Event pEvent = publishedEvent.join();
+        correlationId = pEvent.getCorrelationId();
+        Event event = new Event(correlationId,requestEvent, new Object[] { customerId,NTokens });
+        assertEquals(event,pEvent);
     }
     @When ("the {string} event is sent")
     public void issueEvent(String issueEvent){
@@ -67,11 +71,11 @@ public class IssueTokensSteps {
             tokens.add(new Token());
         }
         String tokenString = gson.toJson(tokens);
-        service.handleTokensIssued(new Event("..",new Object[] {tokenString}));
+        service.handleTokensIssued(new Event(correlationId,"..",new Object[] {tokenString}));
     }
     @Then ("the customer has received {int} tokens")
     public void customerReceivedtokens(int tokenAmount){
-
+        assertEquals(tokenAmount,issuedTokens.join().size());
     }
   // @Given("there is a student with empty id")
   // public void thereIsAStudentWithEmptyId() {

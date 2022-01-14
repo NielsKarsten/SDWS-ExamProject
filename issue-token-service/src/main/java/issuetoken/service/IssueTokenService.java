@@ -1,7 +1,6 @@
 package issuetoken.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.gson.Gson;
@@ -13,7 +12,7 @@ import javax.ws.rs.core.GenericType;
 public class IssueTokenService {
 
 	private MessageQueue queue;
-	private CompletableFuture<List<Token>> issuedTokens;
+	private Map<UUID, CompletableFuture<Object>> completableFutures = new HashMap<>();
 
 	public IssueTokenService(MessageQueue q) {
 		queue = q;
@@ -21,17 +20,22 @@ public class IssueTokenService {
 	}
 
 	public List<Token> issue(String customerId, int amount) {
-		issuedTokens = new CompletableFuture<>();
-		Event event = new Event("TokensRequested", new Object[] { customerId,amount });
-		System.out.println("TEST"+event.getArgument(1,int.class));
+		UUID correlationId = UUID.randomUUID();
+		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
+		Event event = new Event(correlationId,"TokensRequested", new Object[] { customerId,amount });
+		completableFutures.put(correlationId, issuedTokens);
 		queue.publish(event);
-		return issuedTokens.join();
+		return (List<Token>) issuedTokens.join();
 	}
 
 	public void handleTokensIssued(Event e) {
+		UUID correlationId = e.getCorrelationId();
 		var gson = new Gson();
 		var tokens = e.getArgument(0, String.class);
 		List<Token> tokenList = gson.fromJson(tokens,new GenericType<List<Token>>(){}.getType());
+		System.out.println(tokenList.toString());
+		CompletableFuture<Object> issuedTokens = completableFutures.get(correlationId);
 		issuedTokens.complete(tokenList);
 	}
 }
+
