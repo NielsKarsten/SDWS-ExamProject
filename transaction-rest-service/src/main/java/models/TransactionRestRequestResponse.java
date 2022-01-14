@@ -1,3 +1,5 @@
+package models;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -5,11 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransactionRequestResponse {
+public class TransactionRestRequestResponse {
     private boolean successful;
     private String errorMessage;
 
-    public TransactionRequestResponse(boolean s) {
+    public TransactionRestRequestResponse(boolean s) {
         this.successful = s;
     }
 }
