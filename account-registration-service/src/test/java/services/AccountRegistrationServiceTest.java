@@ -19,8 +19,9 @@ public class AccountRegistrationServiceTest {
 	private MessageQueue queue;
 	private AccountRegistrationService accountRegistrationService;
 	private CompletableFuture<UUID> registeredUser;
+	private CompletableFuture<String> userAccountId;
 	private EventConstruction eventConstruction;
-	private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
+	private CompletableFuture<Event> publishedEvent;
 	private UUID correlationID;
 
 	@Before
@@ -40,6 +41,7 @@ public class AccountRegistrationServiceTest {
 		accountRegistrationService = new AccountRegistrationService(queue);
 		registeredUser = new CompletableFuture<>();
 		eventConstruction = new EventConstruction(accountRegistrationService);
+		publishedEvent = new CompletableFuture<>();
 	}
 
 	@Given("a user {string} {string} with bank account {string}")
@@ -59,11 +61,23 @@ public class AccountRegistrationServiceTest {
 		}).start();
 	}
 
+	@When("the user account id is requested")
+	public void theUserAccountIdIsRequested() {
+		new Thread(() -> {
+			String accountId = accountRegistrationService
+					.requestAsyncUserAccountInfo(eventConstruction.getUserId());
+			userAccountId.complete(accountId);
+		}).start();
+	}
+
 	@Then("the {string} event is sent")
 	public void theEventIsSent(String eventName) throws InterruptedException {
 		Event pEvent = publishedEvent.join();
 		correlationID = pEvent.getCorrelationId();
+		System.out.println(eventName);
 		Event event = new Event(correlationID, eventName, new Object[] { eventConstruction.getEventObject(eventName) });
+		event.toString();
+		pEvent.toString();
 		assertEquals(event, pEvent);
 	}
 
@@ -79,7 +93,6 @@ public class AccountRegistrationServiceTest {
 
 	@Then("the account information is returned")
 	public void theAccountInformationIsReturned() {
-		// Write code here that turns the phrase above into concrete actions
-		throw new io.cucumber.java.PendingException();
+		assertEquals(eventConstruction.getUser().getAccountId(), userAccountId.join());
 	}
 }
