@@ -19,12 +19,12 @@ public class TransactionResource {
     private MessageQueue queue;
     private CompletableFuture<TransactionRestRequestResponse> response;
 
-    public TransactionResource () {
+    public TransactionResource() {
         this.queue.addHandler("TransactionRestRequestResponse", this::handleTransactionRequestResponse);
 
     }
 
-    private void handleTransactionRequestResponse(Event event) {
+    public void handleTransactionRequestResponse(Event event) {
         TransactionRestRequestResponse r = event.getArgument(0, TransactionRestRequestResponse.class);
         response.complete(r);
     }
