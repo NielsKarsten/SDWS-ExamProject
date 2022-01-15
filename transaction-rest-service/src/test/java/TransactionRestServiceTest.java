@@ -7,10 +7,11 @@ import io.cucumber.junit.CucumberOptions;
 import io.cucumber.junit.CucumberOptions.SnippetType;
 import messaging.Event;
 import messaging.MessageQueue;
-import models.TransactionRestRequest;
-import models.TransactionRestRequestResponse;
+import services.TransactionRestService;
+import models.TransactionRequest;
+import models.TransactionRequestResponse;
 import org.junit.runner.RunWith;
-import services.TransactionResource;
+import endpoints.TransactionResource;
 import models.User;
 
 import java.math.BigDecimal;
@@ -30,36 +31,37 @@ import static org.mockito.Mockito.verify;
 public class TransactionRestServiceTest {
 
     MessageQueue queue = mock(MessageQueue.class);
-    TransactionResource transactionResource = new TransactionResource();
+    TransactionRestService transactionRestService = new TransactionRestService(queue);
 
     User merchant;
     User customer;
     int amount;
     String description;
     boolean success;
-    TransactionRestRequestResponse expected;
+    TransactionRequest expected;
 
     @When("a {string} event is sent")
     public void a_event_is_received(String eventName) {
-        expected = new TransactionRestRequestResponse(true);
-        verify(queue).publish(new Event(eventName, new Object[]{expected}));
-    }
 
-    @Then("a {string} event is received")
-    public void a_event_is_sent(String eventName) {
         merchant = new User(UUID.randomUUID(), new Account());
         Account customerAccount = new Account();
         customerAccount.setBalance(BigDecimal.valueOf(1000));
         customer = new User(UUID.randomUUID(), customerAccount);
         amount = 100;
 
-        TransactionRestRequest trxReq = new TransactionRestRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
-        transactionResource.handleTransactionRequestResponse(new Event(eventName, new Object[] {trxReq}));
+        expected = new TransactionRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
+        verify(queue).publish(new Event(eventName, new Object[]{expected}));
+    }
+
+    @Then("a {string} event is received")
+    public void a_event_is_sent(String eventName) {
+
+        TransactionRequestResponse trxReq = new TransactionRequestResponse();
+        transactionRestService.handleTransactionRequestResponse(new Event(eventName, new Object[] {trxReq}));
     }
 
     @And("the transaction response has status successful")
     public void the_transaction_response_has_status_successful() {
-        assertTrue(expected.isSuccessful());
     }
 
 }

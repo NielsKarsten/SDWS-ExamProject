@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransactionRestRequestResponse {
+public class TransactionRequestResponse {
     private boolean successful;
     private String errorMessage;
 
-    public TransactionRestRequestResponse(boolean s) {
+    public TransactionRequestResponse(boolean s) {
         this.successful = s;
     }
 }
