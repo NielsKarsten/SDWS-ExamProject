@@ -81,10 +81,10 @@ public class TransactionService {
     public void handleTransactionsByUserIdRequest(Event event) {
         UUID userId = event.getArgument(0, UUID.class);
         UUID correlationId = event.getCorrelationId();
-        Map<UUID, Transaction> transactionMap = TransactionStore.getInstance().getTransactions();
+        List<Transaction> allTransactionsList = TransactionStore.getInstance().getAllTransactions();
         List<Transaction> transactionList = new ArrayList<>();
 
-        for (Transaction t : transactionMap.values()) {
+        for (Transaction t : allTransactionsList) {
             if (t.getCustomer() == userId || t.getMerchant() == userId)
                 transactionList.add(t);
         }
@@ -93,12 +93,12 @@ public class TransactionService {
         this.queue.publish(outgoingEvent);
     }
     
-    public List<Transaction> handleCustomerReportRequest(Event event){
+    public void handleCustomerReportRequest(Event event) {
     	UUID correlationId = event.getCorrelationId();
-    	UUID userId = getArgument(0, UUID.class);
+    	UUID userId = event.getArgument(0, UUID.class);
     	List<Transaction> userTransactions = TransactionStore.getInstance().getCustomerTransactions(userId);
     	
-    	Event event = new Event(correlationId, "CustomerReportResponse", new Object[] {userTransactions});
-    	this.queue.publish(event);
+    	Event outgoingEvent = new Event(correlationId, "CustomerReportResponse", new Object[] {userTransactions});
+    	this.queue.publish(outgoingEvent);
     }
 }

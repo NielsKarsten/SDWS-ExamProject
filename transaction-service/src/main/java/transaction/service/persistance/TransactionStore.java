@@ -21,7 +21,7 @@ public class TransactionStore {
     private final List<Transaction> transactions;
 
     private TransactionStore() {
-        transactions = new ArrayList<Transaction>();
+        transactions = new ArrayList<>();
     }
 
     public static TransactionStore getInstance() {
@@ -32,7 +32,7 @@ public class TransactionStore {
     }
 
     public void addTransaction(Transaction transaction) {
-        transactions.put(transaction.getCustomer(), transaction);
+        transactions.add(transaction);
     }
 
     public List<Transaction> getAllTransactions() {

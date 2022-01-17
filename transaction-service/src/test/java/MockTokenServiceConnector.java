@@ -9,7 +9,7 @@ public class MockTokenServiceConnector extends TokenServiceConnector {
     }
 
     @Override
-    public String getUserIdFromToken(UUID token) {
-        return UUID.randomUUID().toString();
+    public UUID getUserIdFromToken(UUID token) {
+        return UUID.randomUUID();
     }
 }

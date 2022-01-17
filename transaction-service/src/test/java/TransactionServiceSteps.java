@@ -1,3 +1,5 @@
+import io.cucumber.java.Before;
+import io.cucumber.java.PendingException;
 import transaction.service.models.Transaction;
 import transaction.service.models.TransactionRequest;
 import transaction.service.models.TransactionRequestResponse;
@@ -41,7 +43,7 @@ public class TransactionServiceSteps {
     //Results
     boolean success;
     List<Transaction> transactions = new ArrayList<Transaction>();
-    TransactionRequestResponse expected;
+    Object expected;
     
     
     //Event construction
@@ -49,16 +51,16 @@ public class TransactionServiceSteps {
 		Object obj = null;
 		switch (eventName) {
 			case "TransactionRequest":
-				obj = new TransactionRequest(merchantId, customerId, UUID.randomUUID(); BigDecimal.valueOf(amount));
+				obj = new TransactionRequest(merchantId, UUID.randomUUID(), BigDecimal.valueOf(amount));
 				break;
 			case "TransactionRequestResponse":
 				obj = new TransactionRequestResponse(true);
 				break;
 			case "CustomerReportRequested":
-				obj = userId;
+				obj = customerId;
 				break;
 			case "CustomerReportResponse":
-				obj = user.getAccountId();
+				obj = new ArrayList<Transaction>();
 				break;
 			default:
 				System.out.println("No event object found for " + eventName);
@@ -69,25 +71,26 @@ public class TransactionServiceSteps {
 	}
 
 	public void handleEventReceived(String eventName) {
-		Object eventObject = getEventObject(eventName);
-		Event event = new Event(eventName, new Object[] { eventObject });
-		switch (eventName) {
-			case "TransactionRequest":
-				transactionService.handleTransactionRequestEvent(event);
-				break;
-			case "TransactionRequestResponse":
-				service.handleUserAccountInfoResponse(event);
-				break;
-			case "CustomerReportRequested":
-				service.handleUserAccountClosedResponse(event);
-				break;
-			case "CustomerReportResponse":
-				service.handleUserAccountClosedResponse(event);
-				break;
-			default:
-				System.out.println("No event handler found for " + eventName);
-				break;
-		}
+        Object eventObject = getEventObject(eventName);
+        Event event = new Event(eventName, new Object[]{eventObject});
+        switch (eventName) {
+            case "TransactionRequest":
+                transactionService.handleTransactionRequestEvent(event);
+                break;
+//            case "TransactionRequestResponse":
+//                service.handleUserAccountInfoResponse(event);
+//                break;
+            case "CustomerReportRequested":
+                transactionService.handleCustomerReportRequest(event);
+                break;
+//            case "CustomerReportResponse":
+//                service.handleUserAccountClosedResponse(event);
+//                break;
+            default:
+                System.out.println("No event handler found for " + eventName);
+                break;
+        }
+    }
 		
 	@Before
 	public void setUp() {
@@ -116,13 +119,14 @@ public class TransactionServiceSteps {
     @And("a list of transactions")
     public void aListOfTransactions() {
         for (int i = 100; i < 500; i+=100) {
-        	Transaction transaction = new Transaction(merchantId, customerId, i,"Payment!", customerToken);
+        	Transaction transaction = new Transaction(merchantId, customerId, BigDecimal.valueOf(i),"Payment!", customerToken);
         	transactions.add(transaction);
 		}
     }
 
     @When("the transaction is initiated")
     public void the_transactions_is_initiated() {
+        description = "Payment of " + amount + " to merchant " + merchantBankId;
         success = transactionService.pay(customerId, merchantId, BigDecimal.valueOf(amount), customerToken).isSuccessful();
     }
 
@@ -134,8 +138,7 @@ public class TransactionServiceSteps {
     @And("the transaction is saved")
     public void theTransactionIsSaved() {
         Transaction t = new Transaction(merchantId, customerId, BigDecimal.valueOf(amount), description, customerToken);
-        TransactionStore ts = TransactionStore.getInstance();
-        assertTrue(TransactionStore.getInstance().getTransactions().containsKey(customerId));
+        assertTrue(TransactionStore.getInstance().getAllTransactions().contains(t));
     }
 
     @When("a {string} event is received")
@@ -151,6 +154,11 @@ public class TransactionServiceSteps {
 
     @And("the transaction response has status successful")
     public void theTransactionResponseHasStatusSuccessful() {
-        assertTrue(expected.isSuccessful());
+        assertTrue(((TransactionRequestResponse) expected).isSuccessful());
+    }
+
+    @And("the event contains a list of customer transactions")
+    public void theEventContainsAListOfCustomerTransactions() {
+        throw new PendingException();
     }
 }
