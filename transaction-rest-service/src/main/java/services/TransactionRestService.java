@@ -24,6 +24,10 @@ public class TransactionRestService {
 
     public TransactionRequestResponse createTransactionRequest(TransactionRequest request) {
         UUID correlationId = UUID.randomUUID();
+        return createTransactionRequest(correlationId, request);
+    }
+
+    public TransactionRequestResponse createTransactionRequest(UUID correlationId, TransactionRequest request) {
         correlations.put(correlationId, new CompletableFuture<>());
         var event = new Event("TransactionRequest", new Object[] {request});
         this.queue.publish(event);
