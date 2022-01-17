@@ -42,6 +42,8 @@ public class TransactionStore {
     public List<Transaction> getCustomerTransactions(UUID customerId){
     	List<Transaction> customerTransactions = new ArrayList<Transaction>();
     	for (Transaction transaction : transactions) {
+    		System.out.println(transaction.getCustomer().toString());
+    		System.out.println(customerId.toString());
     		if (transaction.getCustomer().equals(customerId)) {
 				customerTransactions.add(transaction);    			
     		}

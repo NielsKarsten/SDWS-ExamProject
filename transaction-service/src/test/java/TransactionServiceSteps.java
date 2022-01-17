@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -25,9 +27,10 @@ import static org.mockito.Mockito.verify;
 public class TransactionServiceSteps {
     BankService bank = mock(BankService.class);
     MessageQueue queue = mock(MessageQueue.class);
-    MockAccountServiceConnector accountServiceConnector = new MockAccountServiceConnector(queue);
-    MockTokenServiceConnector tokenServiceConnector = new MockTokenServiceConnector(queue);
-    TransactionService transactionService = new TransactionService(queue, bank, tokenServiceConnector, accountServiceConnector);
+    MockAccountServiceConnector accountServiceConnector;
+    MockTokenServiceConnector tokenServiceConnector;
+    TransactionService transactionService;
+    CompletableFuture<Event> publishedEvent;
 
     //Setup
     UUID customerId;
@@ -59,8 +62,19 @@ public class TransactionServiceSteps {
 			case "CustomerReportRequested":
 				obj = customerId;
 				break;
+			case "MerchantReportRequested":
+				obj = merchantId;
+				break;
 			case "CustomerReportResponse":
-				obj = new ArrayList<Transaction>();
+				obj = transactions;
+				break;
+			case "MerchantReportResponse":
+				List<Transaction> merchantTransactions = new ArrayList<Transaction>();
+				for (Transaction transaction : transactions) {
+					transaction.setCustomer(null);
+					merchantTransactions.add(transaction);
+				}
+				obj = merchantTransactions;
 				break;
 			default:
 				System.out.println("No event object found for " + eventName);
@@ -77,15 +91,12 @@ public class TransactionServiceSteps {
             case "TransactionRequest":
                 transactionService.handleTransactionRequestEvent(event);
                 break;
-//            case "TransactionRequestResponse":
-//                service.handleUserAccountInfoResponse(event);
-//                break;
             case "CustomerReportRequested":
                 transactionService.handleCustomerReportRequest(event);
                 break;
-//            case "CustomerReportResponse":
-//                service.handleUserAccountClosedResponse(event);
-//                break;
+           case "MerchantReportRequested":
+        	   transactionService.handleMerchantReportRequest(event);
+               break;
             default:
                 System.out.println("No event handler found for " + eventName);
                 break;
@@ -93,21 +104,29 @@ public class TransactionServiceSteps {
     }
 		
 	@Before
-	public void setUp() {
+	public void setUp() {		
+	    accountServiceConnector = new MockAccountServiceConnector(queue);
+	    tokenServiceConnector = new MockTokenServiceConnector(queue);
+	    transactionService = new TransactionService(queue, bank, tokenServiceConnector, accountServiceConnector);
+	    publishedEvent = new CompletableFuture<Event>();
+	    
+	    //Generate Customer data
 		customerId = UUID.randomUUID();
+		customerBankId = UUID.randomUUID();
 		customerToken = UUID.randomUUID();
+
+		//Generate Customer data
 		merchantId = UUID.randomUUID();		
+		merchantBankId = UUID.randomUUID();
 	}
     
     @Given("a merchant with an account with a balance of {int}")
     public void a_merchant_with_merchant_id_and_a_account_with_balance_of(int balance) {
-        merchantBankId = UUID.randomUUID();
         accountServiceConnector.addUser(merchantId, merchantBankId.toString());
     }
     
     @And("a customer with an account with a balance of {int}")
     public void aCustomerWithAnAccountWithABalanceOf(int balance) {
-        customerBankId = UUID.randomUUID();
         accountServiceConnector.addUser(customerId, customerBankId.toString());
     }
     
@@ -119,8 +138,11 @@ public class TransactionServiceSteps {
     @And("a list of transactions")
     public void aListOfTransactions() {
         for (int i = 100; i < 500; i+=100) {
-        	Transaction transaction = new Transaction(merchantId, customerId, BigDecimal.valueOf(i),"Payment!", customerToken);
+        	BigDecimal transactionAmount = BigDecimal.valueOf(i);
+        	String description = "Payment of "+transactionAmount.toString()+" to merchant "+merchantBankId.toString();
+        	Transaction transaction = new Transaction(merchantId, customerId, transactionAmount,description, customerToken);
         	transactions.add(transaction);
+        	transactionService.pay(customerId, merchantId, transactionAmount, customerToken);
 		}
     }
 
@@ -155,10 +177,5 @@ public class TransactionServiceSteps {
     @And("the transaction response has status successful")
     public void theTransactionResponseHasStatusSuccessful() {
         assertTrue(((TransactionRequestResponse) expected).isSuccessful());
-    }
-
-    @And("the event contains a list of customer transactions")
-    public void theEventContainsAListOfCustomerTransactions() {
-        throw new PendingException();
     }
 }

@@ -25,7 +25,7 @@ public class Transaction {
         Transaction that = (Transaction) o;
 
         if (!merchant.equals(that.merchant)) return false;
-        if (!customer.equals(that.customer)) return false;
+        if (!(customer == null) && !customer.equals(that.customer)) return false;
         if (!amount.equals(that.amount)) return false;
         return description.equals(that.description);
     }

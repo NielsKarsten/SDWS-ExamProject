@@ -33,6 +33,8 @@ public class TransactionService {
 
         this.queue.addHandler("TransactionRequest", this::handleTransactionRequestEvent);
         this.queue.addHandler("TransactionsByUserIdRequest", this::handleTransactionsByUserIdRequest);
+        this.queue.addHandler("CustomerReportRequested", this::handleCustomerReportRequest);
+        this.queue.addHandler("MerchantReportRequested", this::handleMerchantReportRequest);
     }
 
     public boolean pay(String userBank, String merchantBank, BigDecimal amount, String description) {
@@ -99,6 +101,15 @@ public class TransactionService {
     	List<Transaction> userTransactions = TransactionStore.getInstance().getCustomerTransactions(userId);
     	
     	Event outgoingEvent = new Event(correlationId, "CustomerReportResponse", new Object[] {userTransactions});
+    	this.queue.publish(outgoingEvent);
+    }
+    
+    public void handleMerchantReportRequest(Event event) {
+    	UUID correlationId = event.getCorrelationId();
+    	UUID merchantId = event.getArgument(0, UUID.class);
+    	List<Transaction> merchantTransactions = TransactionStore.getInstance().getMerchantTransactions(merchantId);
+    	
+    	Event outgoingEvent = new Event(correlationId, "MerchantReportResponse", new Object[] {merchantTransactions});
     	this.queue.publish(outgoingEvent);
     }
 }
