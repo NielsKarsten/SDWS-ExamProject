@@ -30,7 +30,7 @@ public class TransactionStore {
     }
 
     public void addTransaction(Transaction transaction) {
-        transactions.put(transaction.getCustomer().getId(), transaction);
+        transactions.put(transaction.getCustomer(), transaction);
     }
 
     public HashMap<UUID, Transaction> getTransactions() {

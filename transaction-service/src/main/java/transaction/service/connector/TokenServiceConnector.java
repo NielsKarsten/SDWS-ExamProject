@@ -20,13 +20,13 @@ public class TokenServiceConnector {
 
     public TokenServiceConnector(MessageQueue q) {
         this.queue = q;
-        this.queue.addHandler("GetUserFromTokenResponse", this::handleGetUserFromTokenResponse);
+        this.queue.addHandler("TokenToCustomerIdResponse", this::handleGetUserFromTokenResponse);
     }
 
     public String getUserIdFromToken(UUID token) {
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event event = new Event("GetUserFromTokenRequest", new Object[]{token});
+        Event event = new Event("TokenToCustomerIdRequested", new Object[]{token});
         queue.publish(event);
         return correlations.get(correlationId).join();
     }

@@ -1,6 +1,10 @@
 import dtu.ws.fastmoney.Account;
+import dk.dtu.sdws.group3.models.Transaction;
+import dk.dtu.sdws.group3.models.TransactionRequest;
+import dk.dtu.sdws.group3.models.TransactionRequestResponse;
+import dk.dtu.sdws.group3.persistance.TransactionStore;
+import dk.dtu.sdws.group3.services.TransactionService;
 import dtu.ws.fastmoney.BankService;
-import dtu.ws.fastmoney.BankServiceException_Exception;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -26,24 +30,24 @@ import static org.mockito.Mockito.verify;
 public class TransactionServiceSteps {
     BankService bank = mock(BankService.class);
     MessageQueue queue = mock(MessageQueue.class);
-    AccountServiceConnector accountServiceConnector = new MockAccountServiceConnector(queue);
-    TokenServiceConnector tokenServiceConnector = new MockTokenServiceConnector(queue);
+    MockAccountServiceConnector accountServiceConnector = new MockAccountServiceConnector(queue);
+    MockTokenServiceConnector tokenServiceConnector = new MockTokenServiceConnector(queue);
     TransactionService transactionService = new TransactionService(queue, bank, tokenServiceConnector, accountServiceConnector);
 
-    User merchant;
-    User customer;
     int amount;
     String description;
     boolean success;
+    UUID merchantId;
+    UUID customerId;
+    UUID merchantBankId;
+    UUID customerBankId;
     TransactionRequestResponse expected;
 
     @Given("a merchant with an account with a balance of {int}")
     public void a_merchant_with_merchant_id_and_a_account_with_balance_of(int balance) {
-        merchant = new User();
-        merchant.setId(UUID.randomUUID());
-        Account account = new Account();
-        account.setBalance(BigDecimal.valueOf(balance));
-        merchant.setAccount(account);
+        merchantId = UUID.randomUUID();
+        merchantBankId = UUID.randomUUID();
+        accountServiceConnector.addUser(merchantId, merchantBankId.toString());
     }
 
     @And("an amount of {int}")
@@ -53,39 +57,34 @@ public class TransactionServiceSteps {
 
     @When("the transaction is initiated")
     public void the_transactions_is_initiated() {
-        success = transactionService.pay(merchant, customer, BigDecimal.valueOf(amount));
+        success = transactionService.pay(customerId, merchantId, BigDecimal.valueOf(amount)).isSuccessful();
     }
 
     @Then("the transaction is successful")
-    public void the_transaction_is_successful() throws BankServiceException_Exception {
+    public void the_transaction_is_successful() {
         assertTrue(success);
-        description = "Payment of " + amount + " to merchant " + merchant.getAccount().getId();
-        verify(bank).transferMoneyFromTo(merchant.getAccount().getId(), customer.getAccount().getId(), BigDecimal.valueOf(amount), description);
     }
 
     @And("a customer with an account with a balance of {int}")
     public void aCustomerWithAnAccountWithABalanceOf(int balance) {
-        customer = new User();
-        Account account = new Account();
-        account.setBalance(BigDecimal.valueOf(balance));
-        customer.setAccount(account);
+        customerId = UUID.randomUUID();
+        customerBankId = UUID.randomUUID();
+        accountServiceConnector.addUser(customerId, customerBankId.toString());
     }
 
     @And("the transaction is saved")
     public void theTransactionIsSaved() {
-        Transaction t = new Transaction(merchant, customer, BigDecimal.valueOf(amount), description);
-        assertTrue(TransactionStore.getInstance().getTransactions().containsKey(customer.getId()));
+        Transaction t = new Transaction(merchantId, customerId, BigDecimal.valueOf(amount), description);
+        TransactionStore ts = TransactionStore.getInstance();
+        assertTrue(TransactionStore.getInstance().getTransactions().containsKey(customerId));
     }
 
     @When("a {string} event is received")
     public void aEventIsReceived(String eventName) {
-        merchant = new User(UUID.randomUUID(), new Account());
-        Account customerAccount = new Account();
-        customerAccount.setBalance(BigDecimal.valueOf(1000));
-        customer = new User(UUID.randomUUID(), customerAccount);
-        amount = 100;
+        merchantId = UUID.randomUUID();
+        customerId = UUID.randomUUID();
 
-        TransactionRequest trxReq = new TransactionRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
+        TransactionRequest trxReq = new TransactionRequest(merchantId.toString(), customerId.toString(), BigDecimal.valueOf(amount));
         transactionService.handleTransactionRequestEvent(new Event(eventName, new Object[] {trxReq}));
     }
 

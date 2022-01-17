@@ -13,25 +13,24 @@ public class AccountServiceConnector {
 
     MessageQueue queue;
 
-    private Map<UUID, CompletableFuture<User>> correlations = new ConcurrentHashMap<>();
+    private Map<UUID, CompletableFuture<String>> correlations = new ConcurrentHashMap<>();
 
     public AccountServiceConnector(MessageQueue q) {
         this.queue = q;
-
-        this.queue.addHandler("GetAccountFromIdResponse", this::handleGetAccountFromIdResponse);
+        this.queue.addHandler("UserAccountInfoResponse", this::handleGetAccountFromIdResponse);
     }
 
-    public User getUserFromId(UUID id) {
+    public String getUserBankAccountFromId(UUID id) {
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event e = new Event(correlationId, "GetAccountFromIdRequest", new Object[]{id});
+        Event e = new Event(correlationId, "UserAccountInfoRequested", new Object[]{id});
         this.queue.publish(e);
         return correlations.get(correlationId).join();
     }
 
     public void handleGetAccountFromIdResponse(Event event) {
-        User u = event.getArgument(0, User.class);
+        String s = event.getArgument(0, String.class);
         UUID correlationId = UUID.randomUUID();
-        correlations.get(correlationId).complete(u);
+        correlations.get(correlationId).complete(s);
     }
 }

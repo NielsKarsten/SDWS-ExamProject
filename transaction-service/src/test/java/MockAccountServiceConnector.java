@@ -1,21 +1,30 @@
 import dtu.ws.fastmoney.Account;
 import messaging.Event;
+import dk.dtu.sdws.group3.connector.AccountServiceConnector;
 import messaging.MessageQueue;
 import transaction.service.connector.AccountServiceConnector;
 import transaction.service.models.User;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class MockAccountServiceConnector extends AccountServiceConnector {
+
+    private HashMap<UUID, String> bankAccounts = new HashMap<>();
+
     public MockAccountServiceConnector(MessageQueue q) {
         super(q);
     }
 
+    public void addUser(UUID userId, String bankId) {
+        bankAccounts.put(userId, bankId);
+    }
+
     @Override
-    public User getUserFromId(UUID id) {
-        User u = new User();
-        u.setId(UUID.randomUUID());
-        u.setAccount(new Account());
-        return u;
+    public String getUserBankAccountFromId(UUID id) {
+        if (bankAccounts.get(id) != null)
+            return bankAccounts.get(id);
+
+        return UUID.randomUUID().toString();
     }
 }
