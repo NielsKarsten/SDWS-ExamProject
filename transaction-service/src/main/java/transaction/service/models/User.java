@@ -1,4 +1,4 @@
-package dk.dtu.sdws.group3.models;
+package transaction.service.models;
 
 import dtu.ws.fastmoney.Account;
 import lombok.AllArgsConstructor;

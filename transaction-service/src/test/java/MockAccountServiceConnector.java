@@ -1,8 +1,8 @@
-import dk.dtu.sdws.group3.connector.AccountServiceConnector;
-import dk.dtu.sdws.group3.models.User;
 import dtu.ws.fastmoney.Account;
 import messaging.Event;
 import messaging.MessageQueue;
+import transaction.service.connector.AccountServiceConnector;
+import transaction.service.models.User;
 
 import java.util.UUID;
 

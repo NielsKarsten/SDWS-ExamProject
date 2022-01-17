@@ -2,7 +2,7 @@ package services;
 
 import messaging.Event;
 import messaging.MessageQueue;
-import models.TransactionRequestResponse;
+import transaction.service.models.TransactionRequestResponse;
 import transaction.service.models.*;
 
 import java.util.Map;

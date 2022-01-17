@@ -1,11 +1,3 @@
-import dk.dtu.sdws.group3.connector.AccountServiceConnector;
-import dk.dtu.sdws.group3.connector.TokenServiceConnector;
-import dk.dtu.sdws.group3.models.Transaction;
-import dk.dtu.sdws.group3.models.TransactionRequest;
-import dk.dtu.sdws.group3.models.TransactionRequestResponse;
-import dk.dtu.sdws.group3.models.User;
-import dk.dtu.sdws.group3.persistance.TransactionStore;
-import dk.dtu.sdws.group3.services.TransactionService;
 import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
@@ -15,6 +7,14 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import messaging.Event;
 import messaging.MessageQueue;
+import transaction.service.connector.AccountServiceConnector;
+import transaction.service.connector.TokenServiceConnector;
+import transaction.service.models.Transaction;
+import transaction.service.models.TransactionRequest;
+import transaction.service.models.TransactionRequestResponse;
+import transaction.service.models.User;
+import transaction.service.persistance.TransactionStore;
+import transaction.service.services.TransactionService;
 
 import java.math.BigDecimal;
 import java.util.UUID;

@@ -1,8 +1,8 @@
-package dk.dtu.sdws.group3.connector;
+package transaction.service.connector;
 
-import dk.dtu.sdws.group3.models.User;
 import messaging.Event;
 import messaging.MessageQueue;
+import transaction.service.models.User;
 
 import java.util.Map;
 import java.util.UUID;

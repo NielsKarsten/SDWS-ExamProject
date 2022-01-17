@@ -1,9 +1,9 @@
-package dk.dtu.sdws.group3.persistance;
-
-import dk.dtu.sdws.group3.models.Transaction;
+package transaction.service.persistance;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import transaction.service.models.Transaction;
 
 /**
  * Pseudo database to keep track of all transactions
