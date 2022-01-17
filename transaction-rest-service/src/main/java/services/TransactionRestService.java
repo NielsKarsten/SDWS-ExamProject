@@ -5,11 +5,15 @@ import messaging.MessageQueue;
 import models.TransactionRequest;
 import models.TransactionRequestResponse;
 
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TransactionRestService {
 
     private MessageQueue queue;
+    private Map<UUID, CompletableFuture<TransactionRequestResponse>> correlations = new ConcurrentHashMap<>();
     private CompletableFuture<TransactionRequestResponse> response;
 
     public TransactionRestService(MessageQueue q) {
@@ -19,15 +23,17 @@ public class TransactionRestService {
     }
 
     public TransactionRequestResponse createTransactionRequest(TransactionRequest request) {
+        UUID correlationId = UUID.randomUUID();
+        correlations.put(correlationId, new CompletableFuture<>());
         var event = new Event("TransactionRequest", new Object[] {request});
         this.queue.publish(event);
-        response = new CompletableFuture<>();
-        return response.join();
+        return correlations.get(correlationId).join();
     }
 
     public void handleTransactionRequestResponse(Event event) {
         TransactionRequestResponse r = event.getArgument(0, TransactionRequestResponse.class);
-        response.complete(r);
+        UUID correlationId = event.getCorrelationId();
+        correlations.get(correlationId).complete(r);
     }
 
 }
