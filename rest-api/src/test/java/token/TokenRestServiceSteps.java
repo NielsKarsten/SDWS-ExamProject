@@ -2,7 +2,7 @@
 // Theodor Guttesen s185121
 // Main: Christian Gernsøe s163552
 
-package behaviourtests;
+package token;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,12 +17,12 @@ import com.google.gson.Gson;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import issuetoken.service.IssueTokenService;
+import services.TokenRestService;
 import messaging.Event;
 import messaging.MessageQueue;
 
 
-public class IssueTokensSteps {
+public class TokenRestServiceSteps {
 
     private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
 
@@ -38,13 +38,13 @@ public class IssueTokensSteps {
         }
 
     };
-    private IssueTokenService service = new IssueTokenService(q);
+    private TokenRestService service = new TokenRestService(q);
     private CompletableFuture<List<UUID>> issuedTokens = new CompletableFuture<>();
     private UUID customerId;
     private int NTokens;
     private UUID correlationId;
 
-    public IssueTokensSteps() {
+    public TokenRestServiceSteps() {
     }
     @Given ("there is a customer with id {string}")
     public void givenCustomer(String id){

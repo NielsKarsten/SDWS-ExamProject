@@ -7,13 +7,13 @@
 
 package issuetoken.service.adapter.rest;
 
-import issuetoken.service.IssueTokenService;
+import issuetoken.service.TokenRestService;
 import messaging.implementations.RabbitMqQueue;
 
 public class TokenManagementFactory {
-	static IssueTokenService service = null;
+	static TokenRestService service = null;
 
-	public IssueTokenService getService() {
+	public TokenRestService getService() {
 		// The singleton pattern.
 		// Ensure that there is at most
 		// one instance of a PaymentService
@@ -30,7 +30,7 @@ public class TokenManagementFactory {
 		// At the end, we can use the PaymentService in tests
 		// without sending actual messages to RabbitMq.
 		var mq = new RabbitMqQueue("rabbitMq");
-		service = new IssueTokenService(mq);
+		service = new TokenRestService(mq);
 //		new StudentRegistrationServiceAdapter(service, mq);
 		return service;
 	}

@@ -1,4 +1,4 @@
-package tests;
+package transaction;
 
 import dtu.ws.fastmoney.Account;
 import io.cucumber.java.Before;

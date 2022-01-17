@@ -4,9 +4,9 @@
 // Theodor Guttesen s185121
 // Main: Christian Gernsøe s163552
 
-package issuetoken.service.adapter.rest;
+package endpoints;
 
-import issuetoken.service.TokenRestService;
+import services.TokenRestService;
 import messaging.implementations.RabbitMqQueue;
 
 import javax.ws.rs.Consumes;

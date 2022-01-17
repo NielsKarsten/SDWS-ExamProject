@@ -13,12 +13,12 @@ import messaging.MessageQueue;
 
 import javax.ws.rs.core.GenericType;
 
-public class IssueTokenService {
+public class TokenRestService {
 
 	private MessageQueue queue;
 	private Map<UUID, CompletableFuture<Object>> completableFutures = new HashMap<>();
 
-	public IssueTokenService(MessageQueue q) {
+	public TokenRestService(MessageQueue q) {
 		queue = q;
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 	}

@@ -1,4 +1,4 @@
-package tests;
+package account;
 
 import java.util.UUID;
 import services.AccountRestService;
