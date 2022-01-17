@@ -64,5 +64,4 @@ Scenario: Find customerId through event that gives token
 	And has 1 tokens
 	When the "TokenToCustomerIdRequested" event is received
 	Then the "TokenToCustomerIdResponse" event is sent
-	And customer id "aa4aaa2c-c6ca-d5f5-b8b2-0b5c78ee2cb7" is returned
 

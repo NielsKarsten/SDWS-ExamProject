@@ -4,12 +4,6 @@ package behaviourtests;
 // Main: Theodor Guttesen s185121
 // Christian Gernsøe s163552
 
-// Vi skal have gemt responset fra handleTokenToCustomerIdRequested, så vi kan teste at
-// det er det rigtige customerId der bliver fundet.
-
-// Idé: Lav completable futures i tokenManagement og hent result derfra.
-// Alternativ Idé: Mock en eventhandler, der venter på response.
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,7 +18,6 @@ import org.junit.After;
 import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
