@@ -95,6 +95,13 @@ public class TransactionService {
         this.queue.publish(outgoingEvent);
     }
     
+    public void handleAdminReportRequest(Event event) {
+    	UUID correlationId = event.getCorrelationId();
+    	List<Transaction> allTransactions = TransactionStore.getInstance().getAllTransactions();
+    	Event outgoingEvent = new Event (correlationId, "AdminReportResponse", new Object[] {allTransactions});
+    	this.queue.publish(outgoingEvent);
+    }
+    
     public void handleCustomerReportRequest(Event event) {
     	UUID correlationId = event.getCorrelationId();
     	UUID userId = event.getArgument(0, UUID.class);

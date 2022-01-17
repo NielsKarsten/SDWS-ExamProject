@@ -76,6 +76,12 @@ public class TransactionServiceSteps {
 				}
 				obj = merchantTransactions;
 				break;
+			case "AdminReportRequested":
+				obj = merchantId;
+				break;
+			case "AdminReportResponse":
+				obj = TransactionStore.getInstance().getAllTransactions();
+				break;
 			default:
 				System.out.println("No event object found for " + eventName);
 				obj = null;
@@ -97,6 +103,9 @@ public class TransactionServiceSteps {
            case "MerchantReportRequested":
         	   transactionService.handleMerchantReportRequest(event);
                break;
+           case "AdminReportRequested":
+        	   transactionService.handleAdminReportRequest(event);
+        	   break;
             default:
                 System.out.println("No event handler found for " + eventName);
                 break;

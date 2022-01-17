@@ -25,6 +25,13 @@ Feature: Transaction Service
     And a list of transactions
     When a "MerchantReportRequested" event is received
     Then a "MerchantReportResponse" event is sent
+   
+  Scenario: Admin report is requested
+    Given a merchant with an account with a balance of 1000
+    And a customer with an account with a balance of 1000
+    And a list of transactions
+    When a "AdminReportRequested" event is received
+    Then a "AdminReportResponse" event is sent
 #
 #  Scenario: a payment can not not be initiated due to invalid token
 #    Given a merchant with merchant id "id1" and a account with balance of 1000
