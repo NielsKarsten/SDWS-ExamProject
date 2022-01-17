@@ -1,3 +1,7 @@
+// Authors:
+// Main: Theodor Guttesen s185121
+// Christian Gernsøe s163552
+
 package issuetoken.service;
 
 import java.util.*;
@@ -19,20 +23,20 @@ public class IssueTokenService {
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 	}
 
-	public List<Token> issue(String customerId, int amount) {
+	public List<UUID> issue(UUID customerId, int amount) {
 		UUID correlationId = UUID.randomUUID();
 		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
 		Event event = new Event(correlationId,"TokensRequested", new Object[] { customerId,amount });
 		completableFutures.put(correlationId, issuedTokens);
 		queue.publish(event);
-		return (List<Token>) issuedTokens.join();
+		return (List<UUID>) issuedTokens.join();
 	}
 
 	public void handleTokensIssued(Event e) {
 		UUID correlationId = e.getCorrelationId();
 		var gson = new Gson();
 		var tokens = e.getArgument(0, String.class);
-		List<Token> tokenList = gson.fromJson(tokens,new GenericType<List<Token>>(){}.getType());
+		List<UUID> tokenList = gson.fromJson(tokens,new GenericType<List<UUID>>(){}.getType());
 		System.out.println(tokenList.toString());
 		CompletableFuture<Object> issuedTokens = completableFutures.get(correlationId);
 		issuedTokens.complete(tokenList);

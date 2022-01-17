@@ -1,6 +1,9 @@
 // Authors:
+// Code used from Hubert Baumeisters example,
+// The code has been adapted by:
 // Main: Theodor Guttesen s185121
 // Christian Gernsøe s163552
+
 
 package issuetoken.service.adapter.rest;
 

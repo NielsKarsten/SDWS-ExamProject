@@ -6,35 +6,39 @@ package behaviourtests;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
+import com.google.gson.Gson;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import messaging.Event;
 import messaging.MessageQueue;
 import org.junit.After;
-import tokenmanagement.service.Token;
 import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
 	private TokenManagementService tokenService = new TokenManagementService(q);
 
-	private String _customerId;
+	private UUID _customerId;
 	private Exception exception;
-	private String result;
-	private Token tokenResult;
-	private Token expectedToken;
-	private List<Token> tokenList;
+	private UUID result;
+	private UUID tokenResult;
+	private UUID expectedToken;
+	private List<UUID> tokenList;
+	private UUID correlationId;
 
 	public TokenServiceSteps() {
 	}
 
 	@Given("customer id {string}")
 	public void costumerWithID(String customerId) {
-		_customerId = customerId;
+		_customerId = UUID.fromString(customerId);
 	}
 
 	@Given("has {int} tokens")
@@ -85,9 +89,21 @@ public class TokenServiceSteps {
 		});
 	}
 
+	@When ("the {string} event is received")
+	public void customerIdFromTokenEvent(String tokenEvent){
+		UUID token = tokenService.findCustomersTokens(_customerId).get(0);
+		tokenService.handleTokenToCustomerIdRequested(new Event(correlationId,tokenEvent,new Object[] {token}));
+	}
+
+	@When ("the {string} event is sent")
+	public void customerIdFromTokenEventResponse(String tokenEvent){
+		Event event = new Event(correlationId,tokenEvent,new Object[] {_customerId});
+		verify(q).publish(event);
+	}
+
 	@Then("customer id {string} is returned")
 	public void customerIdReturned(String testingId) {
-		assertEquals(testingId, result);
+		assertEquals(UUID.fromString(testingId), result);
 	}
 
 	@Then("customer has {int} tokens")
