@@ -38,10 +38,10 @@ public class TransactionRestServiceTest {
     int amount;
     String description;
     boolean success;
-    TransactionRequest expected;
+    TransactionRequestResponse expected;
 
     @When("a {string} event is sent")
-    public void a_event_is_received(String eventName) {
+    public void a_event_is_sent(String eventName) {
 
         merchant = new User(UUID.randomUUID(), new Account());
         Account customerAccount = new Account();
@@ -49,15 +49,18 @@ public class TransactionRestServiceTest {
         customer = new User(UUID.randomUUID(), customerAccount);
         amount = 100;
 
-        expected = new TransactionRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
-        verify(queue).publish(new Event(eventName, new Object[]{expected}));
+        TransactionRequest trxReq = new TransactionRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
+        transactionRestService.handleTransactionRequestResponse(new Event(eventName, new Object[] {trxReq}));
+
     }
 
     @Then("a {string} event is received")
-    public void a_event_is_sent(String eventName) {
+    public void a_event_is_received(String eventName) {
 
-        TransactionRequestResponse trxReq = new TransactionRequestResponse();
-        transactionRestService.handleTransactionRequestResponse(new Event(eventName, new Object[] {trxReq}));
+        expected = new TransactionRequestResponse(true);
+        verify(queue).publish(new Event(eventName, new Object[]{expected}));
+
+
     }
 
     @And("the transaction response has status successful")
