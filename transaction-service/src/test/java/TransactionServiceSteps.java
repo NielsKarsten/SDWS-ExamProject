@@ -1,14 +1,9 @@
-import dk.dtu.sdws.group3.connector.AccountServiceConnector;
-import dk.dtu.sdws.group3.connector.TokenServiceConnector;
 import dk.dtu.sdws.group3.models.Transaction;
 import dk.dtu.sdws.group3.models.TransactionRequest;
 import dk.dtu.sdws.group3.models.TransactionRequestResponse;
-import dk.dtu.sdws.group3.models.User;
 import dk.dtu.sdws.group3.persistance.TransactionStore;
 import dk.dtu.sdws.group3.services.TransactionService;
-import dtu.ws.fastmoney.Account;
 import dtu.ws.fastmoney.BankService;
-import dtu.ws.fastmoney.BankServiceException_Exception;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -30,8 +25,6 @@ public class TransactionServiceSteps {
     MockTokenServiceConnector tokenServiceConnector = new MockTokenServiceConnector(queue);
     TransactionService transactionService = new TransactionService(queue, bank, tokenServiceConnector, accountServiceConnector);
 
-    User merchant;
-    User customer;
     int amount;
     String description;
     boolean success;
@@ -79,13 +72,10 @@ public class TransactionServiceSteps {
 
     @When("a {string} event is received")
     public void aEventIsReceived(String eventName) {
-        merchant = new User(UUID.randomUUID(), new Account());
-        Account customerAccount = new Account();
-        customerAccount.setBalance(BigDecimal.valueOf(1000));
-        customer = new User(UUID.randomUUID(), customerAccount);
-        amount = 100;
+        merchantId = UUID.randomUUID();
+        customerId = UUID.randomUUID();
 
-        TransactionRequest trxReq = new TransactionRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
+        TransactionRequest trxReq = new TransactionRequest(merchantId.toString(), customerId.toString(), BigDecimal.valueOf(amount));
         transactionService.handleTransactionRequestEvent(new Event(eventName, new Object[] {trxReq}));
     }
 

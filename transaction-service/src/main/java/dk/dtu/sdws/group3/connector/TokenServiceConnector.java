@@ -1,6 +1,5 @@
 package dk.dtu.sdws.group3.connector;
 
-import dk.dtu.sdws.group3.models.User;
 import messaging.Event;
 import messaging.MessageQueue;
 

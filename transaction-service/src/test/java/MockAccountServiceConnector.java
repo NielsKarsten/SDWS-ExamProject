@@ -1,7 +1,4 @@
 import dk.dtu.sdws.group3.connector.AccountServiceConnector;
-import dk.dtu.sdws.group3.models.User;
-import dtu.ws.fastmoney.Account;
-import messaging.Event;
 import messaging.MessageQueue;
 
 import java.util.HashMap;
