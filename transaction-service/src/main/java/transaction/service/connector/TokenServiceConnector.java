@@ -16,14 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TokenServiceConnector {
 
     private MessageQueue queue;
-    private Map<UUID, CompletableFuture<String>> correlations = new ConcurrentHashMap<>();
+    private Map<UUID, CompletableFuture<UUID>> correlations = new ConcurrentHashMap<>();
 
     public TokenServiceConnector(MessageQueue q) {
         this.queue = q;
         this.queue.addHandler("TokenToCustomerIdResponse", this::handleGetUserFromTokenResponse);
     }
 
-    public String getUserIdFromToken(UUID token) {
+    public UUID getUserIdFromToken(UUID token) {
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
         Event event = new Event("TokenToCustomerIdRequested", new Object[]{token});
@@ -32,7 +32,7 @@ public class TokenServiceConnector {
     }
 
     public void handleGetUserFromTokenResponse(Event e) {
-        String s = e.getArgument(0, String.class);
+        UUID s = e.getArgument(0, UUID.class);
         UUID correlationId = e.getCorrelationId();
         correlations.get(correlationId).complete(s);
     }

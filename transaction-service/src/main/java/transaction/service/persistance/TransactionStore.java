@@ -1,6 +1,8 @@
 package transaction.service.persistance;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import transaction.service.models.Transaction;
@@ -16,10 +18,10 @@ import transaction.service.models.Transaction;
 public class TransactionStore {
 
     private static TransactionStore instance;
-    private final HashMap<UUID, Transaction> transactions;
+    private final List<Transaction> transactions;
 
     private TransactionStore() {
-        transactions = new HashMap<>();
+        transactions = new ArrayList<Transaction>();
     }
 
     public static TransactionStore getInstance() {
@@ -33,7 +35,29 @@ public class TransactionStore {
         transactions.put(transaction.getCustomer(), transaction);
     }
 
-    public HashMap<UUID, Transaction> getTransactions() {
+    public List<Transaction> getAllTransactions() {
         return transactions;
+    }
+    
+    public List<Transaction> getCustomerTransactions(UUID customerId){
+    	List<Transaction> customerTransactions = new ArrayList<Transaction>();
+    	for (Transaction transaction : transactions) {
+    		if (transaction.getCustomer().equals(customerId)) {
+				customerTransactions.add(transaction);    			
+    		}
+    	}
+    	return customerTransactions;
+    }
+    
+    public List<Transaction> getMerchantTransactions(UUID merchantId){
+    	List<Transaction> customerTransactions = new ArrayList<Transaction>();
+    	for (Transaction transaction : transactions) {
+    		if (transaction.getMerchant().equals(merchantId)) {
+    			Transaction tmpTransaction = transaction;
+    			tmpTransaction.setCustomer(null);
+				customerTransactions.add(tmpTransaction);    			
+    		}
+    	}
+    	return customerTransactions;
     }
 }

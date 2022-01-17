@@ -15,6 +15,7 @@ public class Transaction {
     private UUID customer;
     private BigDecimal amount;
     private String description;
+    private UUID token;
 
     @Override
     public boolean equals(Object o) {

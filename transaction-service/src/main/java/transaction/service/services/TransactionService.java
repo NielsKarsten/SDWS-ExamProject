@@ -47,15 +47,17 @@ public class TransactionService {
         return true;
     }
 
-    public TransactionRequestResponse pay(UUID customer, UUID merchant, BigDecimal amount) {
+    public TransactionRequestResponse pay(UUID customer, UUID merchant, BigDecimal amount, UUID token) {
         String customerBankAccount = accountServiceConnector.getUserBankAccountFromId(customer);
         String merchantBankAccount = accountServiceConnector.getUserBankAccountFromId(merchant);
 
         TransactionRequestResponse trxReqResp = new TransactionRequestResponse();
         String description = "Payment of " + amount + " to merchant " + merchantBankAccount;
-        if (this.pay(customerBankAccount, merchantBankAccount, amount, description)) {
-            trxReqResp.setSuccessful(true);
-            Transaction t = new Transaction(merchant, customer, amount, description);
+        
+        boolean paymentSuccesfull = this.pay(customerBankAccount, merchantBankAccount, amount, description); 
+        if (paymentSuccesfull) {
+            trxReqResp.setSuccessful(paymentSuccesfull);
+            Transaction t = new Transaction(merchant, customer, amount, description, token);
             TransactionStore.getInstance().addTransaction(t);
         } else {
             trxReqResp.setSuccessful(false);
@@ -69,8 +71,9 @@ public class TransactionService {
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
         UUID correlationId = event.getCorrelationId();
 
-        String customerId = tokenServiceConnector.getUserIdFromToken(UUID.fromString(request.getUserToken()));
-        TransactionRequestResponse trxReqResp = this.pay(UUID.fromString(customerId), UUID.fromString(request.getMerchantId()), request.getAmount());
+        UUID customerId = tokenServiceConnector.getUserIdFromToken(request.getUserToken());
+        
+        TransactionRequestResponse trxReqResp = this.pay(customerId, request.getMerchantId(), request.getAmount(), request.getUserToken());
         Event e = new Event(correlationId, "TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(e);
     }
@@ -88,5 +91,14 @@ public class TransactionService {
 
         Event outgoingEvent = new Event(correlationId,"TransactionsByUserIdResponse", new Object[]{userId, transactionList});
         this.queue.publish(outgoingEvent);
+    }
+    
+    public List<Transaction> handleCustomerReportRequest(Event event){
+    	UUID correlationId = event.getCorrelationId();
+    	UUID userId = getArgument(0, UUID.class);
+    	List<Transaction> userTransactions = TransactionStore.getInstance().getCustomerTransactions(userId);
+    	
+    	Event event = new Event(correlationId, "CustomerReportResponse", new Object[] {userTransactions});
+    	this.queue.publish(event);
     }
 }

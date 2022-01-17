@@ -11,6 +11,14 @@ Feature: Transaction Service
     When a "TransactionRequest" event is received
     Then a "TransactionRequestResponse" event is sent
     And the transaction response has status successful
+
+	Scenario: Customer report is requested
+		Given a merchant with an account with a balance of 1000
+    And a customer with an account with a balance of 1000
+		And a list of transactions
+		When a "CustomerReportRequested" event is received
+		Then a "CustomerReportResponse" event is sent
+		And the event constains a list of customer transactions
 #
 #  Scenario: a payment can not not be initiated due to invalid token
 #    Given a merchant with merchant id "id1" and a account with balance of 1000

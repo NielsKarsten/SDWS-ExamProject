@@ -65,7 +65,7 @@ public class TransactionRestServiceSteps {
         customer = new User(UUID.randomUUID(), customerAccount);
         amount = 100;
 
-        trxReq = new TransactionRequest(merchant.getId().toString(), customer.getId().toString(), BigDecimal.valueOf(amount));
+        trxReq = new TransactionRequest(merchant.getId(), UUID.randomUUID(), BigDecimal.valueOf(amount));
     }
     
     @When("the transaction request is being registered")
