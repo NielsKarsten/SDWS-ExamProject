@@ -1,6 +1,6 @@
 import dtu.ws.fastmoney.Account;
 import messaging.Event;
-import dk.dtu.sdws.group3.connector.AccountServiceConnector;
+import transaction.service.connector.*;
 import messaging.MessageQueue;
 import transaction.service.connector.AccountServiceConnector;
 import transaction.service.models.User;

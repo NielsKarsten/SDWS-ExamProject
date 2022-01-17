@@ -1,4 +1,4 @@
-package transaction.test;
+package tests;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
 import io.cucumber.junit.CucumberOptions.SnippetType;
@@ -10,5 +10,7 @@ import org.junit.runner.RunWith;
         , features = "features"  // directory of the feature files
         , snippets = SnippetType.CAMELCASE
 )
-public class TransactionRestServiceTest {
+
+public class RestApiTest {
+
 }

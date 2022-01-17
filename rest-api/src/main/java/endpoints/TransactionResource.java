@@ -6,13 +6,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import messaging.Event;
-import messaging.MessageQueue;
 import messaging.implementations.RabbitMqQueue;
 import services.TransactionRestService;
 import transaction.service.models.*;
-
-import java.util.concurrent.CompletableFuture;
 
 @Path("/transactions")
 public class TransactionResource {
