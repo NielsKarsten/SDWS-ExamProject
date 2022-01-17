@@ -4,8 +4,10 @@ import dk.dtu.sdws.group3.models.User;
 import messaging.Event;
 import messaging.MessageQueue;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Connector class to handle communication with the token service
@@ -14,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 public class TokenServiceConnector {
 
     private MessageQueue queue;
-    private CompletableFuture<String> userId;
+    private Map<UUID, CompletableFuture<String>> correlations = new ConcurrentHashMap<>();
 
     public TokenServiceConnector(MessageQueue q) {
         this.queue = q;
@@ -22,14 +24,16 @@ public class TokenServiceConnector {
     }
 
     public String getUserIdFromToken(UUID token) {
-        userId = new CompletableFuture<>();
+        UUID correlationId = UUID.randomUUID();
+        correlations.put(correlationId, new CompletableFuture<>());
         Event event = new Event("GetUserFromTokenRequest", new Object[]{token});
         queue.publish(event);
-        return userId.join();
+        return correlations.get(correlationId).join();
     }
 
     public void handleGetUserFromTokenResponse(Event e) {
         String s = e.getArgument(0, String.class);
-        userId.complete(s);
+        UUID correlationId = e.getCorrelationId();
+        correlations.get(correlationId).complete(s);
     }
 }

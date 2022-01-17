@@ -52,6 +52,7 @@ public class TransactionService {
 
     public void handleTransactionRequestEvent(Event event) {
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
+        UUID correlationId = event.getCorrelationId();
         String customerId = tokenServiceConnector.getUserIdFromToken(UUID.fromString(request.getUserToken()));
         User customer = accountServiceConnector.getUserFromId(UUID.fromString(customerId));
         User merchant = accountServiceConnector.getUserFromId(UUID.fromString(request.getMerchantId()));
@@ -59,12 +60,13 @@ public class TransactionService {
         TransactionRequestResponse trxReqResp = new TransactionRequestResponse();
         trxReqResp.setSuccessful(this.pay(merchant, customer, request.getAmount()));
         if (errorMessage != null) trxReqResp.setErrorMessage(errorMessage);
-        Event outgoingEvent = new Event("TransactionRequestResponse", new Object[]{trxReqResp});
+        Event outgoingEvent = new Event(correlationId,"TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(outgoingEvent);
     }
 
     public void handleTransactionsByUserIdRequest(Event event) {
         UUID userId = event.getArgument(0, UUID.class);
+        UUID correlationId = event.getCorrelationId();
         Map<UUID, Transaction> transactionMap = TransactionStore.getInstance().getTransactions();
         List<Transaction> transactionList = new ArrayList<>();
 
@@ -73,7 +75,7 @@ public class TransactionService {
                 transactionList.add(t);
         }
 
-        Event outgoingEvent = new Event("TransactionsByUserIdResponse", new Object[]{userId, transactionList});
+        Event outgoingEvent = new Event(correlationId,"TransactionsByUserIdResponse", new Object[]{userId, transactionList});
         this.queue.publish(outgoingEvent);
     }
 }
