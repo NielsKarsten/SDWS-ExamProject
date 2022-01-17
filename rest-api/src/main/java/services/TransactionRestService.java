@@ -2,7 +2,6 @@ package services;
 
 import messaging.Event;
 import messaging.MessageQueue;
-import models.TransactionRequestResponse;
 import transaction.service.models.*;
 
 import java.util.Map;
@@ -23,13 +22,9 @@ public class TransactionRestService {
     }
 
     public TransactionRequestResponse createTransactionRequest(TransactionRequest request) {
-        UUID correlationId = UUID.randomUUID();
-        return createTransactionRequest(correlationId, request);
-    }
-
-    public TransactionRequestResponse createTransactionRequest(UUID correlationId, TransactionRequest request) {
-        correlations.put(correlationId, new CompletableFuture<>());
-        var event = new Event("TransactionRequest", new Object[] {request});
+    	UUID correlationId = UUID.randomUUID();
+    	correlations.put(correlationId, new CompletableFuture<>());
+        var event = new Event(correlationId, "TransactionRequest", new Object[] {request});
         this.queue.publish(event);
         return correlations.get(correlationId).join();
     }

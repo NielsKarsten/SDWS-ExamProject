@@ -1,8 +1,9 @@
-package account.service;
+package account.service.services;
 
 import java.util.HashMap;
 import java.util.UUID;
 
+import account.service.models.User;
 import messaging.Event;
 import messaging.MessageQueue;
 

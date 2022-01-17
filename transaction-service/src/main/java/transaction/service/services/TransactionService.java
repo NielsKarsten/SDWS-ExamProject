@@ -1,16 +1,16 @@
-package dk.dtu.sdws.group3.services;
+package transaction.service.services;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import dk.dtu.sdws.group3.connector.AccountServiceConnector;
-import dk.dtu.sdws.group3.connector.TokenServiceConnector;
-import dk.dtu.sdws.group3.models.*;
-import dk.dtu.sdws.group3.persistance.TransactionStore;
 import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import messaging.Event;
 import messaging.MessageQueue;
+import transaction.service.connector.AccountServiceConnector;
+import transaction.service.connector.TokenServiceConnector;
+import transaction.service.models.*;
+import transaction.service.persistance.TransactionStore;
 
 public class TransactionService {
 

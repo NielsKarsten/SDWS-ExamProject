@@ -6,8 +6,8 @@ import static org.mockito.Mockito.verify;
 
 import java.util.UUID;
 
-import account.service.AccountService;
-import account.service.User;
+import account.service.models.User;
+import account.service.services.AccountService;
 import io.cucumber.java.en.*;
 import messaging.Event;
 import messaging.MessageQueue;

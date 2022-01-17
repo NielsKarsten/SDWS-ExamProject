@@ -1,5 +1,5 @@
-import dk.dtu.sdws.group3.connector.TokenServiceConnector;
 import messaging.MessageQueue;
+import transaction.service.connector.TokenServiceConnector;
 
 import java.util.UUID;
 

@@ -1,8 +1,8 @@
-import dk.dtu.sdws.group3.models.Transaction;
-import dk.dtu.sdws.group3.models.TransactionRequest;
-import dk.dtu.sdws.group3.models.TransactionRequestResponse;
-import dk.dtu.sdws.group3.persistance.TransactionStore;
-import dk.dtu.sdws.group3.services.TransactionService;
+import transaction.service.models.Transaction;
+import transaction.service.models.TransactionRequest;
+import transaction.service.models.TransactionRequestResponse;
+import transaction.service.persistance.TransactionStore;
+import transaction.service.services.TransactionService;
 import dtu.ws.fastmoney.BankService;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;

@@ -1,4 +1,4 @@
-package account.service;
+package account.service.models;
 
 import java.io.Serializable;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package dk.dtu.sdws.group3.models;
+package transaction.service.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
