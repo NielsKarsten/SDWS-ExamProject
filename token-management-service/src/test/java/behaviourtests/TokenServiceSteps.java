@@ -4,8 +4,15 @@ package behaviourtests;
 // Main: Theodor Guttesen s185121
 // Christian Gernsøe s163552
 
+// Vi skal have gemt responset fra handleTokenToCustomerIdRequested, så vi kan teste at
+// det er det rigtige customerId der bliver fundet.
+
+// Idé: Lav completable futures i tokenManagement og hent result derfra.
+// Alternativ Idé: Mock en eventhandler, der venter på response.
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import com.google.gson.Gson;
 import io.cucumber.java.en.Given;
@@ -14,7 +21,6 @@ import io.cucumber.java.en.When;
 import messaging.Event;
 import messaging.MessageQueue;
 import org.junit.After;
-import tokenmanagement.service.Token;
 import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
 
@@ -29,9 +35,9 @@ public class TokenServiceSteps {
 	private UUID _customerId;
 	private Exception exception;
 	private UUID result;
-	private Token tokenResult;
-	private Token expectedToken;
-	private List<Token> tokenList;
+	private UUID tokenResult;
+	private UUID expectedToken;
+	private List<UUID> tokenList;
 	private UUID correlationId;
 
 	public TokenServiceSteps() {
@@ -90,12 +96,17 @@ public class TokenServiceSteps {
 		});
 	}
 
-	//@When ("the {string} event is received")
-	//public void customerIdFromTokenEvent(String issueEvent){
-	//	Token token = tokenService.findCustomersTokens(_customerId).get(0);
-	//	UUID tokenID = token.getToken();
-	//	tokenService.handleTokenToCustomerIdRequested(new Event(correlationId,issueEvent,new Object[] {tokenID}));
-	//}
+	@When ("the {string} event is received")
+	public void customerIdFromTokenEvent(String tokenEvent){
+		UUID token = tokenService.findCustomersTokens(_customerId).get(0);
+		tokenService.handleTokenToCustomerIdRequested(new Event(correlationId,tokenEvent,new Object[] {token}));
+	}
+
+	@When ("the {string} event is sent")
+	public void customerIdFromTokenEventResponse(String tokenEvent){
+		Event event = new Event(correlationId,tokenEvent,new Object[] {_customerId});
+		verify(q).publish(event);
+	}
 
 	@Then("customer id {string} is returned")
 	public void customerIdReturned(String testingId) {

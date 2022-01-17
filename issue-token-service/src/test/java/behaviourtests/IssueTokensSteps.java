@@ -18,7 +18,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import issuetoken.service.IssueTokenService;
-import issuetoken.service.Token;
 import messaging.Event;
 import messaging.MessageQueue;
 
@@ -40,7 +39,7 @@ public class IssueTokensSteps {
 
     };
     private IssueTokenService service = new IssueTokenService(q);
-    private CompletableFuture<List<Token>> issuedTokens = new CompletableFuture<>();
+    private CompletableFuture<List<UUID>> issuedTokens = new CompletableFuture<>();
     private UUID customerId;
     private int NTokens;
     private UUID correlationId;
@@ -53,7 +52,6 @@ public class IssueTokensSteps {
     }
     @When ("the customer requests {int} tokens")
     public void customerRequestsTokens(int tokenAmount){
-
         NTokens=tokenAmount;
         new Thread(() -> {
             var result = service.issue(customerId,tokenAmount);
@@ -70,9 +68,9 @@ public class IssueTokensSteps {
     @When ("the {string} event is sent")
     public void issueEvent(String issueEvent){
         Gson gson= new Gson();
-        var tokens = new ArrayList<Token>();
+        var tokens = new ArrayList<UUID>();
         for(int i = 0; i<3; i++){
-            tokens.add(new Token());
+            tokens.add(UUID.randomUUID());
         }
         String tokenString = gson.toJson(tokens);
         service.handleTokensIssued(new Event(correlationId,issueEvent,new Object[] {tokenString}));

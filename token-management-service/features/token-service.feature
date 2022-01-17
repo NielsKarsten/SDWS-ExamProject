@@ -59,10 +59,10 @@ Scenario: Consume token from customer with 0 tokens
 	Then customer has 0 tokens
 	And exception "Customer does not have any tokens" is returned
 
-#Scenario: Find customerId through event that gives token
-#	Given customer id "aa4aaa2c-c6ca-d5f5-b8b2-0b5c78ee2cb7"
-#	And has 1 tokens
-#	When the "TokenToCustomerIdRequested" event is received
-#	And get customer id from token
-#	Then customer id "aa4aaa2c-c6ca-d5f5-b8b2-0b5c78ee2cb7" is returned
+Scenario: Find customerId through event that gives token
+	Given customer id "aa4aaa2c-c6ca-d5f5-b8b2-0b5c78ee2cb7"
+	And has 1 tokens
+	When the "TokenToCustomerIdRequested" event is received
+	Then the "TokenToCustomerIdResponse" event is sent
+	And customer id "aa4aaa2c-c6ca-d5f5-b8b2-0b5c78ee2cb7" is returned
 

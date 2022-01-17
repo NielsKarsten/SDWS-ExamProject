@@ -7,7 +7,6 @@
 package issuetoken.service.adapter.rest;
 
 import issuetoken.service.IssueTokenService;
-import issuetoken.service.Token;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -22,7 +21,7 @@ public class TokenResource {
 	@POST
 	@Consumes("application/json")
 	@Produces("application/json")
-	public List<Token> requestTokens(UUID customerId, int tokenAmount) {
+	public List<UUID> requestTokens(UUID customerId, int tokenAmount) {
 		IssueTokenService service = new TokenManagementFactory().getService();
 		return service.issue(customerId, tokenAmount);
 	}
