@@ -6,6 +6,12 @@ Scenario: customer registers account
     Then the "UserAccountRegistered" event is sent
     And the account is registered
 
+Scenario: customer registers account alt
+    Given a user "Johnny" "Bravo" with bank account "1337"
+    When the "AccountRegistrationRequested" event is received
+    Then the "UserAccountRegistered" event is sent
+    And the account is registered
+
 Scenario: user accountInfo is requested
     Given a user "Johnny" "Bravo" with bank account "1337"
     When the "AccountRegistrationRequested" event is received 
