@@ -1,3 +1,7 @@
+// Authors:
+// Theodor Guttesen s185121
+// Main: Christian Gernsøe s163552
+
 package behaviourtests;
 
 import static org.junit.Assert.assertNull;
@@ -37,7 +41,7 @@ public class IssueTokensSteps {
     };
     private IssueTokenService service = new IssueTokenService(q);
     private CompletableFuture<List<Token>> issuedTokens = new CompletableFuture<>();
-    private String customerId;
+    private UUID customerId;
     private int NTokens;
     private UUID correlationId;
 
@@ -45,7 +49,7 @@ public class IssueTokensSteps {
     }
     @Given ("there is a customer with id {string}")
     public void givenCustomer(String id){
-        customerId = id;
+        customerId = UUID.fromString(id);
     }
     @When ("the customer requests {int} tokens")
     public void customerRequestsTokens(int tokenAmount){
@@ -71,7 +75,7 @@ public class IssueTokensSteps {
             tokens.add(new Token());
         }
         String tokenString = gson.toJson(tokens);
-        service.handleTokensIssued(new Event(correlationId,"..",new Object[] {tokenString}));
+        service.handleTokensIssued(new Event(correlationId,issueEvent,new Object[] {tokenString}));
     }
     @Then ("the customer has received {int} tokens")
     public void customerReceivedtokens(int tokenAmount){

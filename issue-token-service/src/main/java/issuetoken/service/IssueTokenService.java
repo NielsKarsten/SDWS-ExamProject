@@ -1,3 +1,7 @@
+// Authors:
+// Main: Theodor Guttesen s185121
+// Christian Gernsøe s163552
+
 package issuetoken.service;
 
 import java.util.*;
@@ -19,7 +23,7 @@ public class IssueTokenService {
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 	}
 
-	public List<Token> issue(String customerId, int amount) {
+	public List<Token> issue(UUID customerId, int amount) {
 		UUID correlationId = UUID.randomUUID();
 		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
 		Event event = new Event(correlationId,"TokensRequested", new Object[] { customerId,amount });

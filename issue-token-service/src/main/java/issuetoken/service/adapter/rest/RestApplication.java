@@ -1,4 +1,7 @@
-package issuetoken.service.adapter.rest;// Authors:
+package issuetoken.service.adapter.rest;
+// Authors:
+// Code used from Hubert Baumeisters example,
+// The code has been adapted by:
 // Theodor Guttesen s185121
 // Main: Christian Gernsøe s163552
 

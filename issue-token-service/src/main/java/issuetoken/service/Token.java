@@ -1,3 +1,7 @@
+// Authors:
+// Theodor Guttesen s185121
+// Main: Christian Gernsøe s163552
+
 package issuetoken.service;
 
 import java.io.Serializable;

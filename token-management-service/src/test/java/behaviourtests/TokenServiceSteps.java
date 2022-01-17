@@ -7,34 +7,39 @@ package behaviourtests;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
+import com.google.gson.Gson;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import messaging.Event;
 import messaging.MessageQueue;
 import org.junit.After;
 import tokenmanagement.service.Token;
 import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TokenServiceSteps {
 	private MessageQueue q = mock(MessageQueue.class);
 	private TokenManagementService tokenService = new TokenManagementService(q);
 
-	private String _customerId;
+	private UUID _customerId;
 	private Exception exception;
-	private String result;
+	private UUID result;
 	private Token tokenResult;
 	private Token expectedToken;
 	private List<Token> tokenList;
+	private UUID correlationId;
 
 	public TokenServiceSteps() {
 	}
 
 	@Given("customer id {string}")
 	public void costumerWithID(String customerId) {
-		_customerId = customerId;
+		_customerId = UUID.fromString(customerId);
 	}
 
 	@Given("has {int} tokens")
@@ -85,9 +90,16 @@ public class TokenServiceSteps {
 		});
 	}
 
+	//@When ("the {string} event is received")
+	//public void customerIdFromTokenEvent(String issueEvent){
+	//	Token token = tokenService.findCustomersTokens(_customerId).get(0);
+	//	UUID tokenID = token.getToken();
+	//	tokenService.handleTokenToCustomerIdRequested(new Event(correlationId,issueEvent,new Object[] {tokenID}));
+	//}
+
 	@Then("customer id {string} is returned")
 	public void customerIdReturned(String testingId) {
-		assertEquals(testingId, result);
+		assertEquals(UUID.fromString(testingId), result);
 	}
 
 	@Then("customer has {int} tokens")
