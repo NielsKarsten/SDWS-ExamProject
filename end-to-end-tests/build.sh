@@ -1,3 +1,5 @@
 #!/bin/bash
 set -e
-mvn clean test 
+mvn clean test
+
+

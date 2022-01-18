@@ -21,3 +21,4 @@ services:
   rabbitMq:
     image: rabbitmq:3-management
     container_name: rabbitMq_container
+
