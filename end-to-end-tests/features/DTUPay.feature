@@ -2,7 +2,7 @@
 # Theodor Guttesen s185121
 # Christian Gernsøe s163552
 # Gustav Lintrup Kirkholt s164765
-
+# Niels Bisgaard-Bohr S202745
 
 Feature: DTU Pay feature
 
