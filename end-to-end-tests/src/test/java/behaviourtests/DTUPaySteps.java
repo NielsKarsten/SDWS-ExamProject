@@ -48,18 +48,18 @@ public class DTUPaySteps {
 
 	@When("customer is being registered")
 	public void theCustomerIsBeingRegistered() {
-		customerTarget.path("/users").request().post(Entity.json(customer), User.class);
+		customerTarget.request().post(Entity.json(customer), User.class);
 	}
 
 	@When("merchant is being registered")
 	public void theMerchantIsBeingRegistered() {
-		merchantTarget.path("/users").request().post(Entity.json(merchant), User.class);
+		merchantTarget.request().post(Entity.json(merchant), User.class);
 	}
 
 	@When ("customer requests {int} tokens")
 	public void customerRequestsTokens(int tokenAmount){
 		TokenRequest tokenRequest = new TokenRequest(customer.getUserId(), tokenAmount);
-		tokens = customerTarget.path("/requesttokens").request().post(Entity.json(tokenRequest), new GenericType<List<UUID>>(){});
+		tokens = customerTarget.path("/token").request().post(Entity.json(tokenRequest), new GenericType<List<UUID>>(){});
 	}
 
 	@Then("customer has {int} tokens")
@@ -70,7 +70,7 @@ public class DTUPaySteps {
 	@When("merchant initiates a transaction for {int}")
 	public void theTransactionsIsInitiated(int amount) {
 		TransactionRequest transactionRequest = new TransactionRequest(merchant.getUserId(), tokens.get(0), BigDecimal.valueOf(amount));
-		merchantTarget.path("/transactions").request().post(Entity.json(transactionRequest));
+		merchantTarget.path("/transaction").request().post(Entity.json(transactionRequest));
 	}
 
 	@Then("customer has balance {int}")
