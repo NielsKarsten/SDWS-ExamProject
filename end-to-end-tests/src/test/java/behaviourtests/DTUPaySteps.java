@@ -50,7 +50,6 @@ public class DTUPaySteps {
 
 	@Before
 	public void createBankAccount() throws BankServiceException_Exception {
-		System.out.println("Before is called");
 		johnnyUser = new User();
 		johnnyUser.setCprNumber("12341234");
 		johnnyUser.setFirstName("Johnny");
@@ -67,59 +66,50 @@ public class DTUPaySteps {
 
 	@Given("a customer {string} {string}")
 	public void aCustomerWithBankAccount(String firstName, String lastName) {
-		System.out.println("Customer with bank account is called");
 		customer = new DTUPayUser(firstName, lastName, customerAccountId);
 		customer.assignUserId();
 	}
 
 	@Given("a merchant {string} {string}")
 	public void aMerchantWithBankAccount(String firstName, String lastName) {
-		System.out.println("Merchant with bank account is called");
 		merchant = new DTUPayUser(firstName, lastName, merchantAccountId);
 		merchant.assignUserId();
 	}
 
 	@Given("an admin {string} {string}")
 	public void anAdminWithBankAccount(String firstName, String lastName) {
-		System.out.println("Admin with bank account is called");
 		admin = new DTUPayUser(firstName, lastName, customerAccountId);
 		admin.assignUserId();
 	}
 
 	@When("customer is being registered")
 	public void theCustomerIsBeingRegistered() {
-		System.out.println("Customer is being registered account is called");
 		customerTarget.request().post(Entity.json(customer), DTUPayUser.class);
 	}
 
 	@When("merchant is being registered")
 	public void theMerchantIsBeingRegistered() {
-		System.out.println("Merchant is being registered account is called");
 		merchantTarget.request().post(Entity.json(merchant), DTUPayUser.class);
 	}
 
 	@When("admin is being registered")
 	public void theAdminIsBeingRegistered() {
-		System.out.println("Admin is being registered account is called");
 		adminTarget.request().post(Entity.json(admin), DTUPayUser.class);
 	}
 
 	@When ("customer requests {int} tokens")
 	public void customerRequestsTokens(int tokenAmount){
-		System.out.println("Customer requests tokens is called");
 		TokenRequest tokenRequest = new TokenRequest(customer.getUserId(), tokenAmount);
 		tokens = customerTarget.path("/token").request().post(Entity.json(tokenRequest), new GenericType<List<UUID>>(){});
 	}
 
 	@Then("customer has {int} tokens")
 	public void theCustomerHasTokens(int amount)  {
-		System.out.println("Customer has tokens is called");
 		assertEquals(tokens.size(), amount);
 	}
 
 	@When("merchant initiates a transaction for {int}")
 	public void theTransactionsIsInitiated(int amount) {
-		System.out.println("Merchant initiates transaction is called");
 		transactionToken = tokens.get(0);
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchant.getUserId(), transactionToken, transactionAmount);
@@ -128,28 +118,24 @@ public class DTUPaySteps {
 
 	@When("customer requests transactions")
 	public void theCustomerRequestsTransactions() {
-		System.out.println("Customer initiates transactions list is called");
 		var response = customerTarget.path("/transaction").request().get();
 		transactionList = response.readEntity(List.class);
 	}
 
 	@When("merchant requests transactions")
 	public void theMerchantRequestsTransactions() {
-		System.out.println("Merchant requests transactions list is called");
 		var response = merchantTarget.path("/transaction").request().get();
 		transactionList = response.readEntity(List.class);
 	}
 
 	@When("admin requests transactions")
 	public void theAdminRequestsTransactions() {
-		System.out.println("Admin initiates transactions list is called");
 		var response = adminTarget.path("/transaction").request().get();
 		transactionList = response.readEntity(List.class);
 	}
 
 	@Then("user gets transaction")
 	public void theUserGetsTransactions() {
-		System.out.println("User gets transaction verification is called");
 		Transaction transaction = transactionList.get(0);
 		assertEquals(transaction.getToken(), transactionToken);
 		assertEquals(transaction.getMerchant(), merchant.getUserId());
@@ -158,48 +144,41 @@ public class DTUPaySteps {
 
 	@Then("customer has balance {int}")
 	public void theCustomerHasBalance(int amount) throws BankServiceException_Exception {
-		System.out.println("Customer has balance verification is called");
 		BigDecimal actual = bankService.getAccount(customer.getAccountId()).getBalance();
 		assertEquals(actual, BigDecimal.valueOf(amount));
 	}
 
 	@Then("merchant has balance {int}")
 	public void theMerchantHasBalance(int amount) throws BankServiceException_Exception {
-		System.out.println("Merchant has balance verification is called");
 		BigDecimal actual = bankService.getAccount(merchant.getAccountId()).getBalance();
 		assertEquals(actual, BigDecimal.valueOf(amount));
 	}
 
 	@When("customer account is retired")
 	public void theCustomerAccountIsDeleted() {
-		System.out.println("Customer account retired is called");
 		var response = customerTarget.queryParam("userId", customer.getUserId()).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
 	}
 
 	@When("merchant account is retired")
 	public void theMerchantAccountIsDeleted() {
-		System.out.println("Merchant account retired is called");
 		var response = merchantTarget.queryParam("userId", merchant.getUserId()).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
 	}
 
 	@When("admin account is retired")
 	public void theAdminAccountIsDeleted() {
-		System.out.println("Admin account retired is called");
 		var response = adminTarget.queryParam("userId", admin.getUserId()).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
 	}
 
 	@Then("account does not exist")
 	public void theAccountDoesNotExist() {
-		System.out.println("account retired verification is called");
 		assertTrue(deleteAccountResponse);
 	}
 
 	@After
 	public void retireBankAccount() throws BankServiceException_Exception {
-		System.out.println("After is called");
 		bankService.retireAccount(customerAccountId);
 		bankService.retireAccount(merchantAccountId);
 	}
