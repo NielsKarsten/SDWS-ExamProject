@@ -9,6 +9,6 @@ sleep 10
 docker-compose up -d account-service token-management-service transaction-service rest-api
 
 sleep 20
-pushd rest-api
+pushd end-to-end-tests
 ./build.sh
 popd
