@@ -37,12 +37,11 @@ public class TokenService {
     }
 
     public void handleTokensRequested(Event e) {
-        UUID customerId = e.getArgument(1, UUID.class);
-        int tokenAmount = e.getArgument(2, Integer.class);
+        TokenRequest request = e.getArgument(0, TokenRequest.class);
 
         List<UUID> tokenList = null;
         try {
-            tokenList = requestTokens(new TokenRequest(customerId, tokenAmount));
+            tokenList = requestTokens(request);
         } catch (IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
