@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-./build.sh
+bash build.sh
 
 docker image prune -f
 docker-compose up -d rabbitMq
@@ -10,5 +10,5 @@ docker-compose up -d account-service token-management-service transaction-servic
 
 sleep 20
 pushd end-to-end-tests
-./build.sh
+bash build.sh
 popd
