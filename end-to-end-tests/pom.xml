@@ -98,36 +98,12 @@
             <version>3.2</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>dk.dtu.sdws.group3</groupId>
-			<artifactId>account-registration-service</artifactId>
-			<version>1.0.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>dk.dtu.sdws.group3</groupId>
-			<artifactId>account-registration-service</artifactId>
-			<version>1.0.0</version>
-			<scope>test</scope>
-		</dependency>
-        <dependency>
-            <groupId>dk.dtu.compute</groupId>
-            <artifactId>issue-token-service</artifactId>
-            <version>1.0.0</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>3.6.0</version>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>dk.dtu.sdws.group3</groupId>
-			<artifactId>transaction-service</artifactId>
-			<version>1.0.0</version>
-			<scope>test</scope>
-		</dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
