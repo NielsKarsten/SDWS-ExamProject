@@ -29,7 +29,7 @@ hs_err_pid*
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-# User-specific stuff
+# behaviourtests.User-specific stuff
 .idea
 .idea/*
 .idea/**/workspace.xml
@@ -39,7 +39,7 @@ hs_err_pid*
 .idea/**/shelf
 .idea/*.xml
 
-# AWS User-specific
+# AWS behaviourtests.User-specific
 .idea/**/aws.xml
 
 # Generated files

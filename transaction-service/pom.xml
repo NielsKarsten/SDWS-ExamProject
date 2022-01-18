@@ -104,7 +104,7 @@
                         <wsdlUrl>http://fm-00.compute.dtu.dk/BankService.wsdl.xml</wsdlUrl>
                     </wsdlUrls>
                     <keep>true</keep>
-                    <packageName>dtu.ws.fastmoney</packageName>
+                    <packageName>dtu.ws.dtu.ws.fastmoney</packageName>
                     <sourceDestDir>src/main/java</sourceDestDir>
                 </configuration>
             </plugin>

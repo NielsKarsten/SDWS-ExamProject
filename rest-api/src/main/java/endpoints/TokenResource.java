@@ -8,6 +8,7 @@ package endpoints;
 
 import services.TokenRestService;
 import messaging.implementations.RabbitMqQueue;
+import tokenmanagement.service.TokenRequest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,7 +25,7 @@ public class TokenResource {
 	@POST
 	@Consumes("application/json")
 	@Produces("application/json")
-	public List<UUID> requestTokens(UUID customerId, int tokenAmount) {
-		return service.issue(customerId, tokenAmount);
+	public List<UUID> requestTokens(TokenRequest tokenRequest) {
+		return service.issue(tokenRequest);
 	}
 }

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.gson.Gson;
 import messaging.Event;
 import messaging.MessageQueue;
+import tokenmanagement.service.TokenRequest;
 
 import javax.ws.rs.core.GenericType;
 
@@ -23,10 +24,10 @@ public class TokenRestService {
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 	}
 
-	public List<UUID> issue(UUID customerId, int amount) {
+	public List<UUID> issue(TokenRequest tokenRequest) {
 		UUID correlationId = UUID.randomUUID();
 		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
-		Event event = new Event(correlationId,"TokensRequested", new Object[] { customerId,amount });
+		Event event = new Event(correlationId,"TokensRequested", new Object[] { tokenRequest });
 		completableFutures.put(correlationId, issuedTokens);
 		queue.publish(event);
 		return (List<UUID>) issuedTokens.join();

@@ -33,8 +33,10 @@ public class TokenManagementService {
         this.tokens = new HashMap<>();
     }
 
-    public List<UUID> requestTokens(UUID customerId, int tokenAmount) throws TokenException {
-        verifyRequestTokenInput(customerId, tokenAmount);
+    public List<UUID> requestTokens(TokenRequest tokenRequest) throws TokenException {
+        verifyRequestTokenInput(tokenRequest);
+        UUID customerId = tokenRequest.getUserId();
+        int tokenAmount = tokenRequest.getAmount();
 
         if (findCustomersTokens(customerId) == null) {
             List<UUID> tokenList = new ArrayList<>();
@@ -81,7 +83,7 @@ public class TokenManagementService {
         var tokenAmount = e.getArgument(2, int.class);
         List<UUID> tokenList = null;
         try {
-            tokenList = requestTokens(customerId, tokenAmount);
+            tokenList = requestTokens(new TokenRequest(customerId, tokenAmount));
         } catch (TokenException tokenException) {
             tokenException.printStackTrace();
         }
@@ -115,7 +117,10 @@ public class TokenManagementService {
         tokens.put(customerId, tokenList);
     }
 
-    private void verifyRequestTokenInput(UUID customerId, int tokenAmount) throws TokenException {
+    private void verifyRequestTokenInput(TokenRequest tokenRequest) throws TokenException {
+        UUID customerId = tokenRequest.getUserId();
+        int tokenAmount = tokenRequest.getAmount();
+
         if (tokenAmount > 5 || tokenAmount < 1) {
             throw new TokenException(RequestTooManyTokensExceptionMsg);
         }

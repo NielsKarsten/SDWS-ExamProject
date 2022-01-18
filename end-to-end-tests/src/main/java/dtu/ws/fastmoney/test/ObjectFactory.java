@@ -1,5 +1,5 @@
 
-package dtu.ws.fastmoney;
+package dtu.ws.fastmoney.test;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
