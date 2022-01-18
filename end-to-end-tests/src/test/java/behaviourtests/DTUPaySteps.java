@@ -1,26 +1,22 @@
 package behaviourtests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import accountregistration.service.AccountRegistrationService;
-import accountregistration.service.User;
 import dtu.ws.fastmoney.test.BankService;
 import dtu.ws.fastmoney.test.BankServiceException_Exception;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import issuetoken.service.IssueTokenService;
 import messaging.Event;
 import messaging.MessageQueue;
-import transaction.service.services.TransactionService;
+import org.junit.Assert;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -30,10 +26,10 @@ import static org.mockito.Mockito.mock;
 
 public class DTUPaySteps {
 	private MessageQueue queue;
-	private AccountRegistrationService accountRegistrationService;
-	private IssueTokenService issueTokenService;
+	//private AccountRegistrationService accountRegistrationService;
+	//private IssueTokenService issueTokenService;
 	private BankService bankService;
-	TransactionService transactionService = new TransactionService(queue, bank);
+	//TransactionService transactionService = new TransactionService(queue, bank);
 
 	private CompletableFuture<UUID> registeredUser;
 	private CompletableFuture<List<UUID>> issuedTokens;
@@ -64,8 +60,8 @@ public class DTUPaySteps {
 			}
 		};
 
-		accountRegistrationService = new AccountRegistrationService(queue);
-		issueTokenService = new IssueTokenService(queue);
+		//accountRegistrationService = new AccountRegistrationService(queue);
+		//issueTokenService = new IssueTokenService(queue);
 		bankService = mock(BankService.class);
 
 		registeredUser = new CompletableFuture<>();
@@ -113,14 +109,19 @@ public class DTUPaySteps {
 		//	issuedTokens.complete(result);
 		//}).start();
 		TokenRequest tokenRequest = new TokenRequest(customer.getUserId(), tokenAmount);
-		tokens = target.path("/requesttokens").request().post(Entity.json(tokenRequest), TokenRequest.class);
+		tokens = target.path("/requesttokens").request().post(Entity.json(tokenRequest), new GenericType<List<UUID>>(){});
+	}
+
+	@Then("customer has {int} tokens")
+	public void theCustomerHasTokens(int amount)  {
+		assertEquals(tokens.size(), amount);
 	}
 
 	@When("merchant initiates a transaction for {int}")
 	public void theTransactionsIsInitiated(int amount) {
 		//success = transactionService.pay(customer.getUserId(), merchant.getUserId(), BigDecimal.valueOf(amount)).isSuccessful();
-		TransactionRequest transactionRequest = new TransactionRequest();
-		target.path("/transactions").request().post()
+		TransactionRequest transactionRequest = new TransactionRequest(merchant.getUserId(), tokens.get(0), BigDecimal.valueOf(amount));
+		target.path("/transactions").request().post(Entity.json(transactionRequest));
 	}
 
 	@Then("customer has balance {int}")
@@ -129,11 +130,16 @@ public class DTUPaySteps {
 		assertEquals(actual, amount);
 	}
 
-	@Then("merchant has balance {int}")
-	public void theMerchantHasBalance(int amount) throws BankServiceException_Exception {
-		BigDecimal actual = bankService.getAccount(customer.getAccountId()).getBalance();
-		assertEquals(actual, amount);
+	@When("account with id {string} is retired")
+	public void theAccountIsRetired(String accountId) throws BankServiceException_Exception {
+		bankService.retireAccount(accountId);
 	}
+
+	@Then("account with id {string} does not exist")
+	public void theAccountDoesNotExist(String accountId) throws BankServiceException_Exception {
+		assertEquals("null", bankService.getAccount(accountId));
+	}
+
 
 	//@Given("an unregistered student with empty id")
 	//public void anUnregisteredStudentWithEmptyId() {
