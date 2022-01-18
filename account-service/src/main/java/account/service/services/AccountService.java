@@ -12,6 +12,7 @@ public class AccountService {
 	private MessageQueue queue;
 	private HashMap<UUID, User> users;
 
+	// test
 	public HashMap<UUID, User> getUsers() {
 		return users;
 	}
