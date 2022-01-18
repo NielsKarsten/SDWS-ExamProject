@@ -13,3 +13,4 @@ public class TokenRequest implements Serializable {
     private UUID userId;
     private int amount;
 }
+

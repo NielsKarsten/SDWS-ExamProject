@@ -3,7 +3,9 @@
 # Christian Gernsøe s163552
 # Gustav Lintrup Kirkholt s164765
 # Niels Bisgaard-Bohr S202745
-# Simon
+# Simon 
+# Thomas
+
 Feature: DTU Pay feature
 
 Scenario: Successful registered a customer

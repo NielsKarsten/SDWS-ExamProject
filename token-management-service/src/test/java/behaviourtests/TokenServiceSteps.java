@@ -70,6 +70,7 @@ public class TokenServiceSteps {
 		Object obj = null;
 		switch(eventName) {
 			case "TokensRequested":
+				obj = customerId;
 				break;
 			case "TokenToCustomerIdRequested":
 				obj = tokens.get(0);
