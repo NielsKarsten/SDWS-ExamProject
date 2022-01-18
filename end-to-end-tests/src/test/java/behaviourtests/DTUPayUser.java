@@ -3,13 +3,13 @@ package behaviourtests;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class User implements Serializable{
+public class DTUPayUser implements Serializable{
 	private static final long serialVersionUID = -1483091887852909042L;
 	private String firstName, lastName;
 	private UUID userId;
 	private String accountId;
 	
-	public User(String firstName, String lastName, String accountId) {
+	public DTUPayUser(String firstName, String lastName, String accountId) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.accountId = accountId;

@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import models.*;
 import services.*;
 
-@Path("/Customer")
+@Path("/customer")
 public class CustomerResource {
     private ServicesFactory factory = new ServicesFactory();
 
