@@ -26,11 +26,10 @@ public class TokenRestService {
 
 	public List<UUID> issueTokens(TokenRequest tokenRequest) {
 		UUID correlationId = UUID.randomUUID();
-		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
 		Event event = new Event(correlationId,"TokensRequested", new Object[] { tokenRequest });
-		completableFutures.put(correlationId, issuedTokens);
+		completableFutures.put(correlationId, new CompletableFuture<>());
 		queue.publish(event);
-		return (List<UUID>) issuedTokens.join();
+		return (List<UUID>) completableFutures.get(correlationId).join();
 	}
 
 	public void handleTokensIssued(Event e) {
@@ -39,8 +38,9 @@ public class TokenRestService {
 		var tokens = e.getArgument(0, String.class);
 		List<UUID> tokenList = gson.fromJson(tokens,new GenericType<List<UUID>>(){}.getType());
 		System.out.println(tokenList.toString());
-		CompletableFuture<Object> issuedTokens = completableFutures.get(correlationId);
-		issuedTokens.complete(tokenList);
+		completableFutures.get(correlationId).complete(tokenList);
+//		CompletableFuture<Object> issuedTokens = completableFutures.get(correlationId);
+//		issuedTokens.complete(tokenList);
 	}
 }
 

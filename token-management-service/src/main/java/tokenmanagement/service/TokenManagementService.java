@@ -6,6 +6,7 @@
 
 package tokenmanagement.service;
 
+import com.google.gson.Gson;
 import messaging.Event;
 import messaging.MessageQueue;
 import tokenmanagement.service.exceptions.TokenException;
@@ -79,15 +80,15 @@ public class TokenManagementService {
 
     public void handleTokensRequested(Event e){
         var correlationID = e.getCorrelationId();
-        var customerId = e.getArgument(1, UUID.class);
-        var tokenAmount = e.getArgument(2, int.class);
+        var tokenRequest = e.getArgument(0, TokenRequest.class);
         List<UUID> tokenList = null;
         try {
-            tokenList = requestTokens(new TokenRequest(customerId, tokenAmount));
+            tokenList = requestTokens(tokenRequest);
         } catch (TokenException tokenException) {
             tokenException.printStackTrace();
         }
-        Event event = new Event(correlationID, "TokensIssued", new Object[] { tokenList });
+        String json = new Gson().toJson(tokenList);
+        Event event = new Event(correlationID, "TokensIssued", new Object[] { json });
         queue.publish(event);
     }
 
