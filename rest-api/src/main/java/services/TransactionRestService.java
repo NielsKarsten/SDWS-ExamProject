@@ -27,10 +27,22 @@ public class TransactionRestService {
 
     }
 
+    private Object buildCompletableFutureEvent(Object eventObject, String eventTopic) {
+        CompletableFuture<Object> completableFuture = new CompletableFuture<Object>();
+
+        UUID correlationId = UUID.randomUUID();
+        Event event = new Event(correlationId, eventTopic, new Object[] { eventObject });
+
+        correlations.put(correlationId, completableFuture);
+        queue.publish(event);
+        return completableFuture.join();
+    }
+
+    // TODO refactor with buildCompletableFutureEvent
     public TransactionRequestResponse createTransactionRequest(TransactionRequest request) {
-    	UUID correlationId = UUID.randomUUID();
-    	correlations.put(correlationId, new CompletableFuture<>());
-        var event = new Event(correlationId, "TransactionRequest", new Object[] {request});
+        UUID correlationId = UUID.randomUUID();
+        correlations.put(correlationId, new CompletableFuture<>());
+        var event = new Event(correlationId, "TransactionRequest", new Object[] { request });
         this.queue.publish(event);
         return (TransactionRequestResponse) correlations.get(correlationId).join();
     }
@@ -40,32 +52,32 @@ public class TransactionRestService {
         UUID correlationId = event.getCorrelationId();
         correlations.get(correlationId).complete(r);
     }
-    
+
     private List<Transaction> getTransactions(String eventName, UUID id) {
-    	UUID correlationId = UUID.randomUUID();
-    	correlations.put(correlationId, new CompletableFuture<>());
-        var event = new Event(correlationId, eventName, new Object[] {id});
+        UUID correlationId = UUID.randomUUID();
+        correlations.put(correlationId, new CompletableFuture<>());
+        var event = new Event(correlationId, eventName, new Object[] { id });
         this.queue.publish(event);
         return (List<Transaction>) correlations.get(correlationId).join();
     }
-    
-    public List<Transaction> getCustomerTransactions(UUID userId){
-    	return getTransactions("CustomerReportRequested", userId);
+
+    public List<Transaction> getCustomerTransactions(UUID userId) {
+        return getTransactions("CustomerReportRequested", userId);
     }
-    
+
     public void handleReportResponse(Event event) {
         List<Transaction> requestedTransactions = event.getArgument(0, List.class);
         UUID correlationId = event.getCorrelationId();
         correlations.get(correlationId).complete(requestedTransactions);
     }
-    
-    public List<Transaction> getMerchantTransactions(UUID merchantId){
-    	return getTransactions("MerchantReportRequested", merchantId);
+
+    public List<Transaction> getMerchantTransactions(UUID merchantId) {
+        return getTransactions("MerchantReportRequested", merchantId);
     }
-    
-    public List<Transaction> getAdminTransactions(){
-    	UUID correlationId = UUID.randomUUID();
-    	correlations.put(correlationId, new CompletableFuture<>());
+
+    public List<Transaction> getAdminTransactions() {
+        UUID correlationId = UUID.randomUUID();
+        correlations.put(correlationId, new CompletableFuture<>());
         var event = new Event(correlationId, "AdminReportRequested", new Object[] {});
         this.queue.publish(event);
         return (List<Transaction>) correlations.get(correlationId).join();

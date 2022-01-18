@@ -1,10 +1,10 @@
 import messaging.MessageQueue;
 import messaging.implementations.RabbitMqQueue;
-import tokenmanagement.service.TokenManagementService;
+import tokenmanagement.service.TokenService;
 
 public class StartUp {
     public static void main(String[] args) {
         MessageQueue q = new RabbitMqQueue("rabbitMq");
-        new TokenManagementService(q);
+        new TokenService(q);
     }
 }
