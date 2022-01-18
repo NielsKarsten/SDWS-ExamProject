@@ -6,6 +6,7 @@
 
 package tokenmanagement.service;
 
+import com.google.gson.Gson;
 import messaging.Event;
 import messaging.MessageQueue;
 import token.service.manager.ActiveTokenManager;
@@ -45,7 +46,8 @@ public class TokenService {
         } catch (IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
-        publishNewEvent(e, "TokensIssued", tokenList);
+        String json = new Gson().toJson(tokenList);
+        publishNewEvent(e, "TokensIssued", json);
     }
 
     public List<UUID> requestTokens(TokenRequest tokenRequest) throws IllegalArgumentException {

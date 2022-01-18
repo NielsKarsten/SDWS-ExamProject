@@ -7,14 +7,13 @@ package behaviourtests;
 
 import static org.junit.Assert.assertEquals;
 
-import dtu.ws.fastmoney.test.BankService;
-import dtu.ws.fastmoney.test.BankServiceException_Exception;
-import dtu.ws.fastmoney.test.User;
+import com.google.gson.Gson;
+import dtu.ws.fastmoney.test.*;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.After;
-import org.junit.Before;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -29,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class DTUPaySteps {
-	private BankService bankService = mock(BankService.class);;
+	private BankService bankService = new BankServiceService().getBankServicePort();
 	private DTUPayUser customer;
 	private DTUPayUser merchant;
 	private DTUPayUser admin;
@@ -42,6 +41,9 @@ public class DTUPaySteps {
 	private String customerAccountId;
 	private String merchantAccountId;
 	private boolean deleteAccountResponse;
+
+	private UUID customerId;
+	private UUID merchantId;
 
 	Client client = ClientBuilder.newClient();
 	WebTarget merchantTarget = client.target("http://localhost:8080/").path("merchant");
@@ -61,8 +63,16 @@ public class DTUPaySteps {
 		bravoUser.setFirstName("Bravo");
 		bravoUser.setLastName("Johnny");
 
-		customerAccountId = bankService.createAccountWithBalance(johnnyUser, BigDecimal.valueOf(1000));
-		merchantAccountId = bankService.createAccountWithBalance(bravoUser, BigDecimal.valueOf(1000));
+		for (AccountInfo accountInfo : bankService.getAccounts()) {
+			if (accountInfo.getUser().getCprNumber().equals(johnnyUser.getCprNumber()))
+				bankService.retireAccount(accountInfo.getAccountId());
+
+			if (accountInfo.getUser().getCprNumber().equals(bravoUser.getCprNumber()))
+				bankService.retireAccount(accountInfo.getAccountId());
+		}
+
+		customerAccountId = bankService.createAccountWithBalance(johnnyUser, BigDecimal.valueOf(0));
+		merchantAccountId = bankService.createAccountWithBalance(bravoUser, BigDecimal.valueOf(0));
 	}
 
 	@Given("a customer {string} {string}")
@@ -89,13 +99,13 @@ public class DTUPaySteps {
 	@When("customer is being registered")
 	public void theCustomerIsBeingRegistered() {
 		System.out.println("Customer is being registered account is called");
-		customerTarget.request().post(Entity.json(customer), DTUPayUser.class);
+		customerId = customerTarget.request().post(Entity.json(customer), UUID.class);
 	}
 
 	@When("merchant is being registered")
 	public void theMerchantIsBeingRegistered() {
 		System.out.println("Merchant is being registered account is called");
-		merchantTarget.request().post(Entity.json(merchant), DTUPayUser.class);
+		merchantId = merchantTarget.request().post(Entity.json(merchant), UUID.class);
 	}
 
 	@When("admin is being registered")
@@ -107,8 +117,9 @@ public class DTUPaySteps {
 	@When ("customer requests {int} tokens")
 	public void customerRequestsTokens(int tokenAmount){
 		System.out.println("Customer requests tokens is called");
-		TokenRequest tokenRequest = new TokenRequest(customer.getUserId(), tokenAmount);
-		tokens = customerTarget.path("/token").request().post(Entity.json(tokenRequest), new GenericType<List<UUID>>(){});
+		TokenRequest tokenRequest = new TokenRequest(customerId, tokenAmount);
+		String json = new Gson().toJson(tokenRequest);
+		tokens = customerTarget.path("/token").request().post(Entity.json(json), new GenericType<List<UUID>>(){});
 	}
 
 	@Then("customer has {int} tokens")
@@ -122,8 +133,10 @@ public class DTUPaySteps {
 		System.out.println("Merchant initiates transaction is called");
 		transactionToken = tokens.get(0);
 		transactionAmount = BigDecimal.valueOf(amount);
-		TransactionRequest transactionRequest = new TransactionRequest(merchant.getUserId(), transactionToken, transactionAmount);
-		merchantTarget.path("/transaction").request().post(Entity.json(transactionRequest));
+		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
+		String json = new Gson().toJson(transactionRequest);
+		var response = merchantTarget.path("/transaction").request().post(Entity.json(json));
+		String test = "J";
 	}
 
 	@When("customer requests transactions")
@@ -160,27 +173,27 @@ public class DTUPaySteps {
 	public void theCustomerHasBalance(int amount) throws BankServiceException_Exception {
 		System.out.println("Customer has balance verification is called");
 		BigDecimal actual = bankService.getAccount(customer.getAccountId()).getBalance();
-		assertEquals(actual, BigDecimal.valueOf(amount));
+		assertEquals(BigDecimal.valueOf(amount), actual);
 	}
 
 	@Then("merchant has balance {int}")
 	public void theMerchantHasBalance(int amount) throws BankServiceException_Exception {
 		System.out.println("Merchant has balance verification is called");
 		BigDecimal actual = bankService.getAccount(merchant.getAccountId()).getBalance();
-		assertEquals(actual, BigDecimal.valueOf(amount));
+		assertEquals(BigDecimal.valueOf(amount), actual);
 	}
 
 	@When("customer account is retired")
 	public void theCustomerAccountIsDeleted() {
 		System.out.println("Customer account retired is called");
-		var response = customerTarget.queryParam("userId", customer.getUserId()).request().delete();
-		deleteAccountResponse = response.readEntity(boolean.class);
+		var response = customerTarget.queryParam("userId", customerId).request().delete();
+		deleteAccountResponse = response.readEntity(Boolean.class);
 	}
 
 	@When("merchant account is retired")
 	public void theMerchantAccountIsDeleted() {
 		System.out.println("Merchant account retired is called");
-		var response = merchantTarget.queryParam("userId", merchant.getUserId()).request().delete();
+		var response = merchantTarget.queryParam("userId", merchantId).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
 	}
 

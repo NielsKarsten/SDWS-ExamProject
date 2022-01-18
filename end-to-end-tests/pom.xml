@@ -26,6 +26,27 @@
 				<configuration>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>wsimport-from-jdk</id>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<wsdlUrls>
+						<wsdlUrl>http://fm-00.compute.dtu.dk/BankService.wsdl.xml</wsdlUrl>
+					</wsdlUrls>
+					<keep>true</keep>
+					<packageName>dtu.ws.fastmoney.test</packageName>
+					<sourceDestDir>src/main/java</sourceDestDir>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
