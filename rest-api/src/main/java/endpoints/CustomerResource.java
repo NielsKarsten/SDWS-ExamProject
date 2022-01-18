@@ -13,9 +13,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import models.User;
+import models.*;
 import services.*;
-import tokenmanagement.service.TokenRequest;
 
 @Path("/Customer")
 public class CustomerResource {

@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.gson.Gson;
 import messaging.Event;
 import messaging.MessageQueue;
-import tokenmanagement.service.TokenRequest;
+import models.TokenRequest;
 
 import javax.ws.rs.core.GenericType;
 

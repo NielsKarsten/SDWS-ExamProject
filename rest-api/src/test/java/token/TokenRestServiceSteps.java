@@ -20,7 +20,7 @@ import io.cucumber.java.en.When;
 import services.TokenRestService;
 import messaging.Event;
 import messaging.MessageQueue;
-import tokenmanagement.service.TokenRequest;
+import models.TokenRequest;
 
 
 public class TokenRestServiceSteps {
