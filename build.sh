@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-pushd messaging-utilities
+pushd messaging-utilities-3.3
 ./build.sh
 popd
 
