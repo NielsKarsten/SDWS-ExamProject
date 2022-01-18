@@ -33,3 +33,8 @@ Scenario: Find customerId through event that gives token
 	When the "TokenToCustomerIdRequested" event is received
 	Then the "TokenToCustomerIdResponse" event is sent
 
+Scenario: Request tokens event test
+	Given a customer
+	When the "TokensRequested" event is received
+	Then the "TokensIssued" event is sent
+
