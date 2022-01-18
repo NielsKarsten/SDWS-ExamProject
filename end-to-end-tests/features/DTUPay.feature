@@ -21,6 +21,58 @@ Scenario: Successful payment
 	Then account with id "1337" does not exist
 	And account with id "1337" does not exist
 
+Scenario: Customer gets transaction
+	Given a customer "Johnny" "Bravo" with bank account "1337"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny" with bank account "1111"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 100
+	And customer requests transactions
+	Then user gets transaction
+	When account with id "1337" is retired
+	And account with id "1111" is retired
+	Then account with id "1337" does not exist
+	And account with id "1337" does not exist
+
+
+Scenario: Merchant gets transaction
+	Given a customer "Johnny" "Bravo" with bank account "1337"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny" with bank account "1111"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 100
+	And merchant requests transactions
+	Then user gets transaction
+	When account with id "1337" is retired
+	And account with id "1111" is retired
+	Then account with id "1337" does not exist
+	And account with id "1337" does not exist
+
+Scenario: Admin gets transaction
+	Given a customer "Johnny" "Bravo" with bank account "1337"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny" with bank account "1111"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 100
+	And admin requests transactions
+	Then user gets transaction
+	When account with id "1337" is retired
+	And account with id "1111" is retired
+	Then account with id "1337" does not exist
+	And account with id "1337" does not exist
+
+Scenario: Admin creates and deletes
+	Given an admin "Johnny" "Bravo" with bank account "1337"
+	When admin is being registered
+	And account with id "1337" is retired
+	Then account with id "1337" does not exist
+
 #customerAccount = bank.createAccount Name, CPR, balance
 #merchantAccount = bank.createAccount Name, CPR, balance
 #cid = customerAPI.register Name, customerAccount, ...
