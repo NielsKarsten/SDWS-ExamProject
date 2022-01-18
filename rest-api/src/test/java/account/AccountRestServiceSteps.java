@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import services.AccountRestService;
-import account.service.models.User;
+import models.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import messaging.Event;
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 
 public class AccountRestServiceSteps {
 	private MessageQueue queue;
-	private AccountRestService accountRegistrationService;
+	private AccountRestService accountRestService;
 	private CompletableFuture<UUID> registeredUser;
 	private CompletableFuture<String> userAccountId;
 	private CompletableFuture<Boolean> userAccountDeleted;
@@ -44,11 +44,11 @@ public class AccountRestServiceSteps {
 			}
 		};
 
-		accountRegistrationService = new AccountRestService(queue);
+		accountRestService = new AccountRestService(queue);
 		registeredUser = new CompletableFuture<>();
 		userAccountId = new CompletableFuture<>();
 		userAccountDeleted = new CompletableFuture<>();
-		eventConstruction = new EventConstruction(accountRegistrationService);
+		eventConstruction = new EventConstruction(accountRestService);
 		publishedEvent = new CompletableFuture<>();
 	}
 
@@ -64,7 +64,7 @@ public class AccountRestServiceSteps {
 		// the register method will only finish after the next @When
 		// step is executed.
 		new Thread(() -> {
-			UUID result = accountRegistrationService.registerAsyncUserAccount(eventConstruction.getUser());
+			UUID result = accountRestService.registerAsyncUserAccount(eventConstruction.getUser());
 			registeredUser.complete(result);
 		}).start();
 	}
@@ -72,7 +72,7 @@ public class AccountRestServiceSteps {
 	@When("the user account id is requested")
 	public void theUserAccountIdIsRequested() {
 		new Thread(() -> {
-			String accountId = accountRegistrationService
+			String accountId = accountRestService
 					.requestAsyncUserAccountInfo(eventConstruction.getUserId());
 			userAccountId.complete(accountId);
 		}).start();
@@ -94,7 +94,7 @@ public class AccountRestServiceSteps {
 	@When("the user account is closed")
 	public void theUserAccountIsClosed() {
 		new Thread(() -> {
-			Boolean accountClosed = accountRegistrationService
+			Boolean accountClosed = accountRestService
 					.requestAsyncUserAccountDeletion(eventConstruction.getUserId());
 			userAccountDeleted.complete(accountClosed);
 		}).start();

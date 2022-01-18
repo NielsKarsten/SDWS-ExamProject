@@ -5,6 +5,7 @@ import java.util.*;
 
 import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
+import dtu.ws.fastmoney.BankServiceService;
 import messaging.Event;
 import messaging.MessageQueue;
 import transaction.service.connector.AccountServiceConnector;
@@ -21,6 +22,10 @@ public class TransactionService {
 
     private String errorMessage;
 
+    public TransactionService(MessageQueue queue){
+        this(queue, new BankServiceService().getBankServicePort());
+    }
+
     public TransactionService(MessageQueue queue, BankService bank) {
         this(queue, bank, new TokenServiceConnector(queue), new AccountServiceConnector(queue));
     }
@@ -35,6 +40,7 @@ public class TransactionService {
         this.queue.addHandler("TransactionsByUserIdRequest", this::handleTransactionsByUserIdRequest);
         this.queue.addHandler("CustomerReportRequested", this::handleCustomerReportRequest);
         this.queue.addHandler("MerchantReportRequested", this::handleMerchantReportRequest);
+        this.queue.addHandler("AdminReportResponse", this::handleAdminReportRequest);
     }
 
     public boolean pay(String userBank, String merchantBank, BigDecimal amount, String description) {

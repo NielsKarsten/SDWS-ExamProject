@@ -23,7 +23,7 @@ public class TokenRestService {
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 	}
 
-	public List<UUID> issue(UUID customerId, int amount) {
+	public List<UUID> issueTokens(UUID customerId, int amount) {
 		UUID correlationId = UUID.randomUUID();
 		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
 		Event event = new Event(correlationId,"TokensRequested", new Object[] { customerId,amount });
@@ -42,4 +42,3 @@ public class TokenRestService {
 		issuedTokens.complete(tokenList);
 	}
 }
-
