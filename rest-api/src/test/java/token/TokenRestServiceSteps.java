@@ -68,7 +68,7 @@ public class TokenRestServiceSteps {
         Event event = new Event(correlationId,requestEvent, new Object[] { tokenRequest });
         assertEquals(event,pEvent);
     }
-    @When ("the {string} event is sent")
+    @When ("the {string} token event is sent")
     public void issueEvent(String issueEvent){
         Gson gson= new Gson();
         var tokens = new ArrayList<UUID>();
