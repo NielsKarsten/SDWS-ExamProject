@@ -1,7 +1,8 @@
 # Authors:
 # Theodor Guttesen s185121
+# Niels
 # Main: Christian Gernsøe s163552
-
+# 
 Feature: Token Service
 Scenario: new Customer requests tokens
 	Given a customer
