@@ -1,4 +1,4 @@
 FROM adoptopenjdk:11-jre-hotspot
-COPY target/account-service-1.0.0.jar /usr/src/
 WORKDIR /usr/src/
-CMD java -Xmx32m -jar account-service-1.0.0.jar 
+COPY target/account-service-1.0.0-jar-with-dependencies.jar /usr/src/
+CMD java -Xmx64m -jar account-service-1.0.0-jar-with-dependencies.jar 

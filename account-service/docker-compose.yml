@@ -1,6 +1,6 @@
 version: '3'
 services:
-  account-service:
+  DTUPay:
     image: accounts 
     container_name: account-service
     build: .
