@@ -1,13 +1,8 @@
-package models;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
+package behaviourtests;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
 public class User implements Serializable{
 	private static final long serialVersionUID = -1483091887852909042L;
 	private String firstName, lastName;
@@ -24,6 +19,20 @@ public class User implements Serializable{
 		this.userId = UUID.randomUUID();
 		return this.userId;
 	}
-	
-}
 
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public UUID getUserId() {
+		return userId;
+	}
+
+	public String getAccountId() {
+		return accountId;
+	}
+}

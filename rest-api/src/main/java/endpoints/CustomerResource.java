@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 
 import models.User;
 import services.*;
+import tokenmanagement.service.TokenRequest;
 
 @Path("/Customer")
 public class CustomerResource {
@@ -49,9 +50,9 @@ public class CustomerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response requestTokens(@QueryParam("userId") UUID userId, @QueryParam("amount") int amount) {
+    public Response requestTokens(TokenRequest tokenRequest) {
     	try {
-    		List<UUID> tokens = factory.getTokenService().issueTokens(userId, amount);
+    		List<UUID> tokens = factory.getTokenService().issueTokens(tokenRequest);
     		return Response.status(200).entity(tokens).build();
     	}
     	catch(Exception e) {

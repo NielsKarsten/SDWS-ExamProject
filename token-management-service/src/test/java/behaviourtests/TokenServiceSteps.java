@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.gson.Gson;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import messaging.Event;
 import messaging.MessageQueue;
 import org.junit.After;
+import tokenmanagement.service.TokenRequest;
 import tokenmanagement.service.exceptions.TokenException;
 import tokenmanagement.service.TokenManagementService;
 
@@ -32,6 +32,7 @@ public class TokenServiceSteps {
 	private UUID expectedToken;
 	private List<UUID> tokenList;
 	private UUID correlationId;
+	private TokenRequest tokenRequest;
 
 	public TokenServiceSteps() {
 	}
@@ -43,26 +44,30 @@ public class TokenServiceSteps {
 
 	@Given("has {int} tokens")
 	public void hasTokens(int tokenAmount) throws TokenException {
-		tokenList = tokenService.requestTokens(_customerId, tokenAmount);
+		tokenRequest = new TokenRequest(_customerId,tokenAmount);
+		tokenList = tokenService.requestTokens(tokenRequest);
 		tokenResult = tokenList.get(0);
 	}
 
 	@When("{int} tokens are requested")
 	public void costumerRequestsNewTokens(int tokenAmount) throws TokenException {
-		tokenList = tokenService.requestTokens(_customerId, tokenAmount);
+		tokenRequest = new TokenRequest(_customerId,tokenAmount);
+		tokenList = tokenService.requestTokens(tokenRequest);
 	}
 
 	@When("{int} tokens are requested then customer has too many tokens")
 	public void costumerHasTooManyTokensWhenRequesting(int tokenAmount) {
+		tokenRequest = new TokenRequest(_customerId,tokenAmount);
 		exception = assertThrows(TokenException.class, () -> {
-			tokenService.requestTokens(_customerId, tokenAmount);
+			tokenService.requestTokens(tokenRequest);
 		});
 	}
 
 	@When("{int} tokens are requested then token limit exceeds")
 	public void requestingTokensExceedsLimit(int tokenAmount) {
+		tokenRequest = new TokenRequest(_customerId,tokenAmount);
 		exception = assertThrows(TokenException.class, () -> {
-			tokenService.requestTokens(_customerId, tokenAmount);
+			tokenService.requestTokens(tokenRequest);
 		});
 	}
 

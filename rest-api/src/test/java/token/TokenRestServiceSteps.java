@@ -20,6 +20,7 @@ import io.cucumber.java.en.When;
 import services.TokenRestService;
 import messaging.Event;
 import messaging.MessageQueue;
+import tokenmanagement.service.TokenRequest;
 
 
 public class TokenRestServiceSteps {
@@ -43,6 +44,7 @@ public class TokenRestServiceSteps {
     private UUID customerId;
     private int NTokens;
     private UUID correlationId;
+    private TokenRequest tokenRequest;
 
     public TokenRestServiceSteps() {
     }
@@ -50,11 +52,12 @@ public class TokenRestServiceSteps {
     public void givenCustomer(String id){
         customerId = UUID.fromString(id);
     }
+
     @When ("the customer requests {int} tokens")
     public void customerRequestsTokens(int tokenAmount){
-        NTokens=tokenAmount;
+        tokenRequest = new TokenRequest(customerId, tokenAmount);
         new Thread(() -> {
-            var result = service.issueTokens(customerId,tokenAmount);
+            var result = service.issueTokens(tokenRequest);
             issuedTokens.complete(result);
         }).start();
     }
@@ -62,7 +65,7 @@ public class TokenRestServiceSteps {
     public void requestEvent(String requestEvent){
         Event pEvent = publishedEvent.join();
         correlationId = pEvent.getCorrelationId();
-        Event event = new Event(correlationId,requestEvent, new Object[] { customerId,NTokens });
+        Event event = new Event(correlationId,requestEvent, new Object[] { tokenRequest });
         assertEquals(event,pEvent);
     }
     @When ("the {string} event is sent")
