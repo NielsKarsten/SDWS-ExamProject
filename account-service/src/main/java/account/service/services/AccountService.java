@@ -24,35 +24,38 @@ public class AccountService {
 		queue.addHandler("AccountClosedRequested", this::handleUserAccountClosedRequested);
 	}
 
-	public void handleUserAccountRegistration(Event e) {
+	private void publishNewEvent(Event e, String topic, Object object) {
 		UUID correlationId = e.getCorrelationId();
+		Event event = new Event(correlationId, topic, new Object[] { object });
+		queue.publish(event);
+	}
+
+	public void handleUserAccountRegistration(Event e) {
 		User user = e.getArgument(0, User.class);
 		UUID userId = user.assignUserId();
 		users.put(userId, user);
-		Event event = new Event(correlationId, "UserAccountRegistered", new Object[] { userId });
-		queue.publish(event);
+		publishNewEvent(e, "UserAccountRegistered", userId);
 	}
 
 	public void handleUserAccountInfoRequested(Event e) {
-		Event event;
-		UUID correlationId = e.getCorrelationId();
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
 			String userAccountId = users.get(userId).getAccountId();
-			event = new Event(correlationId, "UserAccountInfoResponse", new Object[] { userAccountId });
+			publishNewEvent(e, "UserAccountInfoResponse", userAccountId);
 		} catch (NullPointerException ex) {
 			System.out.println(ex.getMessage());
-			event = new Event(correlationId, "UserAccountInfoResponse", new Object[] { null });
+			publishNewEvent(e, "UserAccountInfoResponse", null);
 		}
-		queue.publish(event);
 	}
 
 	public void handleUserAccountClosedRequested(Event e) {
-		UUID correlationId = e.getCorrelationId();
-		UUID userId = e.getArgument(0, UUID.class);
-		boolean success = users.remove(userId) != null;
-		Event event = new Event(correlationId, "AccountClosedResponse", new Object[] { success });
-		queue.publish(event);
+		try {
+			UUID userId = e.getArgument(0, UUID.class);
+			boolean success = users.remove(userId) != null;
+			publishNewEvent(e, "AccountClosedResponse", success);
+		} catch (Exception exception) {
+			publishNewEvent(e, "AccountClosedResponse", false);
+		}
 	}
 
 }

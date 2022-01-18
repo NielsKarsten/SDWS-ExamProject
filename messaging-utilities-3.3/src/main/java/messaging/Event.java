@@ -19,13 +19,13 @@ public class Event implements Serializable {
 	public Event() {
 	};
 
-	public Event(UUID uuid, String topic, Object[] arguments) {
-		this.correlationId = uuid;
+	public Event(String topic, Object[] arguments) {
 		this.type = topic;
 		this.arguments = arguments;
 	}
 
-	public Event(String topic, Object[] arguments) {
+	public Event(UUID correlationId, String topic, Object[] arguments) {
+		this.correlationId = correlationId;
 		this.type = topic;
 		this.arguments = arguments;
 	}
@@ -35,7 +35,7 @@ public class Event implements Serializable {
 	}
 
 	public UUID getCorrelationId() {
-		return correlationId;
+		return this.correlationId;
 	}
 
 	public String getType() {
