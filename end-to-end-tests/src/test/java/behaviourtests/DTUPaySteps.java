@@ -130,6 +130,12 @@ public class DTUPaySteps {
 		assertEquals(actual, amount);
 	}
 
+	@Then("merchant has balance {int}")
+	public void theMerchantHasBalance(int amount) throws BankServiceException_Exception {
+		BigDecimal actual = bankService.getAccount(merchant.getAccountId()).getBalance();
+		assertEquals(actual, amount);
+	}
+
 	@When("account with id {string} is retired")
 	public void theAccountIsRetired(String accountId) throws BankServiceException_Exception {
 		bankService.retireAccount(accountId);
