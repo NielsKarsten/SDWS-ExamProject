@@ -21,7 +21,3 @@ pushd rest-api
 ./build.sh
 popd
 
-pushd end-to-end-tests
-./build.sh
-popd
-
