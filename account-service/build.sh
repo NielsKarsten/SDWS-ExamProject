@@ -1,5 +1,5 @@
 #!/bin/bash
 set -e
-mvn clean package
+mvn clean install
 docker-compose build account-service
 docker-compose up -d
