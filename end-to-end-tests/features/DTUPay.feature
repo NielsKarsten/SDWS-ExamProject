@@ -1,3 +1,9 @@
+# Authors:
+# Theodor Guttesen s185121
+# Christian Gernsøe s163552
+# Gustav Lintrup Kirkholt s164765
+
+
 Feature: DTU Pay feature
 
 Scenario: Successful payment
