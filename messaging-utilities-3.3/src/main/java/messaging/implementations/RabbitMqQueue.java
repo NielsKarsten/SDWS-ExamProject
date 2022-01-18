@@ -21,13 +21,15 @@ public class RabbitMqQueue implements MessageQueue {
 	private static final String QUEUE_TYPE = "topic";
 
 	private Channel channel;
+	private String hostname;
 
 	public RabbitMqQueue() {
 		this(DEFAULT_HOSTNAME);
 	}
 
 	public RabbitMqQueue(String hostname) {
-		channel = setUpChannel(hostname);
+		this.hostname = hostname;
+		channel = setUpChannel();
 	}
 
 	@Override
@@ -41,39 +43,40 @@ public class RabbitMqQueue implements MessageQueue {
 		}
 	}
 
-	private Channel setUpChannel(String hostname) {
-		Channel channel;
+	private Channel setUpChannel() {
+		Channel chan;
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(hostname);
 			Connection connection = factory.newConnection();
-			channel = connection.createChannel();
-			channel.exchangeDeclare(EXCHANGE_NAME, QUEUE_TYPE);
+			chan = connection.createChannel();
+			chan.exchangeDeclare(EXCHANGE_NAME, QUEUE_TYPE);
 		} catch (IOException | TimeoutException e) {
 			throw new Error(e);
 		}
-		return channel;
+		return chan;
 	}
 
 	@Override
 	public void addHandler(String eventType, Consumer<Event> handler) {
-		System.out.println("[x] handler "+handler+" for event type " + eventType + " installed");
+		var chan = setUpChannel();
+		System.out.println("[x] handler " + handler + " for event type " + eventType + " installed");
 		try {
-			String queueName = channel.queueDeclare().getQueue();
-			channel.queueBind(queueName, EXCHANGE_NAME, TOPIC);
+			String queueName = chan.queueDeclare().getQueue();
+			chan.queueBind(queueName, EXCHANGE_NAME, TOPIC);
 
 			DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 				String message = new String(delivery.getBody(), "UTF-8");
 
-				System.out.println("[x] handle event "+message);
+				System.out.println("[x] handle event " + message);
 
 				Event event = new Gson().fromJson(message, Event.class);
-				
+
 				if (eventType.equals(event.getType())) {
 					handler.accept(event);
 				}
 			};
-			channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+			chan.basicConsume(queueName, true, deliverCallback, consumerTag -> {
 			});
 		} catch (IOException e1) {
 			throw new Error(e1);

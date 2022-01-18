@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>hubert.dtu.dk</groupId>
 	<artifactId>messaging-utilities</artifactId>
-	<version>3.2</version>
+	<version>3.3</version>
 	<name>message-utilities</name>
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
