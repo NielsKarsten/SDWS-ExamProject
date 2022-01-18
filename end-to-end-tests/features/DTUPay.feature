@@ -6,6 +6,41 @@
 
 Feature: DTU Pay feature
 
+Scenario: Successful registered a customer
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Then customer exists
+
+Scenario: Succesfully un-register a customer
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Then customer exists
+	When customer account is retired
+	Then account does not exist
+
+Scenario: Customer succesfully requests tokens
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	
+Scenario: Succesfully register a merchant
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	Then merchant exists
+
+Scenario: Succesfully un-register a merchant
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	Then merchant exists
+	When merchant account is retired
+	Then account does not exist
+
+Scenario: Succesfully register an admin
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	Then merchant exists
+
 Scenario: Successful payment
 	Given a customer "Johnny" "Bravo"
 	When customer is being registered
