@@ -2,22 +2,22 @@
 set -e
 
 pushd messaging-utilities-3.3
-./build.sh
+bash build.sh
 popd
 
 pushd account-service
-./build.sh
+bash build.sh
 popd
 
 pushd token-management-service
-./build.sh
+bash build.sh
 popd
 
 pushd transaction-service
-./build.sh
+bash build.sh
 popd
 
 pushd rest-api
-./build.sh
+bash build.sh
 popd
 
