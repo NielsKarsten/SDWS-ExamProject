@@ -64,6 +64,7 @@ public class TokenServiceSteps {
 		exception = assertThrows(IllegalArgumentException.class, () -> {
 			tokenService.requestTokens(tokenRequest);
 		});
+		//Niels vil teste, men ikke teste en test
 	}
 	
 	public Object createEventObject(String eventName) {
