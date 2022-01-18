@@ -24,7 +24,7 @@ public class TokenRestService {
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 	}
 
-	public List<UUID> issue(TokenRequest tokenRequest) {
+	public List<UUID> issueTokens(TokenRequest tokenRequest) {
 		UUID correlationId = UUID.randomUUID();
 		CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
 		Event event = new Event(correlationId,"TokensRequested", new Object[] { tokenRequest });

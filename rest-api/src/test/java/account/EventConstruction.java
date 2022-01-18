@@ -2,8 +2,8 @@ package account;
 
 import java.util.UUID;
 import services.AccountRestService;
-import account.service.models.*;
 import messaging.Event;
+import models.*;
 
 /**
 * @authors Thomas Rathsach Strange (s153390), 

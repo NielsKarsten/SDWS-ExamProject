@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import account.service.models.*;
+import models.*;
 import messaging.Event;
 import messaging.MessageQueue;
 
@@ -82,3 +82,4 @@ public class AccountRestService {
 		userAccountDeleted.complete(userAccountDeletedResponse);
 	}
 }
+

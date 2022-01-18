@@ -132,6 +132,13 @@
 			<version>2.3.3</version>
 			<type>pom</type>
 		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>dk.dtu.compute.sdws.group3</groupId>
             <artifactId>token-management-service</artifactId>
