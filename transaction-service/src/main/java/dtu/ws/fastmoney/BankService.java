@@ -29,13 +29,13 @@ public interface BankService {
      * 
      * @param accountId
      * @return
-     *     returns dtu.ws.dtu.ws.fastmoney.Account
+     *     returns dtu.ws.fastmoney.Account
      * @throws BankServiceException_Exception
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "getAccount", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.GetAccount")
-    @ResponseWrapper(localName = "getAccountResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.GetAccountResponse")
+    @RequestWrapper(localName = "getAccount", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.GetAccount")
+    @ResponseWrapper(localName = "getAccountResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.GetAccountResponse")
     public Account getAccount(
         @WebParam(name = "account_id", targetNamespace = "")
         String accountId)
@@ -52,8 +52,8 @@ public interface BankService {
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "createAccountWithBalance", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.CreateAccountWithBalance")
-    @ResponseWrapper(localName = "createAccountWithBalanceResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.CreateAccountWithBalanceResponse")
+    @RequestWrapper(localName = "createAccountWithBalance", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.CreateAccountWithBalance")
+    @ResponseWrapper(localName = "createAccountWithBalanceResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.CreateAccountWithBalanceResponse")
     public String createAccountWithBalance(
         @WebParam(name = "user", targetNamespace = "")
         User user,
@@ -68,8 +68,8 @@ public interface BankService {
      * @throws BankServiceException_Exception
      */
     @WebMethod
-    @RequestWrapper(localName = "retireAccount", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.RetireAccount")
-    @ResponseWrapper(localName = "retireAccountResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.RetireAccountResponse")
+    @RequestWrapper(localName = "retireAccount", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.RetireAccount")
+    @ResponseWrapper(localName = "retireAccountResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.RetireAccountResponse")
     public void retireAccount(
         @WebParam(name = "account_id", targetNamespace = "")
         String accountId)
@@ -79,12 +79,12 @@ public interface BankService {
     /**
      * 
      * @return
-     *     returns java.util.List<dtu.ws.dtu.ws.fastmoney.AccountInfo>
+     *     returns java.util.List<dtu.ws.fastmoney.AccountInfo>
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "getAccounts", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.GetAccounts")
-    @ResponseWrapper(localName = "getAccountsResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.GetAccountsResponse")
+    @RequestWrapper(localName = "getAccounts", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.GetAccounts")
+    @ResponseWrapper(localName = "getAccountsResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.GetAccountsResponse")
     public List<AccountInfo> getAccounts();
 
     /**
@@ -96,8 +96,8 @@ public interface BankService {
      * @throws BankServiceException_Exception
      */
     @WebMethod
-    @RequestWrapper(localName = "transferMoneyFromTo", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.TransferMoneyFromTo")
-    @ResponseWrapper(localName = "transferMoneyFromToResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.dtu.ws.fastmoney.TransferMoneyFromToResponse")
+    @RequestWrapper(localName = "transferMoneyFromTo", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.TransferMoneyFromTo")
+    @ResponseWrapper(localName = "transferMoneyFromToResponse", targetNamespace = "http://fastmoney.ws.dtu/", className = "dtu.ws.fastmoney.TransferMoneyFromToResponse")
     public void transferMoneyFromTo(
         @WebParam(name = "debtor", targetNamespace = "")
         String debtor,

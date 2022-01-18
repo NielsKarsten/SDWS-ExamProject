@@ -2,12 +2,14 @@ package models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable{
 	private static final long serialVersionUID = -1483091887852909042L;
 	private String firstName, lastName;
