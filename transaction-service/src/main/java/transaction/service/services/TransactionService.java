@@ -89,19 +89,24 @@ public class TransactionService {
     }
 
     public void handleTransactionRequestEvent(Event event) {
+    	System.out.println("handleTransactionRequestEvent invoked");
+    	
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
         System.out.println("Transaction request received: " + request.toString());
         UUID correlationId = event.getCorrelationId();
-
+        UUID merchantId = request.getMerchantId();
+        UUID userToken = request.getUserToken();
+        
         System.out.println("handleTransactionRequestEvent - Before getting userId");
-        UUID customerId = tokenServiceConnector.getUserIdFromToken(request.getUserToken());
+        UUID customerId = tokenServiceConnector.getUserIdFromToken(userToken);
         System.out.println("handleTransactionRequestEvent - After getting userId");
-        TransactionRequestResponse trxReqResp = this.pay(customerId, request.getMerchantId(), request.getAmount(), request.getUserToken());
+        TransactionRequestResponse trxReqResp = this.pay(customerId, merchantId, request.getAmount(), userToken);
         Event e = new Event(correlationId, "TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(e);
     }
 
     public void handleTransactionsByUserIdRequest(Event event) {
+    	System.out.println("handleTransactionsByUserIdRequest invoked");
         UUID userId = event.getArgument(0, UUID.class);
         UUID correlationId = event.getCorrelationId();
         List<Transaction> allTransactionsList = TransactionStore.getInstance().getAllTransactions();
@@ -117,6 +122,7 @@ public class TransactionService {
     }
     
     public void handleAdminReportRequest(Event event) {
+    	System.out.println("handleAdminReportRequest invoked");
     	UUID correlationId = event.getCorrelationId();
     	List<Transaction> allTransactions = TransactionStore.getInstance().getAllTransactions();
     	Event outgoingEvent = new Event (correlationId, "AdminReportResponse", new Object[] {allTransactions});
@@ -124,7 +130,7 @@ public class TransactionService {
     }
     
     public void handleCustomerReportRequest(Event event) {
-    	System.out.println("Receiving Customer report request");
+    	System.out.println("handleCustomerReportRequest invoked");
     	UUID correlationId = event.getCorrelationId();
     	UUID userId = event.getArgument(0, UUID.class);
     	System.out.println("From user with id: " + userId.toString());
@@ -135,6 +141,7 @@ public class TransactionService {
     }
     
     public void handleMerchantReportRequest(Event event) {
+    	System.out.println("handleMerchantReportRequest invoked");
     	UUID correlationId = event.getCorrelationId();
     	UUID merchantId = event.getArgument(0, UUID.class);
     	List<Transaction> merchantTransactions = TransactionStore.getInstance().getMerchantTransactions(merchantId);

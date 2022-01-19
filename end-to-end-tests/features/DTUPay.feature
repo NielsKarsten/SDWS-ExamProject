@@ -26,6 +26,12 @@ Scenario: Customer succesfully requests tokens
 	When customer requests 5 tokens
 	Then customer has 5 tokens
 	
+Scenario: Customer Requests too many tokens
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	When customer requests 10 tokens
+	Then they receive an errormessage "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"
+	
 Scenario: Succesfully register a merchant
 	Given a merchant "Bravo" "Johnny"
 	When merchant is being registered
@@ -43,7 +49,7 @@ Scenario: Succesfully register an admin
 	When merchant is being registered
 	Then merchant exists
 
-Scenario: Successful payment
+Scenario: Successful payment 100
 	Given a customer "Johnny" "Bravo"
 	When customer is being registered
 	Given a merchant "Bravo" "Johnny"
@@ -51,6 +57,21 @@ Scenario: Successful payment
 	When customer requests 5 tokens
 	Then customer has 5 tokens
 	When merchant initiates a transaction for 100
+	Then customer has correct balance
+	And merchant has correct balance
+	When customer account is retired
+	Then account does not exist
+	When merchant account is retired
+	Then account does not exist
+
+Scenario: Successful payment 400
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 400
 	Then customer has correct balance
 	And merchant has correct balance
 	When customer account is retired

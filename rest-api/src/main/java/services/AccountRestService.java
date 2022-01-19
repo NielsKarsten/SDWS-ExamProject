@@ -4,6 +4,7 @@ import java.util.UUID;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 import models.*;
 import messaging.Event;
@@ -19,7 +20,7 @@ public class AccountRestService {
 
 	private MessageQueue queue;
 	// private HashMap<UUID, CompletableFuture<UUID>> registeredUsersMap;
-	private Map<UUID, CompletableFuture<Object>> completableFutures = new HashMap<UUID, CompletableFuture<Object>>();
+	private Map<UUID, CompletableFuture<Object>> completableFutures = new ConcurrentHashMap<UUID, CompletableFuture<Object>>();
 
 	public AccountRestService(MessageQueue q) {
 		queue = q;

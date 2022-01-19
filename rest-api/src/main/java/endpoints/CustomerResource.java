@@ -38,7 +38,7 @@ public class CustomerResource {
     public Response getUserTransactions(@QueryParam("customerId") UUID customerId) {
     	System.out.println("Customer requested a list of their transactions. ID: " + customerId.toString());
     	try {
-    		var customerTransactions = factory.getTransactionService().getCustomerTransactions(customerId);
+    		List<Transaction> customerTransactions = factory.getTransactionService().getCustomerTransactions(customerId);
     		return Response.status(200).entity(customerTransactions).build();
     	}
     	catch(Exception e) {
@@ -51,12 +51,17 @@ public class CustomerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response requestTokens(TokenRequest tokenRequest) {
-    	try {
-    		List<UUID> tokens = factory.getTokenService().issueTokens(tokenRequest);
-    		return Response.status(200).entity(tokens).build();
+    	try 
+    	{
+    		Object tokens = factory.getTokenService().issueTokens(tokenRequest);
+    		if (tokens.getClass().equals(String.class))
+    			return Response.status(400).entity(tokens).build();
+    		else
+    			return Response.status(200).entity(tokens).build();
     	}
-    	catch(Exception e) {
-    		return Response.serverError().build();
+    	catch(Exception e) 
+    	{
+    		return Response.serverError().entity(e.getMessage()).build();
     	}
     }
 
