@@ -40,34 +40,37 @@ public class TokenService {
     public void handleTokensRequested(Event e) {
         TokenRequest request = e.getArgument(0, TokenRequest.class);
 
-        List<UUID> tokenList = null;
-        try {
-            tokenList = requestTokens(request);
-        } catch (IllegalArgumentException exception) {
-            System.out.println(exception.getMessage());
-        }
+        List<UUID> tokenList = requestTokens(request);
         String json = new Gson().toJson(tokenList);
         publishNewEvent(e, "TokensIssued", json);
     }
 
-    public List<UUID> requestTokens(TokenRequest tokenRequest) throws IllegalArgumentException {
+    public List<UUID> requestTokens(TokenRequest tokenRequest) {
         UUID userId = tokenRequest.getUserId();
         int tokenAmount = tokenRequest.getAmount();
-        verifyRequestTokenInput(userId, tokenAmount);
-        return activeTokens.generateTokens(userId, tokenAmount);
+        if (verifyRequestTokenInput(userId, tokenAmount))
+        	return activeTokens.generateTokens(userId, tokenAmount);
+    	else
+    		return new ArrayList<>();
     }
 
-    private void verifyRequestTokenInput(UUID userId, int tokenAmount) throws IllegalArgumentException {
+    private boolean verifyRequestTokenInput(UUID userId, int tokenAmount) {
+    	System.out.println("Verifying token request from user with ID: " + userId);
         if (tokenAmount > 5 || tokenAmount < 1) {
-            throw new IllegalArgumentException(
+            System.out.println(
                     "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time");
+    		return false;
         }
 
         List<UUID> customerTokens = activeTokens.getUserTokens(userId);
         if (customerTokens != null && customerTokens.size() > 1) {
-            throw new IllegalArgumentException(
+        	System.out.println("Customer tokens: " + customerTokens.toString());
+        	System.out.println("Customer tokens list size " + customerTokens.size());
+        	System.out.println(
                     "Error: You can only request tokens when you have less than 2 active tokens");
+        	return false;
         }
+        return true;
     }
 
     public void handleTokenToCustomerIdRequested(Event e) {

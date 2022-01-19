@@ -40,12 +40,12 @@ public class TransactionService {
         this.queue.addHandler("TransactionsByUserIdRequest", this::handleTransactionsByUserIdRequest);
         this.queue.addHandler("CustomerReportRequested", this::handleCustomerReportRequest);
         this.queue.addHandler("MerchantReportRequested", this::handleMerchantReportRequest);
-        this.queue.addHandler("AdminReportResponse", this::handleAdminReportRequest);
+        this.queue.addHandler("AdminReportRequested", this::handleAdminReportRequest);
     }
 
     public boolean pay(String userBank, String merchantBank, BigDecimal amount, String description) {
         try {
-            bank.transferMoneyFromTo(merchantBank, userBank, amount, description);
+            bank.transferMoneyFromTo(userBank, merchantBank, amount, description);
         } catch (BankServiceException_Exception e) {
             errorMessage = e.getMessage();
             System.out.println(e.getMessage());
@@ -56,9 +56,20 @@ public class TransactionService {
     }
 
     public TransactionRequestResponse pay(UUID customer, UUID merchant, BigDecimal amount, UUID token) {
-        String customerBankAccount = accountServiceConnector.getUserBankAccountFromId(customer);
+    	System.out.println("Trying to do a payment with");
+    	System.out.println("Customer: " + customer.toString());
+    	System.out.println("Merchant: " + merchant.toString());
+    	System.out.println("Amount: " + amount.toString());
+    	System.out.println("Token: " + token.toString());
+        
+    	System.out.println("Getting customer bank acccount:");
+    	String customerBankAccount = accountServiceConnector.getUserBankAccountFromId(customer);
+    	System.out.println("Customer bank account id: " + customerBankAccount);
+    	
+    	System.out.println("Getting merchant Bank Account");
         String merchantBankAccount = accountServiceConnector.getUserBankAccountFromId(merchant);
-
+        System.out.println("Merchant bank account id: " + merchantBankAccount);
+        
         TransactionRequestResponse trxReqResp = new TransactionRequestResponse();
         String description = "Payment of " + amount + " to merchant " + merchantBankAccount;
         
@@ -71,16 +82,20 @@ public class TransactionService {
             trxReqResp.setSuccessful(false);
             trxReqResp.setErrorMessage(errorMessage);
         }
+        
+        System.out.println("Transaction response: " + trxReqResp.toString());
 
         return trxReqResp;
     }
 
     public void handleTransactionRequestEvent(Event event) {
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
+        System.out.println("Transaction request received: " + request.toString());
         UUID correlationId = event.getCorrelationId();
 
+        System.out.println("handleTransactionRequestEvent - Before getting userId");
         UUID customerId = tokenServiceConnector.getUserIdFromToken(request.getUserToken());
-        
+        System.out.println("handleTransactionRequestEvent - After getting userId");
         TransactionRequestResponse trxReqResp = this.pay(customerId, request.getMerchantId(), request.getAmount(), request.getUserToken());
         Event e = new Event(correlationId, "TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(e);
@@ -109,10 +124,12 @@ public class TransactionService {
     }
     
     public void handleCustomerReportRequest(Event event) {
+    	System.out.println("Receiving Customer report request");
     	UUID correlationId = event.getCorrelationId();
     	UUID userId = event.getArgument(0, UUID.class);
+    	System.out.println("From user with id: " + userId.toString());
     	List<Transaction> userTransactions = TransactionStore.getInstance().getCustomerTransactions(userId);
-    	
+    	System.out.println("A list of their transactions: " + userTransactions.toString());
     	Event outgoingEvent = new Event(correlationId, "CustomerReportResponse", new Object[] {userTransactions});
     	this.queue.publish(outgoingEvent);
     }

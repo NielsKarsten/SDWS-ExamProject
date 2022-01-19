@@ -20,17 +20,20 @@ public class AccountServiceConnector {
         this.queue.addHandler("UserAccountInfoResponse", this::handleGetAccountFromIdResponse);
     }
 
-    public String getUserBankAccountFromId(UUID id) {
+    public String getUserBankAccountFromId(UUID userId) {
+    	System.out.println("Getting user bank account from user Id: " + userId.toString());
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event e = new Event(correlationId, "UserAccountInfoRequested", new Object[]{id});
+        Event e = new Event(correlationId, "UserAccountInfoRequested", new Object[]{userId});
         this.queue.publish(e);
         return correlations.get(correlationId).join();
     }
 
     public void handleGetAccountFromIdResponse(Event event) {
-        String s = event.getArgument(0, String.class);
-        UUID correlationId = UUID.randomUUID();
-        correlations.get(correlationId).complete(s);
+    	System.out.println("Receiving User bank account ID");
+        String userBankAccountId = event.getArgument(0, String.class);
+        System.out.println("User bank account id: " + userBankAccountId);
+        UUID correlationId = event.getCorrelationId();
+        correlations.get(correlationId).complete(userBankAccountId);
     }
 }

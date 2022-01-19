@@ -34,8 +34,9 @@ public class TokenRestService {
 
 	public void handleTokensIssued(Event e) {
 		UUID correlationId = e.getCorrelationId();
-		var gson = new Gson();
-		var tokens = e.getArgument(0, String.class);
+		Gson gson = new Gson();
+		String tokens = e.getArgument(0, String.class);
+		System.out.println("Token before GSON " + tokens);
 		List<UUID> tokenList = gson.fromJson(tokens,new GenericType<List<UUID>>(){}.getType());
 		System.out.println(tokenList.toString());
 		completableFutures.get(correlationId).complete(tokenList);

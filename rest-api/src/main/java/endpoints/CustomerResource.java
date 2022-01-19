@@ -28,16 +28,17 @@ public class CustomerResource {
 	}
 
 	@DELETE
-	public boolean deleteUserAccount(@QueryParam("userId") UUID userId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(userId);
+	public boolean deleteUserAccount(@QueryParam("customerId") UUID customerId) {
+		return factory.getAccountService().requestAsyncUserAccountDeletion(customerId);
 	}
 
     @Path("/transaction")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUserTransactions(@QueryParam("userId") UUID userId) {
+    public Response getUserTransactions(@QueryParam("customerId") UUID customerId) {
+    	System.out.println("Customer requested a list of their transactions. ID: " + customerId.toString());
     	try {
-    		var customerTransactions = factory.getTransactionService().getCustomerTransactions(userId);
+    		var customerTransactions = factory.getTransactionService().getCustomerTransactions(customerId);
     		return Response.status(200).entity(customerTransactions).build();
     	}
     	catch(Exception e) {

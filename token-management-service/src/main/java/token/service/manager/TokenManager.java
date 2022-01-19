@@ -29,8 +29,15 @@ public class TokenManager {
         tokens.get(userId).addAll(generatedTokens);
     }
 
-    public List<UUID> getUserTokens(UUID userId) throws NullPointerException {
-        return tokens.get(userId);
+    public List<UUID> getUserTokens(UUID userId) {
+    	try 
+    	{
+            return tokens.get(userId);    		
+    	}
+    	catch(NullPointerException e)
+    	{
+    		return null;
+    	}
     }
 
     public UUID getTokenOwner(UUID token) throws NullPointerException {

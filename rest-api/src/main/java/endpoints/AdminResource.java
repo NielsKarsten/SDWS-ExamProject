@@ -26,14 +26,14 @@ public class AdminResource {
 	}
 
 	@DELETE
-	public boolean deleteUserAccount(@QueryParam("userId") UUID userId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(userId);
+	public boolean deleteUserAccount(@QueryParam("adminId") UUID adminId) {
+		return factory.getAccountService().requestAsyncUserAccountDeletion(adminId);
 	}
 	
 	@Path("/transaction")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTransaction(@QueryParam("merchantId") UUID merchantId) {
+    public Response createTransaction() {
 		try {
 			var obj = factory.getTransactionService().getAdminTransactions();
 			return Response.status(200).entity(obj).build();

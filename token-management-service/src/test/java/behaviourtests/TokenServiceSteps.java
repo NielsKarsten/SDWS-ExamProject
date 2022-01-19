@@ -29,9 +29,7 @@ public class TokenServiceSteps {
 	private UUID customerId;
 	
 	private Exception exception;
-	private UUID result;
-	private UUID tokenResult;
-	private UUID expectedToken;
+	private UUID token;
 	private List<UUID> tokens;
 	private UUID correlationId;
 	private TokenRequest tokenRequest;
@@ -61,17 +59,19 @@ public class TokenServiceSteps {
 	@When("{int} tokens are requested causing an exception")
 	public void costumerHasTooManyTokensWhenRequesting(int tokenAmount) {
 		tokenRequest = new TokenRequest(customerId,tokenAmount);
-		exception = assertThrows(IllegalArgumentException.class, () -> {
-			tokenService.requestTokens(tokenRequest);
-		});
+		assertEquals(tokenService.requestTokens(tokenRequest), new ArrayList<>());
 	}
 	
 	public Object createEventObject(String eventName) {
 		Object obj = null;
 		switch(eventName) {
 			case "TokensRequested":
-				obj = customerId;
+				int n = 1;
+				obj = new TokenRequest(customerId, n);
+				costumerRequestsNewTokens(n);
 				break;
+			case "TokensIssued":
+				obj = new ArrayList<UUID>().add(token);
 			case "TokenToCustomerIdRequested":
 				obj = tokens.get(0);
 				break;
@@ -87,17 +87,14 @@ public class TokenServiceSteps {
 	
 	public void handleEventRecieved(String eventName) {
 		Object eventObject = createEventObject(eventName);
-		Event event;
-		if (eventName == "TokensRequested")
-			event = new Event(correlationId, eventName ,new Object[] {customerId, 3});
-		else
-			event = new Event(correlationId, eventName ,new Object[] {eventObject});
+		Event event = new Event(correlationId, eventName ,new Object[] {eventObject});
 		switch(eventName) {
 			case "TokensRequested":
 				tokenService.handleTokensRequested(event);
 				break;
 			case "TokenToCustomerIdRequested":
 				tokenService.handleTokenToCustomerIdRequested(event);
+				break;
 			default:
 				System.out.println("No event recieved handler for event: " + eventName);
 				break;
@@ -118,10 +115,5 @@ public class TokenServiceSteps {
 	@Then("customer recieved {int} tokens")
 	public void tokensAreGenerated(int tokenAmount) {
 		assertEquals(tokenAmount, tokens.size());
-	}
-
-	@Then("exception {string} is returned")
-	public void tooManyTokensAreGenerated(String errorMsg) {
-		assertEquals(errorMsg, exception.getMessage());
 	}
 }
