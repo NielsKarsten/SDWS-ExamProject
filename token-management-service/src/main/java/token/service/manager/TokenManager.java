@@ -3,14 +3,16 @@ package token.service.manager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map.Entry;
 
 public class TokenManager {
-    protected HashMap<UUID, List<UUID>> tokens;
+    protected Map<UUID, List<UUID>> tokens;
 
     public TokenManager() {
-        this.tokens = new HashMap<UUID, List<UUID>>();
+        this.tokens = new ConcurrentHashMap<UUID, List<UUID>>();
     }
 
     public void addToken(UUID userId, UUID token) {

@@ -92,11 +92,13 @@ public class TransactionService {
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
         System.out.println("Transaction request received: " + request.toString());
         UUID correlationId = event.getCorrelationId();
-
+        UUID merchantId = request.getMerchantId();
+        UUID userToken = request.getUserToken();
+        
         System.out.println("handleTransactionRequestEvent - Before getting userId");
-        UUID customerId = tokenServiceConnector.getUserIdFromToken(request.getUserToken());
+        UUID customerId = tokenServiceConnector.getUserIdFromToken(userToken);
         System.out.println("handleTransactionRequestEvent - After getting userId");
-        TransactionRequestResponse trxReqResp = this.pay(customerId, request.getMerchantId(), request.getAmount(), request.getUserToken());
+        TransactionRequestResponse trxReqResp = this.pay(customerId, merchantId, request.getAmount(), userToken);
         Event e = new Event(correlationId, "TransactionRequestResponse", new Object[]{trxReqResp});
         this.queue.publish(e);
     }

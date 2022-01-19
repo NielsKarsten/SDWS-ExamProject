@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TokenServiceConnector {
 
     private MessageQueue queue;
-    private HashMap<UUID, CompletableFuture<UUID>> correlations = new HashMap<>();
+    private Map<UUID, CompletableFuture<UUID>> correlations = new ConcurrentHashMap<>();
 
     public TokenServiceConnector(MessageQueue q) {
         this.queue = q;

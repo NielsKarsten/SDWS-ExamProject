@@ -6,6 +6,7 @@ package services;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
 import messaging.Event;
@@ -17,7 +18,7 @@ import javax.ws.rs.core.GenericType;
 public class TokenRestService {
 
 	private MessageQueue queue;
-	private Map<UUID, CompletableFuture<Object>> completableFutures = new HashMap<>();
+	private Map<UUID, CompletableFuture<Object>> completableFutures = new ConcurrentHashMap<>();
 
 	public TokenRestService(MessageQueue q) {
 		queue = q;

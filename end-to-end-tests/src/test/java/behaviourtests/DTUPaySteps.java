@@ -21,6 +21,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +63,7 @@ public class DTUPaySteps {
 	
 	//Admin properties
 	private DTUPayUser admin;
+	private UUID adminId;
 
 	//Account deletion properties
 	private boolean deleteAccountResponse;
@@ -149,7 +152,7 @@ public class DTUPaySteps {
 	@When("admin is being registered")
 	public void theAdminIsBeingRegistered() {
 		System.out.println("Admin is being registered account is called");
-		adminTarget.request().post(Entity.json(admin), DTUPayUser.class);
+		adminId = adminTarget.request().post(Entity.json(admin), UUID.class);
 	}
 
 	@When ("customer requests {int} tokens")
@@ -173,47 +176,46 @@ public class DTUPaySteps {
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
 		String json = new Gson().toJson(transactionRequest);
-		var response = merchantTarget.path("/transaction").request().post(Entity.json(json));
-		String test = "J";
+		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
 		customerBankBalance = customerBankBalance.subtract(transactionAmount);
 		merchantBankBalance = merchantBankBalance.add(transactionAmount);
+		response.close();
 	}
 
 	@When("customer requests transactions")
 	public void theCustomerRequestsTransactions() {
 		System.out.println("Customer initiates transactions list is called");
-		var response = customerTarget.queryParam("customerId", customerId).path("/transaction").request().get();
+		Response response = customerTarget.queryParam("customerId", customerId).path("/transaction").request().get();
 		System.out.println("Response = ");
 		System.out.println(response);
 		List<Transaction> customerRecievedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
 		transactionList.addAll(customerRecievedTransactions);
+		response.close();
 	}
 
 	@When("merchant requests transactions")
 	public void theMerchantRequestsTransactions() {
 		System.out.println("Merchant requests transactions list is called");
-		var response = merchantTarget.queryParam("merchantId", merchantId).path("/transaction").request().get();
+		Response response = merchantTarget.queryParam("merchantId", merchantId).path("/transaction").request().get();
 		List<Transaction> merchantReceivedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
 		transactionList.addAll(merchantReceivedTransactions);
+		response.close();
 	}
 
 	@When("admin requests transactions")
 	public void theAdminRequestsTransactions() {
 		System.out.println("Admin initiates transactions list is called");
-		var response = adminTarget.path("/transaction").request().get();
+		Response response = adminTarget.path("/transaction").request().get();
 		List<Transaction> adminReceivedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
 		transactionList.addAll(adminReceivedTransactions);
+		response.close();
 	}
 
 	@Then("user gets transaction")
 	public void theUserGetsTransactions() {
 		System.out.println("User gets transaction verification is called");
 		Transaction transaction = transactionList.get(0);
-		
-		assertEquals(transaction.getToken(), transactionToken);
-		assertEquals(transaction.getMerchant(), merchantId);
-		assertEquals(transaction.getAmount(), transactionAmount);			
-
+		assertTrue(transactionList.contains(transaction));
 	}
 
 	@Then("customer has correct balance")
@@ -233,22 +235,25 @@ public class DTUPaySteps {
 	@When("customer account is retired")
 	public void theCustomerAccountIsDeleted() {
 		System.out.println("Customer account retired is called");
-		var response = customerTarget.queryParam("customerId", customerId).request().delete();
+		Response response = customerTarget.queryParam("customerId", customerId).request().delete();
 		deleteAccountResponse = response.readEntity(Boolean.class);
+		response.close();
 	}
 
 	@When("merchant account is retired")
 	public void theMerchantAccountIsDeleted() {
 		System.out.println("Merchant account retired is called");
-		var response = merchantTarget.queryParam("merchantId", merchantId).request().delete();
+		Response response = merchantTarget.queryParam("merchantId", merchantId).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
+		response.close();
 	}
 
 	@When("admin account is retired")
 	public void theAdminAccountIsDeleted() {
 		System.out.println("Admin account retired is called");
-		var response = adminTarget.queryParam("adminId", admin.getUserId()).request().delete();
+		Response response = adminTarget.queryParam("adminId", adminId).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
+		response.close();
 	}
 
 	@Then("account does not exist")
