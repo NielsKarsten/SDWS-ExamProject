@@ -51,8 +51,8 @@ Scenario: Successful payment
 	When customer requests 5 tokens
 	Then customer has 5 tokens
 	When merchant initiates a transaction for 100
-	Then customer has balance 0
-	And merchant has balance 100
+	Then customer has correct balance
+	And merchant has correct balance
 	When customer account is retired
 	Then account does not exist
 	When merchant account is retired
@@ -65,7 +65,7 @@ Scenario: Customer gets transaction
 	When merchant is being registered
 	When customer requests 5 tokens
 	Then customer has 5 tokens
-	When merchant initiates a transaction for 100
+	When merchant initiates a transaction for 100.0
 	And customer requests transactions
 	Then user gets transaction
 	When customer account is retired
@@ -81,7 +81,7 @@ Scenario: Merchant gets transaction
 	When merchant is being registered
 	When customer requests 5 tokens
 	Then customer has 5 tokens
-	When merchant initiates a transaction for 100
+	When merchant initiates a transaction for 100.0
 	And merchant requests transactions
 	Then user gets transaction
 	When customer account is retired
@@ -96,7 +96,7 @@ Scenario: Admin gets transaction
 	When merchant is being registered
 	When customer requests 5 tokens
 	Then customer has 5 tokens
-	When merchant initiates a transaction for 100
+	When merchant initiates a transaction for 100.0
 	And admin requests transactions
 	Then user gets transaction
 	When customer account is retired

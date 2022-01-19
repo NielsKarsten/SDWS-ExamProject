@@ -29,8 +29,8 @@ public class MerchantResource {
 	}
 
 	@DELETE
-	public boolean deleteUserAccount(@QueryParam("userId") UUID userId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(userId);
+	public boolean deleteUserAccount(@QueryParam("merchantId") UUID merchantId) {
+		return factory.getAccountService().requestAsyncUserAccountDeletion(merchantId);
 	}
 	
 	@Path("/transaction")
