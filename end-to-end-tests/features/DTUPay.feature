@@ -26,6 +26,12 @@ Scenario: Customer succesfully requests tokens
 	When customer requests 5 tokens
 	Then customer has 5 tokens
 	
+Scenario: Customer Requests too many tokens
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	When customer requests 10 tokens
+	Then they receive an errormessage "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"
+	
 Scenario: Succesfully register a merchant
 	Given a merchant "Bravo" "Johnny"
 	When merchant is being registered

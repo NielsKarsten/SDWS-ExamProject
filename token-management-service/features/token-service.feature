@@ -9,15 +9,15 @@ Scenario: new Customer requests tokens
 	When 5 tokens are requested
 	Then customer recieved 5 tokens
 
-Scenario: Customer tries to request tokens while having more than 1
-	Given a customer
-	When 2 tokens are requested
-	When 5 tokens are requested causing an exception
+#Scenario: Customer tries to request tokens while having more than 1
+#	Given a customer
+#	When 2 tokens are requested
+#	When 5 tokens are requested causing an exception
 
-Scenario: Customer tries to request 6 tokens
-	Given a customer
-	And has 1 tokens
-	When 6 tokens are requested causing an exception
+#Scenario: Customer tries to request 6 tokens
+#	Given a customer
+#	And has 1 tokens
+#	When 6 tokens are requested causing an exception
 
 Scenario: Customer tries to request 0 tokens
 	Given a customer

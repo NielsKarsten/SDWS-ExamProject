@@ -65,7 +65,6 @@ public class TransactionStore {
     	for (Transaction transaction : transactions) {
     		if (transaction.getMerchant().equals(merchantId)) {
     			Transaction tmpTransaction = new Transaction(transaction.getMerchant(), null, transaction.getAmount(), transaction.getDescription(), transaction.getToken());
-    			tmpTransaction.setCustomer(null);
 				customerTransactions.add(tmpTransaction);    			
     		}
     	}

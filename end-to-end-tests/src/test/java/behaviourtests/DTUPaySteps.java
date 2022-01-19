@@ -16,6 +16,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -40,6 +41,8 @@ public class DTUPaySteps {
 	WebTarget merchantTarget = client.target("http://localhost:8080/").path("merchant");
 	WebTarget customerTarget = client.target("http://localhost:8080/").path("customer");
 	WebTarget adminTarget = client.target("http://localhost:8080/").path("admin");
+	Response response;
+	String serverError;
 	
 	//Customer properties
 	private User johnnyUser;
@@ -160,8 +163,14 @@ public class DTUPaySteps {
 		System.out.println("Customer requests tokens is called");
 		TokenRequest tokenRequest = new TokenRequest(customerId, tokenAmount);
 		String json = new Gson().toJson(tokenRequest);
-		tokens = customerTarget.path("/token").request().post(Entity.json(json), new GenericType<List<UUID>>(){});
-		transactionToken = tokens.get(0);
+		try {
+			tokens = customerTarget.path("/token").request().post(Entity.json(json), new GenericType<List<UUID>>(){});
+			transactionToken = tokens.get(0);			
+		}
+		catch(BadRequestException e)
+		{
+			serverError = e.getResponse().readEntity(String.class);
+		}
 	}
 
 	@Then("customer has {int} tokens")
@@ -235,7 +244,7 @@ public class DTUPaySteps {
 	@When("customer account is retired")
 	public void theCustomerAccountIsDeleted() {
 		System.out.println("Customer account retired is called");
-		Response response = customerTarget.queryParam("customerId", customerId).request().delete();
+		response = customerTarget.queryParam("customerId", customerId).request().delete();
 		deleteAccountResponse = response.readEntity(Boolean.class);
 		response.close();
 	}
@@ -243,7 +252,7 @@ public class DTUPaySteps {
 	@When("merchant account is retired")
 	public void theMerchantAccountIsDeleted() {
 		System.out.println("Merchant account retired is called");
-		Response response = merchantTarget.queryParam("merchantId", merchantId).request().delete();
+		response = merchantTarget.queryParam("merchantId", merchantId).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
 		response.close();
 	}
@@ -251,7 +260,7 @@ public class DTUPaySteps {
 	@When("admin account is retired")
 	public void theAdminAccountIsDeleted() {
 		System.out.println("Admin account retired is called");
-		Response response = adminTarget.queryParam("adminId", adminId).request().delete();
+		response = adminTarget.queryParam("adminId", adminId).request().delete();
 		deleteAccountResponse = response.readEntity(boolean.class);
 		response.close();
 	}
@@ -270,6 +279,11 @@ public class DTUPaySteps {
 	@Then("merchant exists")
 	public void merchantExists() {
 		assertNotNull(merchantId);
+	}
+	
+	@Then("they receive an errormessage {string}")
+	public void verifyErrorMessage(String errorMessage) {
+		assertEquals(errorMessage, serverError);
 	}
 
 	@After
