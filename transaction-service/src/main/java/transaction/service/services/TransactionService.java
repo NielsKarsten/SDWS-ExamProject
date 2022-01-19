@@ -89,6 +89,8 @@ public class TransactionService {
     }
 
     public void handleTransactionRequestEvent(Event event) {
+    	System.out.println("handleTransactionRequestEvent invoked");
+    	
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
         System.out.println("Transaction request received: " + request.toString());
         UUID correlationId = event.getCorrelationId();
@@ -104,6 +106,7 @@ public class TransactionService {
     }
 
     public void handleTransactionsByUserIdRequest(Event event) {
+    	System.out.println("handleTransactionsByUserIdRequest invoked");
         UUID userId = event.getArgument(0, UUID.class);
         UUID correlationId = event.getCorrelationId();
         List<Transaction> allTransactionsList = TransactionStore.getInstance().getAllTransactions();
@@ -119,6 +122,7 @@ public class TransactionService {
     }
     
     public void handleAdminReportRequest(Event event) {
+    	System.out.println("handleAdminReportRequest invoked");
     	UUID correlationId = event.getCorrelationId();
     	List<Transaction> allTransactions = TransactionStore.getInstance().getAllTransactions();
     	Event outgoingEvent = new Event (correlationId, "AdminReportResponse", new Object[] {allTransactions});
@@ -126,7 +130,7 @@ public class TransactionService {
     }
     
     public void handleCustomerReportRequest(Event event) {
-    	System.out.println("Receiving Customer report request");
+    	System.out.println("handleCustomerReportRequest invoked");
     	UUID correlationId = event.getCorrelationId();
     	UUID userId = event.getArgument(0, UUID.class);
     	System.out.println("From user with id: " + userId.toString());
@@ -137,6 +141,7 @@ public class TransactionService {
     }
     
     public void handleMerchantReportRequest(Event event) {
+    	System.out.println("handleMerchantReportRequest invoked");
     	UUID correlationId = event.getCorrelationId();
     	UUID merchantId = event.getArgument(0, UUID.class);
     	List<Transaction> merchantTransactions = TransactionStore.getInstance().getMerchantTransactions(merchantId);
