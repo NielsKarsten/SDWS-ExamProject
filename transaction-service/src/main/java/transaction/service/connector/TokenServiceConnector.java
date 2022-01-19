@@ -26,7 +26,7 @@ public class TokenServiceConnector {
     public UUID getUserIdFromToken(UUID token) {
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event event = new Event("TokenToCustomerIdRequested", new Object[]{token});
+        Event event = new Event("TokenToCustomerIdRequested", new Object[] { token });
         queue.publish(event);
         return correlations.get(correlationId).join();
     }

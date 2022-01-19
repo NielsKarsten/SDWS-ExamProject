@@ -1,7 +1,8 @@
 # Authors:
 # Theodor Guttesen s185121
+# Niels t
 # Main: Christian Gernsøe s163552
-
+# 
 Feature: Token Service
 Scenario: new Customer requests tokens
 	Given a customer
@@ -31,4 +32,9 @@ Scenario: Find customerId through event that gives token
 	And has 1 tokens
 	When the "TokenToCustomerIdRequested" event is received
 	Then the "TokenToCustomerIdResponse" event is sent
+
+Scenario: Request tokens event test
+	Given a customer
+	When the "TokensRequested" event is received
+	Then the "TokensIssued" event is sent
 

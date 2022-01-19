@@ -1,3 +1,5 @@
+#Authors: 
+
 Feature: Account service
 
 Scenario: customer registers account

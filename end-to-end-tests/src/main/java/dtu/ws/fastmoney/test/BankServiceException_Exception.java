@@ -45,7 +45,7 @@ public class BankServiceException_Exception
     /**
      * 
      * @return
-     *     returns fault bean: dtu.ws.dtu.ws.fastmoney.test.BankServiceException
+     *     returns fault bean: dtu.ws.fastmoney.test.BankServiceException
      */
     public BankServiceException getFaultInfo() {
         return faultInfo;
