@@ -54,7 +54,7 @@ public class TransactionRestService extends GenericService{
     }
     
     public void handleTransactionRequestResponseInvalid(Event event) {
-        genericHandler(event,Exception.class);
+    	genericErrorHandler(event);
     }
 
     public void handleReportResponse(Event event) {

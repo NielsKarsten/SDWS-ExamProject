@@ -43,7 +43,7 @@ public class MerchantResource {
 			return Response.status(200).entity(obj).build();
 		}
 		catch (Exception e) {
-			return Response.serverError().build();
+			return Response.status(400).entity(e.getMessage()).build();
 		}
     }
 
@@ -57,7 +57,7 @@ public class MerchantResource {
 			return Response.status(200).entity(transactionResponse).build();
 		}
 		catch (Exception e) {
-			return Response.serverError().build();
+			return Response.status(400).entity(e.getMessage()).build();
 		}
     }
 	
