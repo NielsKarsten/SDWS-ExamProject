@@ -71,7 +71,7 @@ public class AccountServiceTest {
 				obj = true;
 				break;
 			case "AccountClosedRetireTokenRequestInvalid":
-				obj = new Exception();
+				obj = new NullPointerException("No tokens to retire");
 				break;
 			default:
 				System.out.println("No event object found for " + eventName);

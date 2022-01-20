@@ -74,6 +74,7 @@ public class TransactionService {
         }
         catch(Exception e)
         {
+        	System.out.println("Error occoured during a transaction request: " + e.getMessage());
         	this.publishEvent(correlationId, "TransactionRequestInvalid", e);
         }
     }

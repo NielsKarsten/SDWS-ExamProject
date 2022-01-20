@@ -122,7 +122,7 @@ Scenario: Unsuccesful payment due to retired customer
 	When customer account is retired
 	When merchant initiates a transaction for 100
 	Then merchant has correct balance
-	And they receive an error message "java.lang.Exception: Customer does not exists"
+	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
 	
 Scenario: Unsuccesful payment due to unregistered merchant
 	Given a customer "Johnny" "Bravo"

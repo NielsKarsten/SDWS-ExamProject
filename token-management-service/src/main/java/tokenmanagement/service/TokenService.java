@@ -54,7 +54,13 @@ public class TokenService {
 
     	UUID userId = request.getUserId();
         int tokenAmount = request.getAmount();
-    	List<UUID> customerTokens = activeTokens.getUserTokens(userId);
+    	List<UUID> customerTokens;
+    	try{
+    		customerTokens = activeTokens.getUserTokens(userId);
+    	}
+    	catch(Exception ex) {
+    		customerTokens = null;
+    	}
     	
         if (tokenAmount > 5 || tokenAmount < 1) 
         {
@@ -90,14 +96,11 @@ public class TokenService {
     	UUID userId = e.getArgument(0, UUID.class);
     	try {
     		List<UUID> userActiveTokens = activeTokens.getUserTokens(userId);
-            for (UUID token : userActiveTokens) {
-                archivedTokens.addToken(userId, token);
-                activeTokens.removeToken(userId, token);
-            }
+    		activeTokens.removeTokens(userId, userActiveTokens);
+    		archivedTokens.addTokens(userId, userActiveTokens);
     		this.publishNewEvent(e, "ClosedUserAccountTokensRetired", true);
     	}
     	catch(Exception ex) {
-            ex.printStackTrace();
     		this.publishNewEvent(e, "AccountClosedRetireTokenRequestInvalid", ex);
     	}
     	

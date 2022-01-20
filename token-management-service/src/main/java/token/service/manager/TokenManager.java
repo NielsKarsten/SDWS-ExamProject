@@ -34,7 +34,6 @@ public class TokenManager {
     public List<UUID> getUserTokens(UUID userId) {
         if (tokens.get(userId) != null)
             return tokens.get(userId);
-
         return new ArrayList<>();
     }
 
@@ -57,7 +56,8 @@ public class TokenManager {
     }
     public void removeTokens(UUID customerId, List<UUID> tokensToBeRemoved) throws NullPointerException {
         try {
-        	tokens.get(customerId).removeAll(tokensToBeRemoved);
+        	if(tokens.containsKey(customerId))
+        		tokens.get(customerId).removeAll(tokensToBeRemoved);
         } catch (NullPointerException e) {
             throw new NullPointerException("ERROR: Customer does not have any tokens");
         }

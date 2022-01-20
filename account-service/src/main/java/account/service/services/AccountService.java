@@ -28,7 +28,7 @@ public class AccountService {
 		queue.addHandler("AccountClosedRequested", this::handleUserAccountClosedRequested);
 		queue.addHandler("VerifyUserAccountExistsRequest", this::handleVerifyUserAccountExistsRequest);
 		queue.addHandler("ClosedUserAccountTokensRetired", this::handleRetireUserAccountTokensResponse);
-		queue.addHandler("AccountClosedRetireTokenRequestInvalid", this::handleRetireUserAccountTokensResponse);
+		queue.addHandler("AccountClosedRetireTokenRequestInvalid", this::handleRetireUserAccountTokensError);
 	}
 
 	private void publishNewEvent(Event e, String topic, Object object) {
@@ -57,13 +57,16 @@ public class AccountService {
 	public void handleUserAccountClosedRequested(Event e) {
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
-			boolean success = users.remove(userId) != null && retireUserAccountToken(e, userId);
+			if (users.get(userId) == null)
+				throw new NullPointerException("No user with ID exists");
+			boolean success = retireUserAccountToken(e, userId) && users.remove(userId) != null;
 			if (success) {
 				publishNewEvent(e, "AccountClosedResponse", success);
 			} else {
 				publishNewEvent(e, "UserAccountInvalid", success);
 			}
 		} catch (Exception exception) {
+			System.out.println("Ending up in exception " + exception.getMessage());
 			publishNewEvent(e, "UserAccountInvalid", false);
 		}
 	}
@@ -78,12 +81,14 @@ public class AccountService {
 	}
 	
 	public void handleRetireUserAccountTokensResponse(Event event) {
+		System.out.println("handleRetireUserAccountTokensResponse");
 		UUID correlationId = event.getCorrelationId();
 		boolean status =  event.getArgument(0, boolean.class);
 		completableFutures.get(correlationId).complete(status);
 	}
 	
 	public void handleRetireUserAccountTokensError(Event event) {
+		System.out.println("handleRetireUserAccountTokensError");
 		UUID correlationId = event.getCorrelationId();
 		Exception exception =  event.getArgument(0, Exception.class);
 		completableFutures.get(correlationId).completeExceptionally(exception);
