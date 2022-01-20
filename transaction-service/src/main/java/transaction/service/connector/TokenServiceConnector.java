@@ -3,6 +3,7 @@ package transaction.service.connector;
 import messaging.Event;
 import messaging.MessageQueue;
 import transaction.service.models.User;
+import transaction.service.services.EventType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,14 +22,14 @@ public class TokenServiceConnector {
 
     public TokenServiceConnector(MessageQueue q) {
         this.queue = q;
-        this.queue.addHandler("TokenToCustomerIdResponse", this::handleGetUserFromTokenResponse);
-        this.queue.addHandler("TokenToCustomerIdResponseInvalid", this::handleGetUserFromTokenResponse);
+        this.queue.addHandler(EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE, this::handleGetUserFromTokenResponse);
+        this.queue.addHandler(EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, this::handleGetUserFromTokenResponse);
     }
 
     public UUID getUserIdFromToken(UUID token) throws IllegalArgumentException{
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event event = new Event(correlationId, "TokenToCustomerIdRequested", new Object[] { token });
+        Event event = new Event(correlationId, EventType.TOKEN_TO_CUSTOMER_ID_REQUESTED, new Object[] { token });
         queue.publish(event);
         return correlations.get(correlationId).join();
     }

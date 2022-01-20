@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import account.service.models.User;
 import account.service.services.AccountService;
+import account.service.services.EventType;
 import io.cucumber.java.en.*;
 import messaging.Event;
 import messaging.MessageQueue;
@@ -27,7 +28,7 @@ public class AccountServiceTest {
 	private Object getEventObject(String eventName) {
 		Object obj = null;
 		switch (eventName) {
-			case "AccountRegistrationRequested":
+			case EventType.ACCOUNT_REGISTRATION_REQUESTED:
 				obj = user;
 				break;
 			case "UserAccountRegistered":

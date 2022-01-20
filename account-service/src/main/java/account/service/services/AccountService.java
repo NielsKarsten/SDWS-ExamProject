@@ -20,10 +20,10 @@ public class AccountService {
 	public AccountService(MessageQueue q) {
 		users = new HashMap<UUID, User>();
 		queue = q;
-		queue.addHandler("AccountRegistrationRequested", this::handleUserAccountRegistration);
-		queue.addHandler("UserAccountInfoRequested", this::handleUserAccountInfoRequested);
-		queue.addHandler("AccountClosedRequested", this::handleUserAccountClosedRequested);
-		queue.addHandler("VerifyUserAccountExistsRequest", this::handleVerifyUserAccountExistsRequest);
+		queue.addHandler(EventType.ACCOUNT_REGISTRATION_REQUESTED, this::handleUserAccountRegistration);
+		queue.addHandler(EventType.USER_ACCOUNT_INFO_REQUESTED, this::handleUserAccountInfoRequested);
+		queue.addHandler(EventType.ACCOUNT_CLOSED_REQUESTED, this::handleUserAccountClosedRequested);
+		queue.addHandler(EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS, this::handleVerifyUserAccountExistsRequest);
 	}
 
 	private void publishNewEvent(Event e, String topic, Object object) {
@@ -36,16 +36,16 @@ public class AccountService {
 		User user = e.getArgument(0, User.class);
 		UUID userId = user.assignUserId();
 		users.put(userId, user);
-		publishNewEvent(e, "UserAccountRegistered", userId);
+		publishNewEvent(e, EventType.USER_ACCOUNT_ACCOUNT_REGISTERED, userId);
 	}
 
 	public void handleUserAccountInfoRequested(Event e) {
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
 			String userAccountId = users.get(userId).getAccountId();
-			publishNewEvent(e, "UserAccountInfoResponse", userAccountId);
+			publishNewEvent(e, EventType.USER_ACCOUNT_INFO_RESPONSE, userAccountId);
 		} catch (NullPointerException ex) {
-			publishNewEvent(e, "UserAccountInvalid", false);
+			publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, false);
 		}
 	}
 
@@ -54,12 +54,12 @@ public class AccountService {
 			UUID userId = e.getArgument(0, UUID.class);
 			boolean success = users.remove(userId) != null;
 			if (success) {
-				publishNewEvent(e, "AccountClosedResponse", success);
+				publishNewEvent(e, EventType.ACCOUNT_CLOSED_RESPONSE, success);
 			} else {
-				publishNewEvent(e, "UserAccountInvalid", success);
+				publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, success);
 			}
 		} catch (Exception exception) {
-			publishNewEvent(e, "UserAccountInvalid", false);
+			publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, false);
 		}
 	}
 
@@ -68,9 +68,9 @@ public class AccountService {
 			UUID userId = e.getArgument(0, UUID.class);
 			String userAccountId = users.get(userId).getAccountId();
 			boolean accountIdExists = userAccountId != null;
-			publishNewEvent(e, "VerifyUserAccountExistsResponse", accountIdExists);
+			publishNewEvent(e, EventType.VERIFY_USER_ACCOUNT_EXISTS_RESPONSE, accountIdExists);
 		} catch (NullPointerException ex) {
-			publishNewEvent(e, "UserAccountInvalid", false);
+			publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, false);
 		}
 	}
 }

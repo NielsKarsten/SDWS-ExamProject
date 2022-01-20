@@ -19,6 +19,8 @@ import messaging.MessageQueue;
 import org.junit.After;
 
 import java.util.function.Consumer;
+
+import tokenmanagement.service.EventType;
 import tokenmanagement.service.TokenRequest;
 import tokenmanagement.service.TokenService;
 
@@ -75,15 +77,15 @@ public class TokenServiceSteps {
 	public Object createEventObject(String eventName) {
 		Object obj = null;
 		switch(eventName) {
-			case "TokensRequested":
+			case EventType.TOKENS_REQUESTED:
 				obj = tokenRequest;
 				break;
-			case "TokensIssued":
+			case EventType.TOKENS_ISSUED:
 				obj = new ArrayList<UUID>().add(token);
-			case "TokenToCustomerIdRequested":
+			case EventType.TOKEN_TO_CUSTOMER_ID_REQUESTED:
 				obj = tokens.get(0);
 				break;
-			case "TokenToCustomerIdResponse":
+			case EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE:
 				obj = customerId;
 				break;
 			default:
@@ -97,10 +99,10 @@ public class TokenServiceSteps {
 		Object eventObject = createEventObject(eventName);
 		Event event = new Event(correlationId, eventName ,new Object[] {eventObject});
 		switch(eventName) {
-			case "TokensRequested":
+			case EventType.TOKENS_REQUESTED:
 				tokenService.handleTokensRequested(event);
 				break;
-			case "TokenToCustomerIdRequested":
+			case EventType.TOKEN_TO_CUSTOMER_ID_REQUESTED:
 				tokenService.handleTokenToCustomerIdRequested(event);
 				break;
 			default:

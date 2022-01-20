@@ -27,9 +27,9 @@ public class TokenService {
         this.activeTokens = new ActiveTokenManager();
         this.archivedTokens = new ArchivedTokenManager();
 
-        queue.addHandler("TokensRequested", this::handleTokensRequested);
-        queue.addHandler("TokenToCustomerIdRequested", this::handleTokenToCustomerIdRequested);
-        queue.addHandler("AccountClosedRequested", this::handleCustomerAccountClosed);
+        queue.addHandler(EventType.TOKENS_REQUESTED, this::handleTokensRequested);
+        queue.addHandler(EventType.TOKEN_TO_CUSTOMER_ID_REQUESTED, this::handleTokenToCustomerIdRequested);
+        queue.addHandler(EventType.ACCOUNT_CLOSED_REQUESTED, this::handleCustomerAccountClosed);
     }
 
     private void publishNewEvent(Event e, String topic, Object object) {
@@ -58,16 +58,16 @@ public class TokenService {
     	
         if (tokenAmount > 5 || tokenAmount < 1) 
         {
-        	publishNewEvent(e, "TokenRequestInvalid", new IllegalArgumentException("Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
+        	publishNewEvent(e, EventType.TOKEN_REQUEST_INVALID, new IllegalArgumentException("Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
         }
         else if (customerTokens != null && customerTokens.size() > 1) 
         {
-        	publishNewEvent(e, "TokenRequestInvalid", new IllegalArgumentException("Error: You can only request tokens when you have less than 2 active tokens"));
+        	publishNewEvent(e, EventType.TOKEN_REQUEST_INVALID, new IllegalArgumentException("Error: You can only request tokens when you have less than 2 active tokens"));
         }
         else 
         {
         	List<UUID> tokenList = requestTokens(request);
-            publishNewEvent(e, "TokensIssued", tokenList);    
+            publishNewEvent(e, EventType.TOKENS_ISSUED, tokenList);    
         }
     }
 
@@ -79,10 +79,10 @@ public class TokenService {
             customerId = activeTokens.getTokenOwner(token);
             activeTokens.removeToken(customerId, token);
             archivedTokens.addToken(customerId, token);
-            this.publishNewEvent(e, "TokenToCustomerIdResponse", customerId);
+            this.publishNewEvent(e, EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE, customerId);
         } catch (NullPointerException tokenException) 
         {
-        	this.publishNewEvent(e, "TokenToCustomerIdResponseInvalid", "Invalid token");
+        	this.publishNewEvent(e, EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, "Invalid token");
         }
     }
     
