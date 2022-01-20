@@ -22,10 +22,10 @@ public class TokenServiceConnector {
     public TokenServiceConnector(MessageQueue q) {
         this.queue = q;
         this.queue.addHandler("TokenToCustomerIdResponse", this::handleGetUserFromTokenResponse);
-        this.queue.addHandler("TokenToCustomerIdResponseInvalid", this::handleGetUserFromTokenResponse);
+        this.queue.addHandler("TokenToCustomerIdResponseInvalid", this::handleGetUserIdFromTokenError);
     }
 
-    public UUID getUserIdFromToken(UUID token) throws IllegalArgumentException{
+    public UUID getUserIdFromToken(UUID token) throws Exception {
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
         Event event = new Event(correlationId, "TokenToCustomerIdRequested", new Object[] { token });

@@ -1,7 +1,9 @@
 package account.service.services;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import account.service.models.User;
 import messaging.Event;
@@ -11,6 +13,7 @@ public class AccountService {
 
 	private MessageQueue queue;
 	private HashMap<UUID, User> users;
+	protected Map<UUID, CompletableFuture<Object>> completableFutures;
 
 	// test
 	public HashMap<UUID, User> getUsers() {
@@ -24,6 +27,8 @@ public class AccountService {
 		queue.addHandler("UserAccountInfoRequested", this::handleUserAccountInfoRequested);
 		queue.addHandler("AccountClosedRequested", this::handleUserAccountClosedRequested);
 		queue.addHandler("VerifyUserAccountExistsRequest", this::handleVerifyUserAccountExistsRequest);
+		queue.addHandler("ClosedUserAccountTokensRetired", this::handleRetureUserAccountTokensResponse);
+		queue.addHandler("AccountClosedRetireTokenRequestInvalid", this::handleRetureUserAccountTokensResponse);
 	}
 
 	private void publishNewEvent(Event e, String topic, Object object) {
@@ -63,11 +68,34 @@ public class AccountService {
 		}
 	}
 
+	private boolean retireUserAccountToken(UUID userId) throws Exception {
+		UUID correlationId = UUID.randomUUID();
+		Event event = new Event(correlationId, "RetireUserAccountTokensRequest", new Object[] {userId});			
+		CompletableFuture<Object> tokensRetired = new CompletableFuture<>();
+		completableFutures.put(correlationId, tokensRetired);
+		this.publishNewEvent(event, "RetireUserAccountTokensRequest", userId);
+		return (boolean) completableFutures.get(correlationId).join();
+
+	}
+	
+	private void handleRetureUserAccountTokensResponse(Event event) {
+		UUID correlationId = event.getCorrelationId();
+		boolean status =  event.getArgument(0, boolean.class);
+		completableFutures.get(correlationId).complete(status);
+	}
+	
+	private void handleRetureUserAccountTokensError(Event event) {
+		UUID correlationId = event.getCorrelationId();
+		Exception exception =  event.getArgument(0, Exception.class);
+		completableFutures.get(correlationId).completeExceptionally(exception);
+	}
+	
 	public void handleVerifyUserAccountExistsRequest(Event e) {
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
 			String userAccountId = users.get(userId).getAccountId();
-			boolean accountIdExists = userAccountId != null;
+			boolean accountIdExists = userAccountId != null;			
+			
 			publishNewEvent(e, "VerifyUserAccountExistsResponse", accountIdExists);
 		} catch (NullPointerException ex) {
 			publishNewEvent(e, "UserAccountInvalid", false);

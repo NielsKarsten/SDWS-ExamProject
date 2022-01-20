@@ -16,8 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TransactionRestService extends GenericService{
 
-    private CompletableFuture<TransactionRequestResponse> response;
-
     public TransactionRestService(MessageQueue q) {
     	super(q);
         this.queue.addHandler("TokenValidityResponse", this::handleTokenValidityResponse);

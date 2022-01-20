@@ -29,7 +29,7 @@ public class TokenService {
 
         queue.addHandler("TokensRequested", this::handleTokensRequested);
         queue.addHandler("TokenToCustomerIdRequested", this::handleTokenToCustomerIdRequested);
-        queue.addHandler("AccountClosedRequested", this::handleCustomerAccountClosed);
+        queue.addHandler("RetireUserAccountTokensRequest", this::handleCustomerAccountClosed);
     }
 
     private void publishNewEvent(Event e, String topic, Object object) {
@@ -88,6 +88,16 @@ public class TokenService {
     
     //TODO
     public void handleCustomerAccountClosed(Event e) {
+    	UUID userId = e.getArgument(0, UUID.class);
+    	try {
+    		List<UUID> userActiveTokens = activeTokens.getUserTokens(userId);
+    		archivedTokens.addTokens(userId, userActiveTokens);
+    		activeTokens.removeTokens(userId, userActiveTokens);
+    		this.publishNewEvent(e, "ClosedUserAccountTokensRetired", "Succesfully retired closed user account tokens");
+    	}
+    	catch(Exception ex) {
+    		this.publishNewEvent(e, "AccountClosedRetireTokenRequestInvalid", ex);
+    	}
     	
     }
 }

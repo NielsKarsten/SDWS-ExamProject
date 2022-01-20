@@ -59,5 +59,12 @@ public class TokenManager {
             throw new NullPointerException("ERROR: Customer does not have any tokens");
         }
     }
+    public void removeTokens(UUID customerId, List<UUID> tokensToBeRemoved) throws NullPointerException {
+        try {
+        	tokens.get(customerId).removeAll(tokensToBeRemoved);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("ERROR: Customer does not have any tokens");
+        }
+    }
 
 }

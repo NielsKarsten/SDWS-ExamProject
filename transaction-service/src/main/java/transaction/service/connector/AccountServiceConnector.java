@@ -18,6 +18,8 @@ public class AccountServiceConnector {
     public AccountServiceConnector(MessageQueue q) {
         this.queue = q;
         this.queue.addHandler("UserAccountInfoResponse", this::handleGetAccountFromIdResponse);
+        this.queue.addHandler("VerifyUserAccountExistsResponse", this::handleVerifyUserAccountExistsResponse);
+        this.queue.addHandler("UserAccountInvalid", this::handleVerifyUserAccountExistsResponse);
     }
 
     public boolean userExists(UUID userId) throws NullPointerException {
@@ -29,6 +31,12 @@ public class AccountServiceConnector {
         Event e = new Event(correlationId, "VerifyUserAccountExistsRequest", new Object[]{userId});
         this.queue.publish(e);
         return (boolean) correlations.get(correlationId).join();    	
+    }
+    
+    public void handleVerifyUserAccountExistsResponse(Event event) {
+    	UUID correlationId = event.getCorrelationId();
+    	boolean success = event.getArgument(0, boolean.class);
+        correlations.get(correlationId).complete(success);
     }
     
     public String getUserBankAccountFromId(UUID userId) throws NullPointerException {

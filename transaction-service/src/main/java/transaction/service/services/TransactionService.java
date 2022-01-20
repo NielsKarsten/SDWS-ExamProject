@@ -58,17 +58,21 @@ public class TransactionService {
         BigDecimal amount = request.getAmount();
         try 
         {
+        	System.out.println("Get uset account from token");
         	UUID customerId = tokenServiceConnector.getUserIdFromToken(userToken);
+        	System.out.println("Verify customer exists");
         	if(!accountServiceConnector.userExists(customerId))
         		throw new NullPointerException("Customer does not exists");
+        	System.out.println("Verify Merchant exists");
         	if(!accountServiceConnector.userExists(merchantId))
         		throw new NullPointerException("Merchant does not exists");
+        	System.out.println("Verify Correct amount");
         	if (amount == null || amount.compareTo(BigDecimal.valueOf(0)) <= 0)
         		throw new NullPointerException("Amount incorrectly specified");
         	this.tryPayment(customerId, merchantId, amount, userToken);
         	this.publishEvent(correlationId, "TransactionRequestSuccesfull", "Transaction was completed succesfully");
         }
-        catch(NullPointerException | BankServiceException_Exception e)
+        catch(Exception e)
         {
         	this.publishEvent(correlationId, "TransactionRequestInvalid", e);
         }
@@ -108,7 +112,7 @@ public class TransactionService {
         	}
         	else
         	{
-        		this.publishEvent(correlationId, "CustomerReportErrorResponse", new NullPointerException("No customer with that ID exists"));
+        		this.publishEvent(correlationId, "ReportRequestInvalid", new NullPointerException("No customer with that ID exists"));
         	}
     	}
     	catch(NullPointerException e)
@@ -128,7 +132,7 @@ public class TransactionService {
         	}
         	else
         	{
-        		this.publishEvent(correlationId, "MerchantReportErrorResponse", new NullPointerException("No customer with that ID exists"));
+        		this.publishEvent(correlationId, "ReportRequestInvalid", new NullPointerException("No customer with that ID exists"));
         	}
     	}
     	catch(NullPointerException e)
