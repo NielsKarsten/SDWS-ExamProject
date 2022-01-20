@@ -25,6 +25,8 @@ public class TokenRestService extends GenericService{
 	}
 
 	public List<UUID> issueTokens(TokenRequest tokenRequest) throws IllegalArgumentException {
+		if (!verifyUserExists(tokenRequest.getUserId()))
+			throw new NullPointerException("No user with ID: " + tokenRequest.getUserId() + " Exists");
 		return (List<UUID>) buildCompletableFutureEvent(tokenRequest,"TokensRequested");						
 	}
 	
@@ -33,9 +35,6 @@ public class TokenRestService extends GenericService{
 	}
 	
 	public void handleTokenRequestError(Event e) {
-		UUID correlationId = e.getCorrelationId();
-		String errorMessage = e.getArgument(0, String.class);
-		IllegalArgumentException ex = new IllegalArgumentException(errorMessage);
-		genericErrorHandler(e,String.class,ex);
+		genericErrorHandler(e);
 	}
 }
