@@ -57,11 +57,11 @@ public class TokenService {
     	
         if (tokenAmount > 5 || tokenAmount < 1) 
         {
-        	publishNewEvent(e, "invalidTokenAmountRequested", "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time");
+        	publishNewEvent(e, "TokenRequestInvalid", "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time");
         }
         else if (customerTokens != null && customerTokens.size() > 1) 
         {
-        	publishNewEvent(e, "tooManyExistingTokens", "Error: You can only request tokens when you have less than 2 active tokens");
+        	publishNewEvent(e, "TokenRequestInvalid", "Error: You can only request tokens when you have less than 2 active tokens");
         }
         else 
         {

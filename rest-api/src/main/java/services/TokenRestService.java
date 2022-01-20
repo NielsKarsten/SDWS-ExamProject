@@ -6,6 +6,7 @@ package services;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.gson.Gson;
@@ -23,17 +24,16 @@ public class TokenRestService {
 	public TokenRestService(MessageQueue q) {
 		queue = q;
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
-		queue.addHandler("invalidTokenAmountRequested", this::handleTokenRequestError);
-		queue.addHandler("tooManyExistingTokens", this::handleTokenRequestError);
+		queue.addHandler("TokenRequestInvalid", this::handleTokenRequestError);
 	}
 
-	public Object issueTokens(TokenRequest tokenRequest) {
+	public List<UUID> issueTokens(TokenRequest tokenRequest) throws IllegalArgumentException {
 		System.out.println("issueTokens invoked");
 		UUID correlationId = UUID.randomUUID();
 		Event event = new Event(correlationId,"TokensRequested", new Object[] { tokenRequest });
 		completableFutures.put(correlationId, new CompletableFuture<>());
 		queue.publish(event);
-		return completableFutures.get(correlationId).join();
+		return (List<UUID>) completableFutures.get(correlationId).join();						
 	}
 
 	public void handleTokensIssued(Event e) {
@@ -47,7 +47,6 @@ public class TokenRestService {
 		System.out.println("handleTokenRequestError invoked");
 		UUID correlationId = e.getCorrelationId();
 		String errorMessage = e.getArgument(0, String.class);
-		completableFutures.get(correlationId).complete(errorMessage);
+		completableFutures.get(correlationId).completeExceptionally(new IllegalArgumentException(errorMessage));
 	}
 }
-

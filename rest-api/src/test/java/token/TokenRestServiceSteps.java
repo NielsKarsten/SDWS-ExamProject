@@ -14,6 +14,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import com.google.gson.Gson;
+
+import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -24,29 +26,34 @@ import models.TokenRequest;
 
 
 public class TokenRestServiceSteps {
-
+	private TokenRestService service;
     private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
-
-    private MessageQueue q = new MessageQueue() {
-
-        @Override
-        public void publish(Event event) {
-            publishedEvent.complete(event);
-        }
-
-        @Override
-        public void addHandler(String eventType, Consumer<Event> handler) {
-        }
-
-    };
-    private TokenRestService service = new TokenRestService(q);
     private CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
+    private CompletableFuture<String> error = new CompletableFuture<>();
+
+    
     private UUID customerId;
-    private int NTokens;
     private UUID correlationId;
     private TokenRequest tokenRequest;
-
+    
     public TokenRestServiceSteps() {
+    }
+
+    @Before
+    public void setUp() {
+        MessageQueue q = new MessageQueue() {
+
+            @Override
+            public void publish(Event event) {
+                publishedEvent.complete(event);
+            }
+
+            @Override
+            public void addHandler(String eventType, Consumer<Event> handler) {
+            }
+
+        };
+        service = new TokenRestService(q);
     }
     @Given ("there is a customer with id")
     public void givenCustomer(){
@@ -57,8 +64,14 @@ public class TokenRestServiceSteps {
     public void customerRequestsTokens(int tokenAmount){
         tokenRequest = new TokenRequest(customerId, tokenAmount);
         new Thread(() -> {
-            var result = service.issueTokens(tokenRequest);
-            issuedTokens.complete(result);
+        	try {
+                var result = service.issueTokens(tokenRequest);        		
+                issuedTokens.complete(result);
+        	}
+        	catch(Exception e){
+        		System.out.println("Test error: " + e.getMessage());
+        		error.complete(e.getMessage());
+    		}
         }).start();
     }
     
@@ -75,7 +88,7 @@ public class TokenRestServiceSteps {
 		        }
 		        obj = tokens;
 		        break;
-	    	case "invalidTokenAmountRequested":
+	    	case "TokenRequestInvalid":
 	    		obj = "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time";
 	    		break;
 	    	default:
@@ -92,7 +105,7 @@ public class TokenRestServiceSteps {
 	    	case "TokensIssued":
 	    		service.handleTokensIssued(event);
 	    		break;
-	    	case "invalidTokenAmountRequested":
+	    	case "TokenRequestInvalid":
 	    		service.handleTokenRequestError(event);
 	    		break;
 	    	default:
@@ -101,7 +114,7 @@ public class TokenRestServiceSteps {
 	    	}
     }
     
-    @Then ("the {string} event is sent from issuetoken")
+    @Then ("the {string} event is sent from TokenRestService")
     public void requestEvent(String eventName){
         Event pEvent = publishedEvent.join();
         correlationId = pEvent.getCorrelationId();
@@ -109,7 +122,7 @@ public class TokenRestServiceSteps {
         assertEquals(event,pEvent);
     }
     
-    @When ("the {string} token event is sent")
+    @When ("the {string} token event is received")
     public void issueEvent(String eventName){
     	eventHandler(eventName);
     }
@@ -119,8 +132,8 @@ public class TokenRestServiceSteps {
         assertEquals(tokenAmount,((List<UUID>) issuedTokens.join()).size());
     }
     
-    @Then ("the customer has received an error {string}")
-    public void customerReceivedtokens(String errorMessage){
-        assertEquals(errorMessage, issuedTokens.join());
+    @Then ("the customer has received an error")
+    public void customerReceivedtokens(){
+        assertNotNull(error.join());
     }
 }
