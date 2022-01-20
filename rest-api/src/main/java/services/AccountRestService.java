@@ -25,8 +25,18 @@ public class AccountRestService extends GenericService{
 		queue.addHandler("AccountClosedResponse", this::handleUserAccountClosedResponse);
 	}
 
+	public UUID registerAsyncUserAccount(User user) {
+		if (user.getFirstName() == null || user.getLastName() == null || user.getAccountId() == null)
+			throw new NullPointerException("Error - Missing information about user");
+		return (UUID) buildCompletableFutureEvent(user, "AccountRegistrationRequested");
+	}
+
 	public void handleUserAccountAssigned(Event e) {
 		genericHandler(e, UUID.class);
+	}
+	
+	public String requestAsyncUserAccountInfo(UUID userId) {
+		return (String) buildCompletableFutureEvent(userId, "UserAccountInfoRequested");
 	}
 
 	public void handleUserAccountInfoResponse(Event e) {
@@ -37,15 +47,9 @@ public class AccountRestService extends GenericService{
 		genericHandler(e, Boolean.class);
 	}
 
-	public UUID registerAsyncUserAccount(User user) {
-		return (UUID) buildCompletableFutureEvent(user, "AccountRegistrationRequested");
-	}
-
-	public String requestAsyncUserAccountInfo(UUID userId) {
-		return (String) buildCompletableFutureEvent(userId, "UserAccountInfoRequested");
-	}
-
 	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
+		if (!verifyUserExists(userId))
+			throw new IllegalArgumentException("No user exists with userId: " + userId.toString());
 		return (Boolean) buildCompletableFutureEvent(userId, "AccountClosedRequested");
 	}
 	
