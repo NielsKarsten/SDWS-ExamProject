@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -114,12 +117,24 @@ public class TransactionServiceSteps {
     }
 		
 	@Before
-	public void setUp() {		
+	public void setUp() {
+		queue = new MessageQueue() {
+
+			@Override
+			public void publish(Event message) {
+				publishedEvent.complete(message);
+			}
+
+			@Override
+			public void addHandler(String eventType, Consumer<Event> handler) {
+			}
+		};
 	    accountServiceConnector = new MockAccountServiceConnector(queue);
 	    tokenServiceConnector = new MockTokenServiceConnector(queue);
 	    transactionService = new TransactionService(queue, bank, tokenServiceConnector, accountServiceConnector);
 	    publishedEvent = new CompletableFuture<Event>();
         transactions = new ArrayList<>();
+        exception = null;
 	}
     
     @Given("a merchant with an account with a balance of {int}")
@@ -189,13 +204,18 @@ public class TransactionServiceSteps {
 
     @Then("a {string} event is sent")
     public void aEventIsSent(String eventName) {
+    	Event pEvent = publishedEvent.join();
         expected = getEventObject(eventName);
-        verify(queue).publish(new Event(eventName, new Object[]{expected}));
+        Event event = new Event(eventName, new Object[]{expected});
+        assertEquals(pEvent, event);
     }
 
     @Then("a {string} event is sent with error message {string}")
     public void aEventIsSentWithErrorMessage(String eventName, String errorMsg) {
-        Exception e = new NullPointerException(errorMsg);
-        verify(queue).publish(new Event(eventName, new Object[]{e}));
+    	Event pEvent = publishedEvent.join();
+    	System.out.println(pEvent);
+    	exception = pEvent.getArgument(0, NullPointerException.class);
+        assertEquals(pEvent.getType(), eventName);
+        assertEquals(errorMsg, exception.getMessage());
     }
 }

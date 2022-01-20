@@ -35,8 +35,29 @@ Feature: Transaction Service
     When a "AdminReportRequested" event is received
     Then a "ReportResponse" event is sent
 
+  Scenario: No existing Customer transaction
+    Given a merchant with an account with a balance of 1000
+    And an amount of 100
+    When a "TransactionRequested" event is received
+    Then a "TransactionRequestInvalid" event is sent with error message "Customer does not exists"
+    
   Scenario: No existing merchant transaction
     Given a customer with an account with a balance of 1000
     And an amount of 100
     When a "TransactionRequested" event is received
     Then a "TransactionRequestInvalid" event is sent with error message "Merchant does not exists"
+ 
+   Scenario: Amount not specified
+    Given a merchant with an account with a balance of 1000
+    And a customer with an account with a balance of 1000
+    When a "TransactionRequested" event is received
+    Then a "TransactionRequestInvalid" event is sent with error message "Amount incorrectly specified"
+
+
+   Scenario: Negative amount specified
+    Given a merchant with an account with a balance of 1000
+    And a customer with an account with a balance of 1000
+    And an amount of -100
+    When a "TransactionRequested" event is received
+    Then a "TransactionRequestInvalid" event is sent with error message "Amount incorrectly specified"
+   

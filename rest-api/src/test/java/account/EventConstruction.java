@@ -77,7 +77,7 @@ public class EventConstruction {
 				service.handleUserAccountInfoResponse(event);
 				break;
 			case "AccountClosedResponse":
-				service.handleUserAccountClosedResponse(event);
+				service.handleUserAccountResponse(event);
 				break;
 			default:
 				System.out.println("No event handler found for " + eventName);

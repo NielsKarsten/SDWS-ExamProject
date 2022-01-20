@@ -16,7 +16,7 @@ import models.TokenRequest;
 
 import javax.ws.rs.core.GenericType;
 
-public class TokenRestService extends UserHandling{
+public class TokenRestService extends GenericService{
 
 	public TokenRestService(MessageQueue q) {
 		super(q);
@@ -24,9 +24,7 @@ public class TokenRestService extends UserHandling{
 		queue.addHandler("TokenRequestInvalid", this::handleTokenRequestError);
 	}
 
-	public List<UUID> issueTokens(TokenRequest tokenRequest) throws IllegalArgumentException {
-		if (!verifyUserExists(tokenRequest.getUserId()))
-			throw new NullPointerException("No user with ID: " + tokenRequest.getUserId() + " Exists");
+	public List<UUID> issueTokens(TokenRequest tokenRequest) throws Exception {
 		return (List<UUID>) buildCompletableFutureEvent(tokenRequest,"TokensRequested");						
 	}
 	

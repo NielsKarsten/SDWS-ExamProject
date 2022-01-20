@@ -16,7 +16,7 @@ import messaging.MessageQueue;
  *          Niels Karsten Bisgaard-Bohr (s202745)
  */
 
-public class AccountRestService extends UserHandling {
+public class AccountRestService extends GenericService {
 
 	public AccountRestService(MessageQueue q) {
 		super(q);
@@ -54,8 +54,6 @@ public class AccountRestService extends UserHandling {
 	}
 
 	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
-		if (!verifyUserExists(userId))
-			throw new IllegalArgumentException("No user exists with userId: " + userId.toString());
 		return (Boolean) buildCompletableFutureEvent(userId, "AccountClosedRequested");
 	}
 

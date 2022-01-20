@@ -29,7 +29,7 @@ public class TokenService {
 
         queue.addHandler("TokensRequested", this::handleTokensRequested);
         queue.addHandler("TokenToCustomerIdRequested", this::handleTokenToCustomerIdRequested);
-        queue.addHandler("AccountClosedRequested", this::handleTokenToCustomerIdRequested);
+        queue.addHandler("AccountClosedRequested", this::handleCustomerAccountClosed);
     }
 
     private void publishNewEvent(Event e, String topic, Object object) {
@@ -58,11 +58,11 @@ public class TokenService {
     	
         if (tokenAmount > 5 || tokenAmount < 1) 
         {
-        	publishNewEvent(e, "TokenRequestInvalid", "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time");
+        	publishNewEvent(e, "TokenRequestInvalid", new IllegalArgumentException("Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
         }
         else if (customerTokens != null && customerTokens.size() > 1) 
         {
-        	publishNewEvent(e, "TokenRequestInvalid", "Error: You can only request tokens when you have less than 2 active tokens");
+        	publishNewEvent(e, "TokenRequestInvalid", new IllegalArgumentException("Error: You can only request tokens when you have less than 2 active tokens"));
         }
         else 
         {
@@ -84,5 +84,10 @@ public class TokenService {
         {
         	this.publishNewEvent(e, "TokenToCustomerIdResponseInvalid", "Invalid token");
         }
+    }
+    
+    //TODO
+    public void handleCustomerAccountClosed(Event e) {
+    	
     }
 }

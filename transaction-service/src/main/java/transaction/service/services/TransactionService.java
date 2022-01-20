@@ -62,7 +62,8 @@ public class TransactionService {
         		throw new NullPointerException("Customer does not exists");
         	if(!accountServiceConnector.userExists(merchantId))
         		throw new NullPointerException("Merchant does not exists");
-        	
+        	if (amount == null || amount.compareTo(BigDecimal.valueOf(0)) <= 0)
+        		throw new NullPointerException("Amount incorrectly specified");
         	this.tryPayment(customerId, merchantId, amount, userToken);
         	this.publishEvent(correlationId, "TransactionRequestSuccesfull", "Transaction was completed succesfully");
         }

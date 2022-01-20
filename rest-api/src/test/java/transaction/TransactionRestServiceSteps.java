@@ -48,6 +48,7 @@ public class TransactionRestServiceSteps {
     
 	@Before
 	public void setUp() {
+		System.out.println("Before");
 		queue = new MessageQueue() {
 
 			@Override
@@ -72,33 +73,25 @@ public class TransactionRestServiceSteps {
 	public Object getEventObject(String eventName) {
 		Object obj = null;
 		switch (eventName) {
-			case "TransactionRequest":
+			case "TransactionRequested":
 				obj = trxReq;
 				break;
-			case "TransactionRequestResponse":
-				obj = new TransactionRequestResponse(true);
+			case "TransactionRequestSuccesfull":
+				obj = "Transaction was completed succesfully";
 				break;
 			case "CustomerReportRequested":
 				obj = customerId;
 				break;
 			case "MerchantReportRequested":
 				obj = merchantId;
-				break;
-			case "CustomerReportResponse":
-				obj = transactions;
-				break;
-			case "MerchantReportResponse":
-				List<Transaction> merchantTransactions = new ArrayList<Transaction>();
 				for (Transaction transaction : transactions) {
 					transaction.setCustomer(null);
-					merchantTransactions.add(transaction);
 				}
-				obj = merchantTransactions;
 				break;
 			case "AdminReportRequested":
 				obj = '1';
 				break;
-			case "AdminReportResponse":
+			case "ReportResponse":
 				obj = transactions;
 				break;
 			default:
@@ -113,12 +106,10 @@ public class TransactionRestServiceSteps {
         Object eventObject = getEventObject(eventName);
         Event event = new Event(correlationId, eventName, new Object[]{eventObject});
         switch (eventName) {
-            case "TransactionRequestResponse":
-                transactionRestService.handleTransactionRequestResponseInvalid(event);
+            case "TransactionRequestSuccesfull":
+                transactionRestService.handleTransactionRequestResponseSuccess(event);
                 break;
-            case "AdminReportResponse":
-            case "CustomerReportResponse":
-            case "MerchantReportResponse":
+            case "ReportResponse":
         	   transactionRestService.handleReportResponse(event);
         	   break;
             default:
@@ -129,6 +120,7 @@ public class TransactionRestServiceSteps {
 	
     @Given("a transaction request")
     public void aTransactionRequest() {
+    	System.out.println("a transaction request");
         merchant = new UserAccount(merchantId, new Account());
         Account customerAccount = new Account();
         customerAccount.setBalance(BigDecimal.valueOf(1000));
@@ -140,6 +132,7 @@ public class TransactionRestServiceSteps {
 
     @And("a list of transactions")
     public void aListOfTransactions() {
+    	System.out.println("a list of transactions");
         customerId = UUID.randomUUID();
         merchantId = UUID.randomUUID();	
         for (int i = 100; i < 500; i += 100) {        	
@@ -153,63 +146,84 @@ public class TransactionRestServiceSteps {
     
     @When("the transaction request is being registered")
     public void theTransactionRequestIsBeingRegistered() {
+    	System.out.println("the transaction request is being registered");
         new Thread(() -> {
-        	TransactionRequestResponse result = transactionRestService.createTransactionRequest(trxReq);
-        	actual.complete(result);
+			try {
+				String result = transactionRestService.createTransactionRequest(trxReq);
+	        	actual.complete(result);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         }).start();
     }
     
     @When("the Customer requests a list of their transactions")
     public void theCustomerRequestsAListOfTheirTransactions() {
+    	System.out.println("the Customer requests a list of their transactions");
         new Thread(() -> {
-        	List<Transaction> result = transactionRestService.getCustomerTransactions(customerId);
-        	actual.complete(result);
+			try {
+				List<Transaction> result = transactionRestService.getCustomerTransactions(customerId);
+				actual.complete(result);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }).start();
     }
 
     @When("the Merchant requests a list of their transactions")
     public void theMerchantRequestsAListOfTheirTransactions() {
+    	System.out.println("the Merchant requests a list of their transactions");
         new Thread(() -> {
-        	List<Transaction> result = transactionRestService.getMerchantTransactions(merchantId);
-        	actual.complete(result);
+			try {
+				List<Transaction> result = transactionRestService.getMerchantTransactions(merchantId);
+	        	actual.complete(result);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }).start();
     }
 
     @When("the Admin requests a list of all transactions")
     public void theAdminRequestsAListOfAllTransactions() {
+    	System.out.println("the Admin requests a list of all transactions");
         new Thread(() -> {
-        	List<Transaction> result = transactionRestService.getAdminTransactions();
-        	actual.complete(result);
+			try {
+				List<Transaction> result = transactionRestService.getAdminTransactions();
+	        	actual.complete(result);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }).start();
     }
     
     @Then("a {string} event is sent")
     public void a_event_is_sent(String eventName) {
+    	System.out.println("a "+eventName+" event is sent");
     	Event pEvent = publishedEvent.join();
     	correlationId = pEvent.getCorrelationId();
-    	Event event;
-    	if (eventName.equals("AdminReportRequested")) {
-    		event = new Event(correlationId, eventName, new Object[]{});
-    	}
-    	else {
-    		event = new Event(correlationId, eventName, new Object[]{getEventObject(eventName)});
-    	}
-    	assertEquals(event, pEvent);
+    	Event event = new Event(correlationId, eventName, new Object[]{getEventObject(eventName)});
+    	assertEquals(event.getType(), pEvent.getType());
     }
     
     @And("a {string} event is received")
     public void a_event_is_received(String eventName) {
+    	System.out.println("a "+eventName+" event is received");
         handleEventReceived(eventName);
     }
 
     @And("the transaction response has status successful")
     public void the_transaction_response_has_status_successful() {
-    	TransactionRequestResponse receivedResponse = (TransactionRequestResponse) actual.join();
+    	System.out.println("the transaction response has status successful");
+    	String receivedResponse =  (String) actual.join();
     	assertNotNull(receivedResponse);
     }
     
     @And("the ReportRequest was successful")
     public void theReportRequestWasSuccesfull() {
+    	System.out.println("the ReportRequest was successful");
     	List<Transaction> receivedResponse = (List<Transaction>) actual.join();
     	assertNotNull(receivedResponse);
     }

@@ -29,13 +29,11 @@ public class TokenRestServiceSteps {
 	private TokenRestService service;
     private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
     private CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
-    private CompletableFuture<String> error = new CompletableFuture<>();
-
+    private CompletableFuture<Boolean> errorRecieved = new CompletableFuture<>();
     
     private UUID customerId;
     private UUID correlationId;
     private TokenRequest tokenRequest;
-    
     public TokenRestServiceSteps() {
     }
 
@@ -67,10 +65,10 @@ public class TokenRestServiceSteps {
         	try {
                 var result = service.issueTokens(tokenRequest);        		
                 issuedTokens.complete(result);
+                errorRecieved.complete(false);
         	}
         	catch(Exception e){
-        		System.out.println("Test error: " + e.getMessage());
-        		error.complete(e.getMessage());
+        		errorRecieved.complete(true);
     		}
         }).start();
     }
@@ -89,7 +87,7 @@ public class TokenRestServiceSteps {
 		        obj = tokens;
 		        break;
 	    	case "TokenRequestInvalid":
-	    		obj = "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time";
+	    		obj = new NullPointerException("");
 	    		break;
 	    	default:
 	    		System.out.println("No object for event: " + eventName);
@@ -119,7 +117,7 @@ public class TokenRestServiceSteps {
         Event pEvent = publishedEvent.join();
         correlationId = pEvent.getCorrelationId();
         Event event = new Event(correlationId,eventName, new Object[] { createEventObject(eventName) });
-        assertEquals(event,pEvent);
+        assertEquals(event.getType(),pEvent.getType());
     }
     
     @When ("the {string} token event is received")
@@ -134,6 +132,6 @@ public class TokenRestServiceSteps {
     
     @Then ("the customer has received an error")
     public void customerReceivedtokens(){
-        assertNotNull(error.join());
+        assertTrue(errorRecieved.join());
     }
 }

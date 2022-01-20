@@ -13,7 +13,7 @@ public class GenericService {
 	protected Map<UUID, CompletableFuture<Object>> completableFutures;
 
 	public GenericService(MessageQueue q) {
-		q = queue;
+		queue = q;
 		completableFutures = new ConcurrentHashMap<UUID, CompletableFuture<Object>>();
 	}
 

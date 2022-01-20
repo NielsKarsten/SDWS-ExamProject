@@ -7,31 +7,39 @@ Feature: Token Service
 Scenario: new Customer requests tokens
 	Given a customer
 	When 5 tokens are requested
-	Then customer recieved 5 tokens
+	And the "TokensRequested" event is received
+	Then the "TokensIssued" event is sent
+	And customer recieved 5 tokens
 
-#Scenario: Customer tries to request tokens while having more than 1
-#	Given a customer
-#	When 2 tokens are requested
-#	When 5 tokens are requested causing an exception
+Scenario: Customer tries to request tokens while having 2 tokens
+	Given a customer
+	When 2 tokens are requested
+	And the "TokensRequested" event is received
+	Then the "TokensIssued" event is sent
+	When 5 tokens are requested
+	And the "TokensRequested" event is received
+	Then the "TokenRequestInvalid" event is sent
+	And An exception is thrown
 
-#Scenario: Customer tries to request 6 tokens
-#	Given a customer
-#	And has 1 tokens
-#	When 6 tokens are requested causing an exception
+Scenario: Customer tries to request 6 tokens
+	Given a customer
+	When 6 tokens are requested
+	And the "TokensRequested" event is received
+	Then the "TokenRequestInvalid" event is sent
+	And An exception is thrown
 
 Scenario: Customer tries to request 0 tokens
 	Given a customer
-	And has 1 tokens
-	When 0 tokens are requested causing an exception
+	When 0 tokens are requested
+	And the "TokensRequested" event is received
+	Then the "TokenRequestInvalid" event is sent
+	And An exception is thrown
 
 Scenario: Find customerId through event that gives token
 	Given a customer
-	And has 1 tokens
+	When 1 tokens are requested
+	And the "TokensRequested" event is received
+	Then the "TokensIssued" event is sent
 	When the "TokenToCustomerIdRequested" event is received
 	Then the "TokenToCustomerIdResponse" event is sent
-
-#Scenario: Request tokens event test
-#	Given a customer
-#	When the "TokensRequested" event is received
-#	Then the "TokensIssued" event is sent
-
+	And the id matches the customer

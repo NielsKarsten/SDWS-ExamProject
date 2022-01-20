@@ -84,6 +84,7 @@ public class AccountRestServiceSteps {
 		correlationID = pEvent.getCorrelationId();
 		Event event = new Event(correlationID, eventName, new Object[] { eventConstruction.getEventObject(eventName) });
 		assertEquals(event, pEvent);
+		publishedEvent = new CompletableFuture<>();
 	}
 
 	@When("the {string} event is received")
