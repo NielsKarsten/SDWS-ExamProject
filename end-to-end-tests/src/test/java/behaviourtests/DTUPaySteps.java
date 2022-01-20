@@ -71,6 +71,7 @@ public class DTUPaySteps {
 	//Account deletion properties
 	private boolean deleteAccountResponse;
 	
+	
 	@Before
 	public void createBankAccount() {
 		System.out.println("Before is called");
@@ -190,11 +191,55 @@ public class DTUPaySteps {
 		merchantBankBalance = merchantBankBalance.add(transactionAmount);
 		response.close();
 	}
+	
+	@When("merchant initiates a transaction for {float} again")
+	public void theTransactionsIsInitiated(float amount) {
+		System.out.println("Merchant initiates transaction is called");
+		transactionAmount = BigDecimal.valueOf(amount);
+		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
+		String json = new Gson().toJson(transactionRequest);
+		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
+		response.close();
+	}
+	
+	@When("unregistered merchant initiates a transaction for {float}")
+	public void theTransactionsIsInitiated(float amount) {
+		merchantId = UUID.randomUUID();
+		System.out.println("Merchant initiates transaction is called");
+		transactionAmount = BigDecimal.valueOf(amount);
+		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
+		String json = new Gson().toJson(transactionRequest);
+		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
+		response.close();
+	}
+	
+	@When("merchant initiates a transaction for {float} with wrong token")
+	public void theTransactionsIsInitiated(float amount) {
+		System.out.println("Merchant initiates transaction with wrong token is called");
+		transactionAmount = BigDecimal.valueOf(amount);
+		TransactionRequest transactionRequest = new TransactionRequest(merchantId, UUID.randomUUID(), transactionAmount);
+		String json = new Gson().toJson(transactionRequest);
+		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
+		serverError = response.readEntity(String.class);
+		response.close();
+	}
 
 	@When("customer requests transactions")
 	public void theCustomerRequestsTransactions() {
 		System.out.println("Customer initiates transactions list is called");
 		Response response = customerTarget.queryParam("customerId", customerId).path("/transaction").request().get();
+		System.out.println("Response = ");
+		System.out.println(response);
+		List<Transaction> customerRecievedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
+		transactionList.addAll(customerRecievedTransactions);
+		response.close();
+	}
+	
+	@When("another customer requests transactions")
+	public void theCustomerRequestsTransactions() {
+		System.out.println("Another customer initiates transactions list is called");
+		UUID anotherCustomerId = UUID.randomUUID();
+		Response response = customerTarget.queryParam("customerId", UUID.randomUUID()).path("/transaction").request().get();
 		System.out.println("Response = ");
 		System.out.println(response);
 		List<Transaction> customerRecievedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
@@ -225,6 +270,18 @@ public class DTUPaySteps {
 		System.out.println("User gets transaction verification is called");
 		Transaction transaction = transactionList.get(0);
 		assertTrue(transactionList.contains(transaction));
+	}
+	
+	@Then("user gets no transactions")
+	public void theUserGetsTransactions() {
+		System.out.println("User gets no transactions verification is called");
+		assertFalse(transactionList.size() < 1);
+	}
+	
+	@Then("merchant cannot identify customer identity")
+	public void merchantCannotIdentifyCustomerIdentity() {
+		Transaction transaction = transactionList.get(0);
+		assertTrue(transaction.getCustomer() == null);
 	}
 
 	@Then("customer has correct balance")
@@ -281,7 +338,7 @@ public class DTUPaySteps {
 		assertNotNull(merchantId);
 	}
 	
-	@Then("they receive an errormessage {string}")
+	@Then("they receive an error message {string}")
 	public void verifyErrorMessage(String errorMessage) {
 		assertEquals(errorMessage, serverError);
 	}

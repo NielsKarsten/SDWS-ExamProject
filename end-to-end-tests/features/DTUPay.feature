@@ -25,12 +25,21 @@ Scenario: Customer succesfully requests tokens
 	When customer is being registered
 	When customer requests 5 tokens
 	Then customer has 5 tokens
+
+Scenario: Customer requests too many tokens
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	And they receive an error message ""
 	
-Scenario: Customer Requests too many tokens
+Scenario: Customer requests too many tokens
 	Given a customer "Johnny" "Bravo"
 	When customer is being registered
 	When customer requests 10 tokens
-	Then they receive an errormessage "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"
+	Then they receive an error message "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"
 	
 Scenario: Succesfully register a merchant
 	Given a merchant "Bravo" "Johnny"
@@ -79,6 +88,52 @@ Scenario: Successful payment 400
 	When merchant account is retired
 	Then account does not exist
 
+Scenario: Unsuccesful payment due to invalid customer token
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 100 with wrong token
+	Then customer has correct balance
+	And merchant has correct balance
+	And they receive an error message ""
+	
+Scenario: Unsuccesful payment due to retired customer token
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 100
+	Then merchant has correct balance
+	And they receive an error message ""
+	
+Scenario: Unsuccesful payment due to retired customer
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When customer account is retired
+	When merchant initiates a transaction for 100
+	Then merchant has correct balance
+	And they receive an error message ""
+	
+Scenario: Unsuccesful payment due to unregistered merchant
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny"
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When unregistered merchant initiates a transaction for 100
+	Then customer has correct balance
+	And merchant has correct balance
+	And they receive an error message ""
+
 Scenario: Customer gets transaction
 	Given a customer "Johnny" "Bravo"
 	When customer is being registered
@@ -94,6 +149,20 @@ Scenario: Customer gets transaction
 	When merchant account is retired
 	Then account does not exist
 
+Scenario: Unregistered customer gets transactions
+	Given a customer "Johnny" "Bravo"
+	When customer is being registered
+	Given a merchant "Bravo" "Johnny"
+	When merchant is being registered
+	When customer requests 5 tokens
+	Then customer has 5 tokens
+	When merchant initiates a transaction for 100.0
+	When another customer requests transactions
+	Then user gets no transactions
+	When customer account is retired
+	Then account does not exist
+	When merchant account is retired
+	Then account does not exist
 
 Scenario: Merchant gets transaction
 	Given a customer "Johnny" "Bravo"
@@ -105,6 +174,7 @@ Scenario: Merchant gets transaction
 	When merchant initiates a transaction for 100.0
 	And merchant requests transactions
 	Then user gets transaction
+	And merchant cannot identify customer identity
 	When customer account is retired
 	Then account does not exist
 	When merchant account is retired
