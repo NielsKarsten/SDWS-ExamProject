@@ -16,37 +16,26 @@ import models.TokenRequest;
 
 import javax.ws.rs.core.GenericType;
 
-public class TokenRestService {
-
-	private MessageQueue queue;
-	private Map<UUID, CompletableFuture<Object>> completableFutures = new ConcurrentHashMap<>();
+public class TokenRestService extends GenericService{
 
 	public TokenRestService(MessageQueue q) {
-		queue = q;
+		super(q);
 		queue.addHandler("TokensIssued", this::handleTokensIssued);
 		queue.addHandler("TokenRequestInvalid", this::handleTokenRequestError);
 	}
 
 	public List<UUID> issueTokens(TokenRequest tokenRequest) throws IllegalArgumentException {
-		System.out.println("issueTokens invoked");
-		UUID correlationId = UUID.randomUUID();
-		Event event = new Event(correlationId,"TokensRequested", new Object[] { tokenRequest });
-		completableFutures.put(correlationId, new CompletableFuture<>());
-		queue.publish(event);
-		return (List<UUID>) completableFutures.get(correlationId).join();						
+		return (List<UUID>) buildCompletableFutureEvent(tokenRequest,"TokensRequested");						
 	}
-
+	
 	public void handleTokensIssued(Event e) {
-		System.out.println("handleTokensIssued invoked");
-		UUID correlationId = e.getCorrelationId();
-		List<UUID> tokens = (List<UUID>) e.getArgument(0, Object.class);
-		completableFutures.get(correlationId).complete(tokens);
+		genericHandler(e,Object.class);
 	}
 	
 	public void handleTokenRequestError(Event e) {
-		System.out.println("handleTokenRequestError invoked");
 		UUID correlationId = e.getCorrelationId();
 		String errorMessage = e.getArgument(0, String.class);
-		completableFutures.get(correlationId).completeExceptionally(new IllegalArgumentException(errorMessage));
+		IllegalArgumentException ex = new IllegalArgumentException(errorMessage);
+		genericErrorHandler(e,String.class,ex);
 	}
 }

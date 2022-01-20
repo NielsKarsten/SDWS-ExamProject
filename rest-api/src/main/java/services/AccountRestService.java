@@ -16,14 +16,10 @@ import messaging.MessageQueue;
  *          Niels Karsten Bisgaard-Bohr (s202745)
  */
 
-public class AccountRestService {
-
-	private MessageQueue queue;
-	// private HashMap<UUID, CompletableFuture<UUID>> registeredUsersMap;
-	private Map<UUID, CompletableFuture<Object>> completableFutures = new ConcurrentHashMap<UUID, CompletableFuture<Object>>();
+public class AccountRestService extends GenericService{
 
 	public AccountRestService(MessageQueue q) {
-		queue = q;
+		super(q);
 		queue.addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
 		queue.addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
 		queue.addHandler("AccountClosedResponse", this::handleUserAccountClosedResponse);
@@ -41,13 +37,6 @@ public class AccountRestService {
 		genericHandler(e, Boolean.class);
 	}
 
-	private <T> void genericHandler(Event e, Class<T> argType) {
-		UUID correlationId = e.getCorrelationId();
-		T arg = e.getArgument(0, argType);
-		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
-		completableFuture.complete(arg);
-	}
-
 	public UUID registerAsyncUserAccount(User user) {
 		return (UUID) buildCompletableFutureEvent(user, "AccountRegistrationRequested");
 	}
@@ -59,15 +48,6 @@ public class AccountRestService {
 	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
 		return (Boolean) buildCompletableFutureEvent(userId, "AccountClosedRequested");
 	}
-
-	private Object buildCompletableFutureEvent(Object eventObject, String eventTopic) {
-		CompletableFuture<Object> completableFuture = new CompletableFuture<Object>();
-
-		UUID correlationId = UUID.randomUUID();
-		Event event = new Event(correlationId, eventTopic, new Object[] { eventObject });
-
-		completableFutures.put(correlationId, completableFuture);
-		queue.publish(event);
-		return completableFuture.join();
-	}
+	
+	
 }
