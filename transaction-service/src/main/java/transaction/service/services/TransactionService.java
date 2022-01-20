@@ -34,6 +34,8 @@ public class TransactionService {
         this.tokenServiceConnector = tokenServiceConnector;
         this.accountServiceConnector = accountServiceConnector;
 
+        TransactionStore.reset();
+
         this.queue.addHandler("TransactionRequested", this::handleTransactionRequestEvent);
         this.queue.addHandler("CustomerReportRequested", this::handleCustomerReportRequest);
         this.queue.addHandler("MerchantReportRequested", this::handleMerchantReportRequest);
@@ -43,7 +45,6 @@ public class TransactionService {
     public void publishEvent(UUID correlationId, String eventName, Object eventData) {
         Event event = new Event(correlationId, eventName, new Object[]{eventData});
         this.queue.publish(event);
-
     }
     
     public void handleTransactionRequestEvent(Event event) {
@@ -65,11 +66,7 @@ public class TransactionService {
         	this.tryPayment(customerId, merchantId, amount, userToken);
         	this.publishEvent(correlationId, "TransactionRequestSuccesfull", "Transaction was completed succesfully");
         }
-        catch(NullPointerException e) 
-        {
-        	this.publishEvent(correlationId, "TransactionRequestInvalid", e);
-        }
-        catch(BankServiceException_Exception e)
+        catch(NullPointerException | BankServiceException_Exception e)
         {
         	this.publishEvent(correlationId, "TransactionRequestInvalid", e);
         }
@@ -80,13 +77,13 @@ public class TransactionService {
         String merchantBankAccount = accountServiceConnector.getUserBankAccountFromId(merchant);
         String description = "Payment of " + amount + " to merchant " + merchantBankAccount;
 
-        this.BankTransfer(customerBankAccount, merchantBankAccount, amount, description); 
+        this.bankTransfer(customerBankAccount, merchantBankAccount, amount, description);
         Transaction t = new Transaction(merchant, customer, amount, description, token);
         TransactionStore.getInstance().addTransaction(t);
     }
 
-	public void BankTransfer(String userBank, String merchantBank, BigDecimal amount, String description) throws BankServiceException_Exception {
-            bank.transferMoneyFromTo(userBank, merchantBank, amount, description);
+	private void bankTransfer(String userBank, String merchantBank, BigDecimal amount, String description) throws BankServiceException_Exception {
+        bank.transferMoneyFromTo(userBank, merchantBank, amount, description);
     }
     
     public void handleAdminReportRequest(Event event) {
@@ -121,7 +118,7 @@ public class TransactionService {
     	try 
     	{
         	if (accountServiceConnector.userExists(merchantId)) {
-            	List<Transaction> transactions = TransactionStore.getInstance().getCustomerTransactions(merchantId);
+            	List<Transaction> transactions = TransactionStore.getInstance().getMerchantTransactions(merchantId);
             	this.publishEvent(correlationId, "ReportResponse", transactions);        		
         	}
         	else

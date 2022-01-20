@@ -31,6 +31,10 @@ public class TransactionStore {
         return instance;
     }
 
+    public static void reset() {
+        instance = null;
+    }
+
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
     }
@@ -54,8 +58,7 @@ public class TransactionStore {
     	List<Transaction> customerTransactions = new ArrayList<Transaction>();
     	for (Transaction transaction : transactions) {
     		if (transaction.getMerchant().equals(merchantId)) {
-    			Transaction tmpTransaction = new Transaction(transaction.getMerchant(), null, transaction.getAmount(), transaction.getDescription(), transaction.getToken());
-				customerTransactions.add(tmpTransaction);    			
+				customerTransactions.add(new Transaction(transaction.getMerchant(), null, transaction.getAmount(), transaction.getDescription(), transaction.getToken()));
     		}
     	}
     	return customerTransactions;

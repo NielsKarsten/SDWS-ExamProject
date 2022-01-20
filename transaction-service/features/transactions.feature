@@ -33,4 +33,10 @@ Feature: Transaction Service
     And a customer with an account with a balance of 1000
     And a list of transactions
     When a "AdminReportRequested" event is received
-    Then a "Response" event is sent
+    Then a "ReportResponse" event is sent
+
+  Scenario: No existing merchant transaction
+    Given a customer with an account with a balance of 1000
+    And an amount of 100
+    When a "TransactionRequested" event is received
+    Then a "TransactionRequestInvalid" event is sent with error message "Merchant does not exists"
