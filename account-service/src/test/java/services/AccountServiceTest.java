@@ -16,6 +16,7 @@ public class AccountServiceTest {
 
 	MessageQueue queue = mock(MessageQueue.class);
 	AccountService accountService = new AccountService(queue);
+	UUID correlationId = UUID.randomUUID();
 	UUID userId;
 	User user;
 
@@ -63,6 +64,15 @@ public class AccountServiceTest {
 			case "VerifyUserAccountExistsResponse":
 				obj = true;
 				break;
+			case "RetireUserAccountTokensRequest":
+				obj = userId;
+				break;
+			case "ClosedUserAccountTokensRetired":
+				obj = true;
+				break;
+			case "AccountClosedRetireTokenRequestInvalid":
+				obj = new Exception();
+				break;
 			default:
 				System.out.println("No event object found for " + eventName);
 				obj = null;
@@ -87,6 +97,12 @@ public class AccountServiceTest {
 			case "VerifyUserAccountExistsRequest":
 				accountService.handleVerifyUserAccountExistsRequest(event);
 				break;
+			case "ClosedUserAccountTokensRetired":
+				accountService.handleRetireUserAccountTokensResponse(event);
+				break;
+			case "AccountClosedRetireTokenRequestInvalid":
+				accountService.handleRetireUserAccountTokensError(event);
+				break;
 			default:
 				break;
 		}
@@ -94,7 +110,11 @@ public class AccountServiceTest {
 
 	@When("the {string} event is received")
 	public void theEventIsReceived(String eventName) {
-		handleEventReceived(eventName);
+		if (eventName.equals("AccountClosedRequested")) {
+			new Thread(() -> handleEventReceived(eventName)).start();
+		} else {
+			handleEventReceived(eventName);
+		}
 	}
 
 	@When("the {string} event is received with no user")
@@ -104,9 +124,13 @@ public class AccountServiceTest {
 	}
 
 	@Then("the {string} event is sent")
-	public void theEventIsSent(String eventName) {
+	public void theEventIsSent(String eventName) throws InterruptedException {
+		// We sleep here to ensure that other events have been posted to the queue
+		// basically simulating the delay that interacting with another service has
+		Thread.sleep(1000);
+
 		Object eventObject = getEventObject(eventName);
-		var event = new Event(eventName, new Object[] { eventObject });
+		var event = new Event(correlationId, eventName, new Object[] { eventObject });
 		verify(queue).publish(event);
 	}
 
