@@ -127,6 +127,7 @@ public class AccountServiceTest {
 	public void theEventIsSent(String eventName) throws InterruptedException {
 		// We sleep here to ensure that other events have been posted to the queue
 		// basically simulating the delay that interacting with another service has
+		System.out.println("Sleeping here to avoid deadlocks...");
 		Thread.sleep(1000);
 
 		Object eventObject = getEventObject(eventName);
