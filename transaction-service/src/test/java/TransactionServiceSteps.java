@@ -1,25 +1,22 @@
-import io.cucumber.java.Before;
-import io.cucumber.java.PendingException;
-import transaction.service.models.Transaction;
-import transaction.service.models.TransactionRequest;
-import transaction.service.models.TransactionRequestResponse;
-import transaction.service.persistance.TransactionStore;
-import transaction.service.services.TransactionService;
 import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import messaging.Event;
 import messaging.MessageQueue;
+import transaction.service.models.Transaction;
+import transaction.service.models.TransactionRequest;
+import transaction.service.persistance.TransactionStore;
+import transaction.service.services.TransactionService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -47,7 +44,7 @@ public class TransactionServiceSteps {
     //Results
     boolean success;
     Exception exception;
-    List<Transaction> transactions = new ArrayList<Transaction>();
+    List<Transaction> transactions = new ArrayList<>();
     Object expected;
     
     
@@ -56,7 +53,9 @@ public class TransactionServiceSteps {
 		Object obj = null;
 		switch (eventName) {
 			case "TransactionRequested":
-				obj = new TransactionRequest(merchantId, UUID.randomUUID(), BigDecimal.valueOf(amount));
+                UUID token = UUID.randomUUID();
+                tokenServiceConnector.addToken(customerId, token);
+				obj = new TransactionRequest(merchantId, token, BigDecimal.valueOf(amount));
 				break;
 			case "TransactionRequestSuccesfull":
 				obj = "Transaction was completed succesfully";
@@ -68,21 +67,23 @@ public class TransactionServiceSteps {
 				obj = merchantId;
 				break;
 			case "AdminReportRequested":
-				obj = merchantId;
-				break;
+                break;
+            case "TransactionRequestInvalid":
+                obj = new NullPointerException();
+                break;
 			case "ReportResponse":
-				if (request == "MerchantReportRequested") {
-					List<Transaction> merchantTransactions = new ArrayList<Transaction>();
+				if (request.equals("MerchantReportRequested")) {
+					List<Transaction> merchantTransactions = new ArrayList<>();
 					for (Transaction transaction : transactions) {
 						transaction.setCustomer(null);
 						merchantTransactions.add(transaction);
 					}
 					obj = merchantTransactions;					
-				}
-				else
-					obj = transactions;
+				} else {
+                    obj = transactions;
+                }
 				break;
-			default:
+            default:
 				System.out.println("No event object found for " + eventName);
 				obj = null;
 				break;
@@ -118,24 +119,21 @@ public class TransactionServiceSteps {
 	    tokenServiceConnector = new MockTokenServiceConnector(queue);
 	    transactionService = new TransactionService(queue, bank, tokenServiceConnector, accountServiceConnector);
 	    publishedEvent = new CompletableFuture<Event>();
-	    
-	    //Generate Customer data
-		customerId = UUID.randomUUID();
-		customerBankId = UUID.randomUUID();
-		customerToken = UUID.randomUUID();
-
-		//Generate Customer data
-		merchantId = UUID.randomUUID();		
-		merchantBankId = UUID.randomUUID();
+        transactions = new ArrayList<>();
 	}
     
     @Given("a merchant with an account with a balance of {int}")
     public void a_merchant_with_merchant_id_and_a_account_with_balance_of(int balance) {
+        merchantId = UUID.randomUUID();
+        merchantBankId = UUID.randomUUID();
         accountServiceConnector.addUser(merchantId, merchantBankId.toString());
     }
     
     @And("a customer with an account with a balance of {int}")
     public void aCustomerWithAnAccountWithABalanceOf(int balance) {
+        customerId = UUID.randomUUID();
+        customerBankId = UUID.randomUUID();
+        customerToken = UUID.randomUUID();
         accountServiceConnector.addUser(customerId, customerBankId.toString());
     }
     
@@ -148,17 +146,15 @@ public class TransactionServiceSteps {
     public void aListOfTransactions() {
         for (int i = 100; i < 500; i+=100) {
         	BigDecimal transactionAmount = BigDecimal.valueOf(i);
-        	String description = "Payment of "+transactionAmount.toString()+" to merchant "+merchantBankId.toString();
+        	String description = "Payment of " + transactionAmount + " to merchant " + merchantBankId.toString();
         	Transaction transaction = new Transaction(merchantId, customerId, transactionAmount,description, customerToken);
-        	transactions.add(transaction);
         	try {
-				transactionService.tryPayment(customerBankId, merchantBankId, transactionAmount, customerToken);
+				transactionService.tryPayment(customerId, merchantId, transactionAmount, customerToken);
+                transactions.add(transaction);
 				success = true;
-			} catch (NullPointerException e) {
+			} catch (NullPointerException | BankServiceException_Exception e) {
 				exception = e;
 				e.printStackTrace();
-			} catch (BankServiceException_Exception e) {
-				exception = e;
 			}
 		}
     }
@@ -195,5 +191,11 @@ public class TransactionServiceSteps {
     public void aEventIsSent(String eventName) {
         expected = getEventObject(eventName);
         verify(queue).publish(new Event(eventName, new Object[]{expected}));
+    }
+
+    @Then("a {string} event is sent with error message {string}")
+    public void aEventIsSentWithErrorMessage(String eventName, String errorMsg) {
+        Exception e = new NullPointerException(errorMsg);
+        verify(queue).publish(new Event(eventName, new Object[]{e}));
     }
 }
