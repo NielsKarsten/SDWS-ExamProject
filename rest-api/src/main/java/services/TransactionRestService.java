@@ -13,14 +13,12 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TransactionRestService {
+public class TransactionRestService extends GenericService{
 
-    private MessageQueue queue;
-    private Map<UUID, CompletableFuture<Object>> correlations = new ConcurrentHashMap<>();
     private CompletableFuture<TransactionRequestResponse> response;
 
     public TransactionRestService(MessageQueue q) {
-        queue = q;
+    	super(q);
         this.queue.addHandler("TransactionRequestSuccesfull", this::handleTransactionRequestResponseSuccess);
         this.queue.addHandler("TransactionRequestInvalid", this::handleTransactionRequestResponseInvalid);
         this.queue.addHandler("ReportResponse", this::handleReportResponse);
@@ -28,17 +26,6 @@ public class TransactionRestService {
 
     }
     
-    private Object buildCompletableFutureEvent(Object eventObject, String eventTopic) {
-    	CompletableFuture<Object> completableFuture = new CompletableFuture<Object>();
-    	
-    	UUID correlationId = UUID.randomUUID();
-    	Event event = new Event(correlationId, eventTopic, new Object[] { eventObject });
-    	
-    	correlations.put(correlationId, completableFuture);
-    	queue.publish(event);
-    	return correlations.get(correlationId).join();
-    }
-
     public String createTransactionRequest(TransactionRequest request) {
     	return (String) buildCompletableFutureEvent(request,"TransactionRequest");
     }
@@ -56,27 +43,20 @@ public class TransactionRestService {
     }
     
     public void handleTransactionRequestResponseSuccess(Event event) {
-    	UUID correlationId = event.getCorrelationId();
-        String r = event.getArgument(0, String.class);
-        correlations.get(correlationId).complete(r);
+        genericHandler(event,String.class);
     }
     
     public void handleTransactionRequestResponseInvalid(Event event) {
-    	UUID correlationId = event.getCorrelationId();
-    	Exception exception = event.getArgument(0, Exception.class);
-        correlations.get(correlationId).completeExceptionally(exception);
+        genericHandler(event,Exception.class);
     }
 
     public void handleReportResponse(Event event) {
-    	UUID correlationId = event.getCorrelationId();
-        List<Transaction> requestedTransactions = event.getArgument(0, List.class);
-        correlations.get(correlationId).complete(requestedTransactions);
+        genericHandler(event,List.class);
     }
     
     public void handleReportRequestInvalid(Event event) {
-    	UUID correlationId = event.getCorrelationId();
     	Exception exception = event.getArgument(0, Exception.class);
-    	correlations.get(correlationId).completeExceptionally(exception);
+    	genericErrorHandler(event,Exception.class,exception);
     }
 
 

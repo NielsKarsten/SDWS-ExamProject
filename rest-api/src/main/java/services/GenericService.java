@@ -14,6 +14,8 @@ public class GenericService {
 	
 	public GenericService(MessageQueue q) {
 		q = queue;
+		this.queue.addHandler("UserAccountExistsResponse", this::handleUserExistsResponse);
+        this.queue.addHandler("TokenValidityResponse", this::handleTokenValidityResponse);
 		completableFutures = new ConcurrentHashMap<UUID, CompletableFuture<Object>>();
 	}
 	
@@ -44,5 +46,17 @@ public class GenericService {
 	
 	protected boolean verifyUserExists(UUID userId) {
 		return (boolean) buildCompletableFutureEvent(userId,"VerifyUserAccountExistsRequest");
+	}
+	
+	protected void handleUserExistsResponse(Event e) {
+		genericHandler(e, Boolean.class);
+	}
+	
+	protected boolean verifyTokenValidity(UUID token) {
+		return (boolean) buildCompletableFutureEvent(token, "VerifyTokenRequest");
+	}
+	
+	protected void handleTokenValidityResponse(Event e) {
+		genericHandler(e, Boolean.class);
 	}
 }
