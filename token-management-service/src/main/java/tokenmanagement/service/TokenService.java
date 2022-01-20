@@ -85,17 +85,19 @@ public class TokenService {
         	this.publishNewEvent(e, "TokenToCustomerIdResponseInvalid", "Invalid token");
         }
     }
-    
-    //TODO
+
     public void handleCustomerAccountClosed(Event e) {
     	UUID userId = e.getArgument(0, UUID.class);
     	try {
     		List<UUID> userActiveTokens = activeTokens.getUserTokens(userId);
-    		archivedTokens.addTokens(userId, userActiveTokens);
-    		activeTokens.removeTokens(userId, userActiveTokens);
-    		this.publishNewEvent(e, "ClosedUserAccountTokensRetired", "Succesfully retired closed user account tokens");
+            for (UUID token : userActiveTokens) {
+                archivedTokens.addToken(userId, token);
+                activeTokens.removeToken(userId, token);
+            }
+    		this.publishNewEvent(e, "ClosedUserAccountTokensRetired", true);
     	}
     	catch(Exception ex) {
+            ex.printStackTrace();
     		this.publishNewEvent(e, "AccountClosedRetireTokenRequestInvalid", ex);
     	}
     	

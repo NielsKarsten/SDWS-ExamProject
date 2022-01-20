@@ -32,14 +32,10 @@ public class TokenManager {
     }
 
     public List<UUID> getUserTokens(UUID userId) {
-    	try 
-    	{
-            return tokens.get(userId);    		
-    	}
-    	catch(NullPointerException e)
-    	{
-    		return null;
-    	}
+        if (tokens.get(userId) != null)
+            return tokens.get(userId);
+
+        return new ArrayList<>();
     }
 
     public UUID getTokenOwner(UUID token) throws NullPointerException {
