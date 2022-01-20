@@ -6,6 +6,7 @@ import models.Transaction;
 import models.TransactionRequest;
 import models.TransactionRequestResponse;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,14 +20,28 @@ public class TransactionRestService extends GenericService{
 
     public TransactionRestService(MessageQueue q) {
     	super(q);
-        this.queue.addHandler("TransactionRequestSuccesfull", this::handleTransactionRequestResponseSuccess);
+        this.queue.addHandler("TokenValidityResponse", this::handleTokenValidityResponse);
+    	this.queue.addHandler("TransactionRequestSuccesfull", this::handleTransactionRequestResponseSuccess);
         this.queue.addHandler("TransactionRequestInvalid", this::handleTransactionRequestResponseInvalid);
         this.queue.addHandler("ReportResponse", this::handleReportResponse);
         this.queue.addHandler("ReportRequestInvalid", this::handleReportRequestInvalid);
-
     }
     
+	protected boolean verifyTokenValidity(UUID token) {
+		return (boolean) buildCompletableFutureEvent(token, "VerifyTokenRequest");
+	}
+	
+	protected void handleTokenValidityResponse(Event e) {
+		genericHandler(e, Boolean.class);
+	}
+    
     public String createTransactionRequest(TransactionRequest request) {
+    	if (!verifyUserExists(request.getMerchantId()))
+    		throw new NullPointerException("No merchent with ID " + request.getMerchantId() + " Exists");
+    	if (!verifyTokenValidity(request.getUserToken()))
+    		throw new NullPointerException("Invalid token");
+    	if (request.getAmount().compareTo(BigDecimal.valueOf(0)) < 0)
+    		throw new IllegalArgumentException("Transaction amounts ");
     	return (String) buildCompletableFutureEvent(request,"TransactionRequest");
     }
     
@@ -35,10 +50,14 @@ public class TransactionRestService extends GenericService{
     }
 
     public List<Transaction> getMerchantTransactions(UUID merchantId) {
+    	if (!verifyUserExists(merchantId))
+    		throw new NullPointerException("No merchent with ID " + merchantId + " Exists");
     	return (List<Transaction>) buildCompletableFutureEvent(merchantId,"MerchantReportRequested");
     }
 
     public List<Transaction> getCustomerTransactions(UUID userId) {
+    	if (!verifyUserExists(userId))
+    		throw new NullPointerException("No customer with ID " + userId + " Exists");
     	return (List<Transaction>) buildCompletableFutureEvent(userId,"CustomerReportRequested");
     }
     
@@ -55,8 +74,7 @@ public class TransactionRestService extends GenericService{
     }
     
     public void handleReportRequestInvalid(Event event) {
-    	Exception exception = event.getArgument(0, Exception.class);
-    	genericErrorHandler(event,Exception.class,exception);
+    	genericErrorHandler(event);
     }
 
 

@@ -1,5 +1,6 @@
 package endpoints;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -12,6 +13,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import models.Transaction;
 import models.User;
 import services.ServicesFactory;
 @Path("/admin")
@@ -35,12 +37,12 @@ public class AdminResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction() {
 		try {
-			var obj = factory.getTransactionService().getAdminTransactions();
-			return Response.status(200).entity(obj).build();
+			List<Transaction> transactions = factory.getTransactionService().getAdminTransactions();
+			return Response.status(200).entity(transactions).build();
 		}
 		catch (Exception e) 
 		{
-			return Response.serverError().build();
+			return Response.status(400).entity(e.getMessage()).build();
 		}
     }
 

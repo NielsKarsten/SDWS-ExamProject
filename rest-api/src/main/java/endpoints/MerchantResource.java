@@ -1,6 +1,7 @@
 package endpoints;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
@@ -38,7 +39,7 @@ public class MerchantResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction(@QueryParam("merchantId") UUID merchantId) {
 		try {
-			var obj = transactionService.getMerchantTransactions(merchantId);
+			List<Transaction> obj = transactionService.getMerchantTransactions(merchantId);
 			return Response.status(200).entity(obj).build();
 		}
 		catch (Exception e) {

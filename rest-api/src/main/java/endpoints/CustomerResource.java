@@ -36,13 +36,12 @@ public class CustomerResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserTransactions(@QueryParam("customerId") UUID customerId) {
-    	System.out.println("Customer requested a list of their transactions. ID: " + customerId.toString());
     	try {	
     		List<Transaction> customerTransactions = factory.getTransactionService().getCustomerTransactions(customerId);
     		return Response.status(200).entity(customerTransactions).build();
     	}
     	catch(Exception e) {
-    		return Response.serverError().build();
+    		return Response.status(400).entity(e.getMessage()).build();
     	}
     }
 
@@ -56,12 +55,9 @@ public class CustomerResource {
     		List<UUID> tokens = factory.getTokenService().issueTokens(tokenRequest);
     		return Response.status(200).entity(tokens).build();
     	}
-    	catch(IllegalArgumentException e) {
-    		return Response.status(400).entity(e.getMessage()).build();
-    	}
     	catch(Exception e) 
     	{
-    		return Response.serverError().entity(e.getMessage()).build();
+    		return Response.status(400).entity(e.getMessage()).build();
     	}
     }
 
