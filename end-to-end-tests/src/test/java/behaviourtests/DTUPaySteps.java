@@ -6,6 +6,7 @@
 package behaviourtests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.gson.Gson;
@@ -193,7 +194,7 @@ public class DTUPaySteps {
 	}
 	
 	@When("merchant initiates a transaction for {float} again")
-	public void theTransactionsIsInitiated(float amount) {
+	public void theTransactionsIsInitiatedAgain(float amount) {
 		System.out.println("Merchant initiates transaction is called");
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
@@ -203,7 +204,7 @@ public class DTUPaySteps {
 	}
 	
 	@When("unregistered merchant initiates a transaction for {float}")
-	public void theTransactionsIsInitiated(float amount) {
+	public void UnregisteredMerchantInitiatesATransactionFor(float amount) {
 		merchantId = UUID.randomUUID();
 		System.out.println("Merchant initiates transaction is called");
 		transactionAmount = BigDecimal.valueOf(amount);
@@ -214,7 +215,7 @@ public class DTUPaySteps {
 	}
 	
 	@When("merchant initiates a transaction for {float} with wrong token")
-	public void theTransactionsIsInitiated(float amount) {
+	public void theTransactionsIsInitiatedWrongToken(float amount) {
 		System.out.println("Merchant initiates transaction with wrong token is called");
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, UUID.randomUUID(), transactionAmount);
@@ -236,7 +237,7 @@ public class DTUPaySteps {
 	}
 	
 	@When("another customer requests transactions")
-	public void theCustomerRequestsTransactions() {
+	public void anotherTheCustomerRequestsTransactions() {
 		System.out.println("Another customer initiates transactions list is called");
 		UUID anotherCustomerId = UUID.randomUUID();
 		Response response = customerTarget.queryParam("customerId", UUID.randomUUID()).path("/transaction").request().get();
@@ -273,7 +274,7 @@ public class DTUPaySteps {
 	}
 	
 	@Then("user gets no transactions")
-	public void theUserGetsTransactions() {
+	public void theUserGetsNoTransactions() {
 		System.out.println("User gets no transactions verification is called");
 		assertFalse(transactionList.size() < 1);
 	}

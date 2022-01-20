@@ -48,6 +48,7 @@ public class TransactionService {
     }
     
     public void handleTransactionRequestEvent(Event event) {
+    	System.out.println("handleTransactionRequestEvent");
     	System.out.println("handleTransactionRequestEvent invoked");
     	
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
@@ -74,6 +75,7 @@ public class TransactionService {
     }
 
     public void tryPayment(UUID customer, UUID merchant, BigDecimal amount, UUID token) throws BankServiceException_Exception, NullPointerException {
+    	System.out.println("tryPayment");
     	String customerBankAccount = accountServiceConnector.getUserBankAccountFromId(customer);
         String merchantBankAccount = accountServiceConnector.getUserBankAccountFromId(merchant);
         String description = "Payment of " + amount + " to merchant " + merchantBankAccount;
@@ -84,10 +86,12 @@ public class TransactionService {
     }
 
 	private void bankTransfer(String userBank, String merchantBank, BigDecimal amount, String description) throws BankServiceException_Exception {
-        bank.transferMoneyFromTo(userBank, merchantBank, amount, description);
+        System.out.println("bankTransfer");
+		bank.transferMoneyFromTo(userBank, merchantBank, amount, description);
     }
     
     public void handleAdminReportRequest(Event event) {
+    	System.out.println("handleAdminReportRequest");
     	UUID correlationId = event.getCorrelationId();
     	List<Transaction> transactions = TransactionStore.getInstance().getAllTransactions();
     	this.publishEvent(correlationId, "ReportResponse", transactions);
