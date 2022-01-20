@@ -54,6 +54,15 @@ public class AccountServiceTest {
 					obj = true;
 				}
 				break;
+			case "UserAccountInvalid":
+				obj = false;
+				break;
+			case "VerifyUserAccountExistsRequest":
+				obj = userId;
+				break;
+			case "VerifyUserAccountExistsResponse":
+				obj = true;
+				break;
 			default:
 				System.out.println("No event object found for " + eventName);
 				obj = null;
@@ -75,6 +84,9 @@ public class AccountServiceTest {
 			case "AccountClosedRequested":
 				accountService.handleUserAccountClosedRequested(event);
 				break;
+			case "VerifyUserAccountExistsRequest":
+				accountService.handleVerifyUserAccountExistsRequest(event);
+				break;
 			default:
 				break;
 		}
@@ -82,6 +94,12 @@ public class AccountServiceTest {
 
 	@When("the {string} event is received")
 	public void theEventIsReceived(String eventName) {
+		handleEventReceived(eventName);
+	}
+
+	@When("the {string} event is received with no user")
+	public void theEventIsReceivedWithNoUser(String eventName) {
+		userId = UUID.randomUUID();
 		handleEventReceived(eventName);
 	}
 

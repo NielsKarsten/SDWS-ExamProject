@@ -16,7 +16,7 @@ import models.TokenRequest;
 
 import javax.ws.rs.core.GenericType;
 
-public class TokenRestService extends GenericService{
+public class TokenRestService extends UserHandling{
 
 	public TokenRestService(MessageQueue q) {
 		super(q);

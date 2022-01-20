@@ -11,20 +11,19 @@ import messaging.MessageQueue;
 public class GenericService {
 	protected MessageQueue queue;
 	protected Map<UUID, CompletableFuture<Object>> completableFutures;
-	
+
 	public GenericService(MessageQueue q) {
 		q = queue;
-		this.queue.addHandler("UserAccountExistsResponse", this::handleUserExistsResponse);
 		completableFutures = new ConcurrentHashMap<UUID, CompletableFuture<Object>>();
 	}
-	
+
 	protected <T> void genericHandler(Event e, Class<T> argType) {
 		UUID correlationId = e.getCorrelationId();
 		T arg = e.getArgument(0, argType);
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
 		completableFuture.complete(arg);
 	}
-	
+
 	protected <T> void genericErrorHandler(Event e) {
 		UUID correlationId = e.getCorrelationId();
 		Exception ex = e.getArgument(0, Exception.class);
@@ -42,12 +41,5 @@ public class GenericService {
 		queue.publish(event);
 		return completableFutures.get(correlationId).join();
 	}
-	
-	protected boolean verifyUserExists(UUID userId) {
-		return (boolean) buildCompletableFutureEvent(userId,"VerifyUserAccountExistsRequest");
-	}
-	
-	protected void handleUserExistsResponse(Event e) {
-		genericHandler(e, Boolean.class);
-	}
+
 }

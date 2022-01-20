@@ -16,13 +16,15 @@ import messaging.MessageQueue;
  *          Niels Karsten Bisgaard-Bohr (s202745)
  */
 
-public class AccountRestService extends GenericService{
+public class AccountRestService extends UserHandling {
 
 	public AccountRestService(MessageQueue q) {
 		super(q);
 		queue.addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
 		queue.addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
-		queue.addHandler("AccountClosedResponse", this::handleUserAccountClosedResponse);
+		queue.addHandler("UserAccountInvalid", this::handleUserAccountInvalid);
+		queue.addHandler("AccountClosedResponse", this::handleUserAccountResponse);
+		queue.addHandler("VerifyUserAccountExistsResponse", this::handleUserAccountResponse);
 	}
 
 	public UUID registerAsyncUserAccount(User user) {
@@ -34,7 +36,7 @@ public class AccountRestService extends GenericService{
 	public void handleUserAccountAssigned(Event e) {
 		genericHandler(e, UUID.class);
 	}
-	
+
 	public String requestAsyncUserAccountInfo(UUID userId) {
 		return (String) buildCompletableFutureEvent(userId, "UserAccountInfoRequested");
 	}
@@ -43,8 +45,12 @@ public class AccountRestService extends GenericService{
 		genericHandler(e, String.class);
 	}
 
-	public void handleUserAccountClosedResponse(Event e) {
+	public void handleUserAccountResponse(Event e) {
 		genericHandler(e, Boolean.class);
+	}
+
+	public void handleUserAccountInvalid(Event e) {
+		genericErrorHandler(e);
 	}
 
 	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
@@ -52,6 +58,5 @@ public class AccountRestService extends GenericService{
 			throw new IllegalArgumentException("No user exists with userId: " + userId.toString());
 		return (Boolean) buildCompletableFutureEvent(userId, "AccountClosedRequested");
 	}
-	
-	
+
 }

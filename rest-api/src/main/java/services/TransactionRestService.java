@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TransactionRestService extends GenericService{
+public class TransactionRestService extends UserHandling{
 
     private CompletableFuture<TransactionRequestResponse> response;
 
@@ -76,6 +76,5 @@ public class TransactionRestService extends GenericService{
     public void handleReportRequestInvalid(Event event) {
     	genericErrorHandler(event);
     }
-
 
 }

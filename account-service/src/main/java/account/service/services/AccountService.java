@@ -45,8 +45,7 @@ public class AccountService {
 			String userAccountId = users.get(userId).getAccountId();
 			publishNewEvent(e, "UserAccountInfoResponse", userAccountId);
 		} catch (NullPointerException ex) {
-			System.out.println(ex.getMessage());
-			publishNewEvent(e, "UserAccountInfoResponse", null);
+			publishNewEvent(e, "UserAccountInvalid", false);
 		}
 	}
 
@@ -54,22 +53,24 @@ public class AccountService {
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
 			boolean success = users.remove(userId) != null;
-			publishNewEvent(e, "AccountClosedResponse", success);
+			if (success) {
+				publishNewEvent(e, "AccountClosedResponse", success);
+			} else {
+				publishNewEvent(e, "UserAccountInvalid", success);
+			}
 		} catch (Exception exception) {
-			publishNewEvent(e, "AccountClosedResponse", false);
+			publishNewEvent(e, "UserAccountInvalid", false);
 		}
 	}
 
-	private void handleVerifyUserAccountExistsRequest(Event e) {
+	public void handleVerifyUserAccountExistsRequest(Event e) {
 		try {
 			UUID userId = e.getArgument(0, UUID.class);
 			String userAccountId = users.get(userId).getAccountId();
 			boolean accountIdExists = userAccountId != null;
-			publishNewEvent(e, "UserAccountExistsResponse", accountIdExists);
+			publishNewEvent(e, "VerifyUserAccountExistsResponse", accountIdExists);
 		} catch (NullPointerException ex) {
-			System.out.println(ex.getMessage());
-			publishNewEvent(e, "UserAccountExistsResponse", false);
+			publishNewEvent(e, "UserAccountInvalid", false);
 		}
 	}
-
 }
