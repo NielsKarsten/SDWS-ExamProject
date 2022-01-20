@@ -29,6 +29,7 @@ public class TokenService {
 
         queue.addHandler("TokensRequested", this::handleTokensRequested);
         queue.addHandler("TokenToCustomerIdRequested", this::handleTokenToCustomerIdRequested);
+        queue.addHandler("AccountClosedRequested", this::handleTokenToCustomerIdRequested);
     }
 
     private void publishNewEvent(Event e, String topic, Object object) {
@@ -71,18 +72,17 @@ public class TokenService {
     }
 
     public void handleTokenToCustomerIdRequested(Event e) {
-        UUID correlationID = e.getCorrelationId();
         UUID token = e.getArgument(0, UUID.class);
-
         UUID customerId = null;
+
         try {
             customerId = activeTokens.getTokenOwner(token);
             activeTokens.removeToken(customerId, token);
             archivedTokens.addToken(customerId, token);
-        } catch (NullPointerException tokenException) {
-            tokenException.printStackTrace();
+            this.publishNewEvent(e, "TokenToCustomerIdResponse", customerId);
+        } catch (NullPointerException tokenException) 
+        {
+        	this.publishNewEvent(e, "TokenToCustomerIdResponseInvalid", "Invalid token");
         }
-        Event event = new Event(correlationID, "TokenToCustomerIdResponse", new Object[] { customerId });
-        queue.publish(event);
     }
 }

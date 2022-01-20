@@ -21,10 +21,10 @@ public class TransactionRestService {
 
     public TransactionRestService(MessageQueue q) {
         queue = q;
-        this.queue.addHandler("TransactionRequestResponse", this::handleTransactionRequestResponse);
-        this.queue.addHandler("AdminReportResponse", this::handleReportResponse);
-        this.queue.addHandler("CustomerReportResponse", this::handleReportResponse);
-        this.queue.addHandler("MerchantReportResponse", this::handleReportResponse);
+        this.queue.addHandler("TransactionRequestSuccesfull", this::handleTransactionRequestResponseSuccess);
+        this.queue.addHandler("TransactionRequestInvalid", this::handleTransactionRequestResponseInvalid);
+        this.queue.addHandler("ReportResponse", this::handleReportResponse);
+        this.queue.addHandler("ReportRequestInvalid", this::handleReportRequestInvalid);
 
     }
 
@@ -39,19 +39,24 @@ public class TransactionRestService {
         return completableFuture.join();
     }
 
-    // TODO refactor with buildCompletableFutureEvent
-    public TransactionRequestResponse createTransactionRequest(TransactionRequest request) {
+    public String createTransactionRequest(TransactionRequest request) {
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
         var event = new Event(correlationId, "TransactionRequest", new Object[] { request });
         this.queue.publish(event);
-        return (TransactionRequestResponse) correlations.get(correlationId).join();
+        return (String) correlations.get(correlationId).join();
     }
 
-    public void handleTransactionRequestResponse(Event event) {
-        TransactionRequestResponse r = event.getArgument(0, TransactionRequestResponse.class);
+    public void handleTransactionRequestResponseSuccess(Event event) {
+        String r = event.getArgument(0, String.class);
         UUID correlationId = event.getCorrelationId();
         correlations.get(correlationId).complete(r);
+    }
+    
+    public void handleTransactionRequestResponseInvalid(Event event) {
+    	UUID correlationId = event.getCorrelationId();
+    	Exception exception = event.getArgument(0, Exception.class);
+        correlations.get(correlationId).completeExceptionally(exception);
     }
 
     private List<Transaction> getTransactions(String eventName, UUID id) {
@@ -70,6 +75,12 @@ public class TransactionRestService {
         List<Transaction> requestedTransactions = event.getArgument(0, List.class);
         UUID correlationId = event.getCorrelationId();
         correlations.get(correlationId).complete(requestedTransactions);
+    }
+    
+    public void handleReportRequestInvalid(Event event) {
+    	UUID correlationId = event.getCorrelationId();
+    	Exception exception = event.getArgument(0, Exception.class);
+    	correlations.get(correlationId).completeExceptionally(exception);
     }
 
     public List<Transaction> getMerchantTransactions(UUID merchantId) {

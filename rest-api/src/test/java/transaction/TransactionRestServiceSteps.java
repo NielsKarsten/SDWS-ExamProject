@@ -114,7 +114,7 @@ public class TransactionRestServiceSteps {
         Event event = new Event(correlationId, eventName, new Object[]{eventObject});
         switch (eventName) {
             case "TransactionRequestResponse":
-                transactionRestService.handleTransactionRequestResponse(event);
+                transactionRestService.handleTransactionRequestResponseInvalid(event);
                 break;
             case "AdminReportResponse":
             case "CustomerReportResponse":

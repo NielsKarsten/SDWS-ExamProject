@@ -52,8 +52,8 @@ public class MerchantResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction(TransactionRequest request) {
 		try {
-			var obj = transactionService.createTransactionRequest(request);
-			return Response.status(200).entity(obj).build();
+			String transactionResponse = transactionService.createTransactionRequest(request);
+			return Response.status(200).entity(transactionResponse).build();
 		}
 		catch (Exception e) {
 			return Response.serverError().build();

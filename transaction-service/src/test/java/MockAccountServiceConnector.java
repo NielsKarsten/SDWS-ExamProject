@@ -7,6 +7,7 @@ import transaction.service.models.User;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class MockAccountServiceConnector extends AccountServiceConnector {
 
@@ -19,7 +20,12 @@ public class MockAccountServiceConnector extends AccountServiceConnector {
     public void addUser(UUID userId, String bankId) {
         bankAccounts.put(userId, bankId);
     }
-
+    
+    @Override
+    public boolean userExists(UUID userId) {
+        return bankAccounts.containsKey(userId);
+    }
+    
     @Override
     public String getUserBankAccountFromId(UUID id) {
         if (bankAccounts.get(id) != null)

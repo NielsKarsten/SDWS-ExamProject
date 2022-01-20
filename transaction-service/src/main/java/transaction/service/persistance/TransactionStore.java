@@ -25,7 +25,6 @@ public class TransactionStore {
     }
 
     public static TransactionStore getInstance() {
-    	System.out.println("getInstance invoked");
         if (instance == null)
             instance = new TransactionStore();
 
@@ -33,34 +32,25 @@ public class TransactionStore {
     }
 
     public void addTransaction(Transaction transaction) {
-    	System.out.println("addTransaction invoked");
         transactions.add(transaction);
     }
 
     public List<Transaction> getAllTransactions() {
-    	System.out.println("getAllTransactions invoked");
         return transactions;
     }
     
     public List<Transaction> getCustomerTransactions(UUID customerId){
-    	System.out.println("getCustomerTransactions invoked");
     	List<Transaction> customerTransactions = new ArrayList<Transaction>();
-    	System.out.println("Size of our transaction list: " + transactions.size());
     	for (Transaction transaction : transactions) {
-    		System.out.println("One more round about in the for loop :D ");
-    		System.out.println(transaction.toString());
     		if (transaction.getCustomer().equals(customerId))
     		{
-    			System.out.println("Found customer transaction");
 				customerTransactions.add(transaction);
     		}
     	}
-    	System.out.println("Returning a list of customer transaction: " + customerTransactions.toString());
     	return customerTransactions;
     }
     
     public List<Transaction> getMerchantTransactions(UUID merchantId){
-    	System.out.println("getMerchantTransactions invoked");
     	List<Transaction> customerTransactions = new ArrayList<Transaction>();
     	for (Transaction transaction : transactions) {
     		if (transaction.getMerchant().equals(merchantId)) {

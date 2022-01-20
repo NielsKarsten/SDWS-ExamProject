@@ -23,6 +23,7 @@ public class AccountService {
 		queue.addHandler("AccountRegistrationRequested", this::handleUserAccountRegistration);
 		queue.addHandler("UserAccountInfoRequested", this::handleUserAccountInfoRequested);
 		queue.addHandler("AccountClosedRequested", this::handleUserAccountClosedRequested);
+		queue.addHandler("VerifyUserAccountExistsRequest", this::handleVerifyUserAccountExistsRequest);
 	}
 
 	private void publishNewEvent(Event e, String topic, Object object) {
@@ -56,6 +57,18 @@ public class AccountService {
 			publishNewEvent(e, "AccountClosedResponse", success);
 		} catch (Exception exception) {
 			publishNewEvent(e, "AccountClosedResponse", false);
+		}
+	}
+
+	private void handleVerifyUserAccountExistsRequest(Event e) {
+		try {
+			UUID userId = e.getArgument(0, UUID.class);
+			String userAccountId = users.get(userId).getAccountId();
+			boolean accountIdExists = userAccountId != null;
+			publishNewEvent(e, "UserAccountExistsResponse", accountIdExists);
+		} catch (NullPointerException ex) {
+			System.out.println(ex.getMessage());
+			publishNewEvent(e, "UserAccountExistsResponse", false);
 		}
 	}
 

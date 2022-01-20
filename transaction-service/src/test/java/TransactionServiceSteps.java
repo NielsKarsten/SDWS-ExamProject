@@ -6,6 +6,7 @@ import transaction.service.models.TransactionRequestResponse;
 import transaction.service.persistance.TransactionStore;
 import transaction.service.services.TransactionService;
 import dtu.ws.fastmoney.BankService;
+import dtu.ws.fastmoney.BankServiceException_Exception;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -31,7 +32,7 @@ public class TransactionServiceSteps {
     MockTokenServiceConnector tokenServiceConnector;
     TransactionService transactionService;
     CompletableFuture<Event> publishedEvent;
-
+    String request;
     //Setup
     UUID customerId;
     UUID customerToken;
@@ -45,6 +46,7 @@ public class TransactionServiceSteps {
     
     //Results
     boolean success;
+    Exception exception;
     List<Transaction> transactions = new ArrayList<Transaction>();
     Object expected;
     
@@ -53,11 +55,11 @@ public class TransactionServiceSteps {
 	public Object getEventObject(String eventName) {
 		Object obj = null;
 		switch (eventName) {
-			case "TransactionRequest":
+			case "TransactionRequested":
 				obj = new TransactionRequest(merchantId, UUID.randomUUID(), BigDecimal.valueOf(amount));
 				break;
-			case "TransactionRequestResponse":
-				obj = new TransactionRequestResponse(true);
+			case "TransactionRequestSuccesfull":
+				obj = "Transaction was completed succesfully";
 				break;
 			case "CustomerReportRequested":
 				obj = customerId;
@@ -65,22 +67,20 @@ public class TransactionServiceSteps {
 			case "MerchantReportRequested":
 				obj = merchantId;
 				break;
-			case "CustomerReportResponse":
-				obj = transactions;
-				break;
-			case "MerchantReportResponse":
-				List<Transaction> merchantTransactions = new ArrayList<Transaction>();
-				for (Transaction transaction : transactions) {
-					transaction.setCustomer(null);
-					merchantTransactions.add(transaction);
-				}
-				obj = merchantTransactions;
-				break;
 			case "AdminReportRequested":
 				obj = merchantId;
 				break;
-			case "AdminReportResponse":
-				obj = TransactionStore.getInstance().getAllTransactions();
+			case "ReportResponse":
+				if (request == "MerchantReportRequested") {
+					List<Transaction> merchantTransactions = new ArrayList<Transaction>();
+					for (Transaction transaction : transactions) {
+						transaction.setCustomer(null);
+						merchantTransactions.add(transaction);
+					}
+					obj = merchantTransactions;					
+				}
+				else
+					obj = transactions;
 				break;
 			default:
 				System.out.println("No event object found for " + eventName);
@@ -94,7 +94,7 @@ public class TransactionServiceSteps {
         Object eventObject = getEventObject(eventName);
         Event event = new Event(eventName, new Object[]{eventObject});
         switch (eventName) {
-            case "TransactionRequest":
+            case "TransactionRequested":
                 transactionService.handleTransactionRequestEvent(event);
                 break;
             case "CustomerReportRequested":
@@ -151,14 +151,27 @@ public class TransactionServiceSteps {
         	String description = "Payment of "+transactionAmount.toString()+" to merchant "+merchantBankId.toString();
         	Transaction transaction = new Transaction(merchantId, customerId, transactionAmount,description, customerToken);
         	transactions.add(transaction);
-        	transactionService.pay(customerId, merchantId, transactionAmount, customerToken);
+        	try {
+				transactionService.tryPayment(customerBankId, merchantBankId, transactionAmount, customerToken);
+				success = true;
+			} catch (NullPointerException e) {
+				exception = e;
+				e.printStackTrace();
+			} catch (BankServiceException_Exception e) {
+				exception = e;
+			}
 		}
     }
 
     @When("the transaction is initiated")
     public void the_transactions_is_initiated() {
         description = "Payment of " + amount + " to merchant " + merchantBankId;
-        success = transactionService.pay(customerId, merchantId, BigDecimal.valueOf(amount), customerToken).isSuccessful();
+        try {
+			transactionService.tryPayment(customerId, merchantId, BigDecimal.valueOf(amount), customerToken);
+			success = true;
+		} catch (NullPointerException | BankServiceException_Exception e) {
+			exception = e;
+		}
     }
 
     @Then("the transaction is successful")
@@ -174,6 +187,7 @@ public class TransactionServiceSteps {
 
     @When("a {string} event is received")
     public void aEventIsReceived(String eventName) {
+    	request = eventName;
     	handleEventReceived(eventName);
     }
 
@@ -181,10 +195,5 @@ public class TransactionServiceSteps {
     public void aEventIsSent(String eventName) {
         expected = getEventObject(eventName);
         verify(queue).publish(new Event(eventName, new Object[]{expected}));
-    }
-
-    @And("the transaction response has status successful")
-    public void theTransactionResponseHasStatusSuccessful() {
-        assertTrue(((TransactionRequestResponse) expected).isSuccessful());
     }
 }
