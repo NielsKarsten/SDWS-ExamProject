@@ -5,7 +5,7 @@ import java.util.UUID;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.QueryParam;
 
-import adapters.ServicesFactory;
+import adapters.AdapterFactory;
 import models.User;
 /**
  * @author Christian Gernsøe - S163552
@@ -19,14 +19,14 @@ import models.User;
  * Main: Niels Bisgaard-Bohr
  */
 public abstract class UserResourceImpl implements UserResource{
-	private ServicesFactory factory = new ServicesFactory();
+	private AdapterFactory factory = new AdapterFactory();
 	
 	public UUID registerUserAcount(User user) {
-		return factory.getAccountService().registerAsyncUserAccount(user);
+		return factory.getAccountRestAdapter().registerAsyncUserAccount(user);
 	}
 
 	@DELETE
 	public boolean deleteUserAccount(@QueryParam("id") UUID id) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(id);
+		return factory.getAccountRestAdapter().requestAsyncUserAccountDeletion(id);
 	}
 }

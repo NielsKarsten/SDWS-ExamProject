@@ -28,8 +28,8 @@ import models.*;
  */
 @Path("/merchants")
 public class MerchantResource extends UserResourceImpl{
-    private ServicesFactory factory = new ServicesFactory();
-    TransactionRestAdapter transactionService = factory.getTransactionService();
+    private AdapterFactory factory = new AdapterFactory();
+    TransactionRestAdapter transactionService = factory.getTransactionRestAdapter();
 
 	@Path("/transactions")
     @GET

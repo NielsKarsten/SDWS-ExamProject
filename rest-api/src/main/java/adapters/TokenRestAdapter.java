@@ -29,7 +29,7 @@ public class TokenRestAdapter extends GenericHandler implements TokenEventType{
 	}
 
 	public List<UUID> issueTokens(TokenRequest tokenRequest) throws Exception {
-		return (List<UUID>) buildCompletableFutureEvent(tokenRequest,"TokensRequested");						
+		return (List<UUID>) buildCompletableFutureEvent(tokenRequest, TOKENS_REQUESTED);
 	}
 
 }

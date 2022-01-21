@@ -6,7 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import adapters.ServicesFactory;
+import adapters.AdapterFactory;
 import models.Transaction;
 
 /**
@@ -22,14 +22,14 @@ import models.Transaction;
  */
 @Path("/admins")
 public class AdminResource extends UserResourceImpl {
-    private ServicesFactory factory = new ServicesFactory();
+    private AdapterFactory factory = new AdapterFactory();
 
 	@Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction() {
 		try {
-			List<Transaction> transactions = factory.getTransactionService().getAdminTransactions();
+			List<Transaction> transactions = factory.getTransactionRestAdapter().getAdminTransactions();
 			return Response.status(200).entity(transactions).build();
 		}
 		catch (Exception e) 

@@ -27,14 +27,14 @@ import models.*;
  */
 @Path("/customers")
 public class CustomerResource extends UserResourceImpl{
-    private ServicesFactory factory = new ServicesFactory();
+    private AdapterFactory factory = new AdapterFactory();
 
     @Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserTransactions(@QueryParam("customerId") UUID customerId) {
     	try {	
-    		List<Transaction> customerTransactions = factory.getTransactionService().getCustomerTransactions(customerId);
+    		List<Transaction> customerTransactions = factory.getTransactionRestAdapter().getCustomerTransactions(customerId);
     		return Response.status(200).entity(customerTransactions).build();
     	}
     	catch(Exception e) {
@@ -49,7 +49,7 @@ public class CustomerResource extends UserResourceImpl{
     public Response requestTokens(TokenRequest tokenRequest) {
     	try 
     	{
-    		List<UUID> tokens = factory.getTokenService().issueTokens(tokenRequest);
+    		List<UUID> tokens = factory.getTokenRestAdapter().issueTokens(tokenRequest);
     		return Response.status(200).entity(tokens).build();
     	}
     	catch(Exception e) 
