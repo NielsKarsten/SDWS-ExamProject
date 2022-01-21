@@ -29,18 +29,18 @@ public class TransactionRestAdapter extends GenericHandler implements Transactio
     }
 
 	public String createTransactionRequest(TransactionRequest request) throws Exception {
-    	return (String) buildCompletableFutureEvent(request,"TransactionRequested");
+    	return (String) buildCompletableFutureEvent(request,TRANSACTION_REQUESTED);
     }
     
     public List<Transaction> getAdminTransactions() throws Exception {
-    	return (List<Transaction>) buildCompletableFutureEvent(null,"AdminReportRequested");
+    	return (List<Transaction>) buildCompletableFutureEvent(null,ADMIN_REPORT_REQUESTED);
     }
 
     public List<Transaction> getMerchantTransactions(UUID merchantId) throws Exception {
-    	return (List<Transaction>) buildCompletableFutureEvent(merchantId,"MerchantReportRequested");
+    	return (List<Transaction>) buildCompletableFutureEvent(merchantId,MERCHANT_REPORT_REQUESTED);
     }
 
     public List<Transaction> getCustomerTransactions(UUID userId) throws Exception{
-    	return (List<Transaction>) buildCompletableFutureEvent(userId,"CustomerReportRequested");
+    	return (List<Transaction>) buildCompletableFutureEvent(userId,CUSTOMER_REPORT_REQUESTED);
     }
 }
