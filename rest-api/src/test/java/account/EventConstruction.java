@@ -67,7 +67,6 @@ public class EventConstruction {
 				obj = true;
 				break;
 			default:
-				System.out.println("No event object found for " + eventName);
 				obj = null;
 				break;
 		}
@@ -88,7 +87,6 @@ public class EventConstruction {
 				service.genericHandler(event);
 				break;
 			default:
-				System.out.println("No event handler found for " + eventName);
 				break;
 		}
 	}

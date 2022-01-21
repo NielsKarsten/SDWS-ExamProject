@@ -59,7 +59,6 @@ public class TransactionRestAdapterSteps {
     
 	@Before
 	public void setUp() {
-		System.out.println("Before");
 		queue = new MessageQueue() {
 
 			@Override
@@ -106,7 +105,6 @@ public class TransactionRestAdapterSteps {
 				obj = transactions;
 				break;
 			default:
-				System.out.println("No event object found for " + eventName);
 				obj = null;
 				break;
 		}
@@ -124,14 +122,12 @@ public class TransactionRestAdapterSteps {
         	   transactionRestService.genericHandler(event);
         	   break;
             default:
-                System.out.println("No event handler found for " + eventName);
                 break;
         }
     }
 	
     @Given("a transaction request")
     public void aTransactionRequest() {
-    	System.out.println("a transaction request");
         merchant = new UserAccount(merchantId, new Account());
         Account customerAccount = new Account();
         customerAccount.setBalance(BigDecimal.valueOf(1000));
@@ -143,7 +139,6 @@ public class TransactionRestAdapterSteps {
 
     @And("a list of transactions")
     public void aListOfTransactions() {
-    	System.out.println("a list of transactions");
         customerId = UUID.randomUUID();
         merchantId = UUID.randomUUID();	
         for (int i = 100; i < 500; i += 100) {        	
@@ -157,7 +152,6 @@ public class TransactionRestAdapterSteps {
     
     @When("the transaction request is being registered")
     public void theTransactionRequestIsBeingRegistered() {
-    	System.out.println("the transaction request is being registered");
         new Thread(() -> {
 			try {
 				String result = transactionRestService.createTransactionRequest(trxReq);
@@ -170,7 +164,6 @@ public class TransactionRestAdapterSteps {
     
     @When("the Customer requests a list of their transactions")
     public void theCustomerRequestsAListOfTheirTransactions() {
-    	System.out.println("the Customer requests a list of their transactions");
         new Thread(() -> {
 			try {
 				List<Transaction> result = transactionRestService.getCustomerTransactions(customerId);
@@ -184,7 +177,6 @@ public class TransactionRestAdapterSteps {
 
     @When("the Merchant requests a list of their transactions")
     public void theMerchantRequestsAListOfTheirTransactions() {
-    	System.out.println("the Merchant requests a list of their transactions");
         new Thread(() -> {
 			try {
 				List<Transaction> result = transactionRestService.getMerchantTransactions(merchantId);
@@ -198,7 +190,6 @@ public class TransactionRestAdapterSteps {
 
     @When("the Admin requests a list of all transactions")
     public void theAdminRequestsAListOfAllTransactions() {
-    	System.out.println("the Admin requests a list of all transactions");
         new Thread(() -> {
 			try {
 				List<Transaction> result = transactionRestService.getAdminTransactions();
@@ -212,7 +203,6 @@ public class TransactionRestAdapterSteps {
     
     @Then("a {string} event is sent")
     public void a_event_is_sent(String eventName) {
-    	System.out.println("a "+eventName+" event is sent");
     	Event pEvent = publishedEvent.join();
     	correlationId = pEvent.getCorrelationId();
     	Event event = new Event(correlationId, eventName, new Object[]{getEventObject(eventName)});
@@ -221,20 +211,17 @@ public class TransactionRestAdapterSteps {
     
     @And("a {string} event is received")
     public void a_event_is_received(String eventName) {
-    	System.out.println("a "+eventName+" event is received");
         handleEventReceived(eventName);
     }
 
     @And("the transaction response has status successful")
     public void the_transaction_response_has_status_successful() {
-    	System.out.println("the transaction response has status successful");
     	String receivedResponse =  (String) actual.join();
     	assertNotNull(receivedResponse);
     }
     
     @And("the ReportRequest was successful")
     public void theReportRequestWasSuccesfull() {
-    	System.out.println("the ReportRequest was successful");
     	List<Transaction> receivedResponse = (List<Transaction>) actual.join();
     	assertNotNull(receivedResponse);
     }

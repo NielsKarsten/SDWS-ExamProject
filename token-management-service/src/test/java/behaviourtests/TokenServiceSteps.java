@@ -58,7 +58,6 @@ public class TokenServiceSteps implements TokenEventType{
 	
 	@Before
 	public void setUp() {
-		System.out.println("BEFORE!");
 		queue = new MessageQueue() {
 
 			@Override
@@ -100,7 +99,6 @@ public class TokenServiceSteps implements TokenEventType{
 				obj = customerId;
 				break;
 			default:
-				System.out.println("No event object for event: " + eventName);
 				break;
 		}
 		return obj;
@@ -117,7 +115,6 @@ public class TokenServiceSteps implements TokenEventType{
 				tokenService.handleTokenToCustomerIdRequested(event);
 				break;
 			default:
-				System.out.println("No event recieved handler for event: " + eventName);
 				break;
 		}
 	}

@@ -52,8 +52,6 @@ public class TokenService extends GenericHandler implements AccountEventType, To
     }
 
     private void tryRequestTokens(Event e, TokenRequest request) {
-        System.out.println("Invoking tryRequestTokens");
-
         UUID userId = request.getUserId();
         int tokenAmount = request.getAmount();
         List<UUID> customerTokens;

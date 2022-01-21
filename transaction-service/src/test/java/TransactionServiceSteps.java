@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * @author Christian Gernsøe - S163552
+ * @author Christian Gernsï¿½e - S163552
  * @author Gustav Utke Kauman - S195396
  * @author Gustav Lintrup Kirkholt - s164765
  * @author Niels Bisgaard-Bohr - S202745
@@ -98,7 +98,6 @@ public class TransactionServiceSteps {
                 }
 				break;
             default:
-				System.out.println("No event object found for " + eventName);
 				obj = null;
 				break;
 		}
@@ -122,7 +121,6 @@ public class TransactionServiceSteps {
         	   transactionService.handleAdminReportRequest(event);
         	   break;
             default:
-                System.out.println("No event handler found for " + eventName);
                 break;
         }
     }
@@ -224,7 +222,6 @@ public class TransactionServiceSteps {
     @Then("a {string} event is sent with error message {string}")
     public void aEventIsSentWithErrorMessage(String eventName, String errorMsg) {
     	Event pEvent = publishedEvent.join();
-    	System.out.println(pEvent);
     	exception = pEvent.getArgument(0, NullPointerException.class);
         assertEquals(pEvent.getType(), eventName);
         assertEquals(errorMsg, exception.getMessage());

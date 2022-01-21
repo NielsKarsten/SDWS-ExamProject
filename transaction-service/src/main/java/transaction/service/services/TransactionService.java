@@ -18,7 +18,7 @@ import transaction.service.models.*;
 import transaction.service.persistance.TransactionStore;
 
 /**
- * @author Christian Gernsøe - S163552
+ * @author Christian Gernsï¿½e - S163552
  * @author Gustav Utke Kauman - S195396
  * @author Gustav Lintrup Kirkholt - s164765
  * @author Niels Bisgaard-Bohr - S202745
@@ -75,7 +75,6 @@ public class TransactionService extends GenericHandler implements  AccountEventT
         }
         catch(Exception e)
         {
-        	System.out.println("Error occoured during a transaction request: " + e.getMessage());
         	publishNewEvent(correlationId, TRANSACTION_REQUEST_INVALID, e);
         }
     }

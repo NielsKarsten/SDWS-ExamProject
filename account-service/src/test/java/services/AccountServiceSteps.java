@@ -105,11 +105,9 @@ public class AccountServiceSteps {
 				obj = true;
 				break;
 			case AccountEventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID:
-				System.out.println("Token retire error");
 				obj = new NullPointerException("No tokens to retire");
 				break;
 			default:
-				System.out.println("No event object found for " + eventName);
 				obj = null;
 				break;
 		}
@@ -133,12 +131,10 @@ public class AccountServiceSteps {
 				accountService.handleVerifyUserAccountExistsRequest(event);
 				break;
 			case AccountEventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED:
-				System.out.println("CLOSED_USER_ACCOUNT_TOKENS_RETIRED");
 				event = new Event(tokenCorrelationId, eventName, new Object[] { eventObject });
 				accountService.genericHandler(event);
 				break;
 			case AccountEventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID:
-				System.out.println("ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID");
 				event = new Event(tokenCorrelationId, eventName, new Object[] { eventObject });
 				accountService.genericErrorHandler(event);
 				break;

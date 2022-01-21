@@ -93,7 +93,6 @@ public class TokenRestAdapterSteps {
 	    		obj = new NullPointerException("");
 	    		break;
 	    	default:
-	    		System.out.println("No object for event: " + eventName);
 	    		break;
     	}
     	return obj;
@@ -110,7 +109,6 @@ public class TokenRestAdapterSteps {
 	    		service.genericErrorHandler(event);
 	    		break;
 	    	default:
-	    		System.out.println("No event handler for event: " + eventName);
 	    		break;
 	    	}
     }
