@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import account.service.models.User;
 import account.service.services.AccountService;
-import handling.EventType;
+import handling.AccountEventType;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import messaging.Event;
@@ -62,49 +62,49 @@ public class AccountServiceSteps {
 	private Object getEventObject(String eventName) {
 		Object obj = null;
 		switch (eventName) {
-			case EventType.ACCOUNT_REGISTRATION_REQUESTED:
+			case AccountEventType.ACCOUNT_REGISTRATION_REQUESTED:
 				obj = user;
 				break;
-			case EventType.USER_ACCOUNT_REGISTERED:
+			case AccountEventType.USER_ACCOUNT_REGISTERED:
 				userId = accountService.getUsers().keySet().iterator().next();
 				obj = userId;
 				break;
-			case EventType.USER_ACCOUNT_INFO_REQUESTED:
+			case AccountEventType.USER_ACCOUNT_INFO_REQUESTED:
 				obj = userId;
 				break;
-			case EventType.USER_ACCOUNT_INFO_RESPONSE:
+			case AccountEventType.USER_ACCOUNT_INFO_RESPONSE:
 				if (userId == null) {
 					obj = null;
 				} else {
 					obj = user.getAccountId();
 				}
 				break;
-			case EventType.ACCOUNT_CLOSED_REQUESTED:
+			case AccountEventType.ACCOUNT_CLOSED_REQUESTED:
 				obj = userId;
 				break;
-			case EventType.ACCOUNT_CLOSED_RESPONSE:
+			case AccountEventType.ACCOUNT_CLOSED_RESPONSE:
 				if (userId == null) {
 					obj = false;
 				} else {
 					obj = true;
 				}
 				break;
-			case EventType.USER_ACCOUNT_INVALID:
+			case AccountEventType.USER_ACCOUNT_INVALID:
 				obj = false;
 				break;
-			case EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS:
+			case AccountEventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS:
 				obj = userId;
 				break;
-			case EventType.VERIFY_USER_ACCOUNT_EXISTS_RESPONSE:
+			case AccountEventType.VERIFY_USER_ACCOUNT_EXISTS_RESPONSE:
 				obj = true;
 				break;
-			case EventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST:
+			case AccountEventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST:
 				obj = userId;
 				break;
-			case EventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED:
+			case AccountEventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED:
 				obj = true;
 				break;
-			case EventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID:
+			case AccountEventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID:
 				System.out.println("Token retire error");
 				obj = new NullPointerException("No tokens to retire");
 				break;
@@ -120,24 +120,24 @@ public class AccountServiceSteps {
 		Object eventObject = getEventObject(eventName);
 		Event event = new Event(correlationId, eventName, new Object[] { eventObject });
 		switch (eventName) {
-			case EventType.ACCOUNT_REGISTRATION_REQUESTED:
+			case AccountEventType.ACCOUNT_REGISTRATION_REQUESTED:
 				accountService.handleUserAccountRegistrationRequested(event);
 				break;
-			case EventType.USER_ACCOUNT_INFO_REQUESTED:
+			case AccountEventType.USER_ACCOUNT_INFO_REQUESTED:
 				accountService.handleUserAccountInfoRequested(event);
 				break;
-			case EventType.ACCOUNT_CLOSED_REQUESTED:
+			case AccountEventType.ACCOUNT_CLOSED_REQUESTED:
 				accountService.handleUserAccountClosedRequested(event);
 				break;
-			case EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS:
+			case AccountEventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS:
 				accountService.handleVerifyUserAccountExistsRequest(event);
 				break;
-			case EventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED:
+			case AccountEventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED:
 				System.out.println("CLOSED_USER_ACCOUNT_TOKENS_RETIRED");
 				event = new Event(tokenCorrelationId, eventName, new Object[] { eventObject });
 				accountService.genericHandler(event);
 				break;
-			case EventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID:
+			case AccountEventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID:
 				System.out.println("ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID");
 				event = new Event(tokenCorrelationId, eventName, new Object[] { eventObject });
 				accountService.genericErrorHandler(event);
@@ -150,7 +150,7 @@ public class AccountServiceSteps {
 
 	@When("the {string} event is received")
 	public void theEventIsReceived(String eventName) {
-		if (eventName.equals(EventType.ACCOUNT_CLOSED_REQUESTED)) {
+		if (eventName.equals(AccountEventType.ACCOUNT_CLOSED_REQUESTED)) {
 			new Thread(() -> handleEventReceived(eventName)).start();
 		} else {
 			handleEventReceived(eventName);
@@ -166,9 +166,9 @@ public class AccountServiceSteps {
 	@Then("the {string} event is sent")
 	public void theEventIsSent(String eventName) throws InterruptedException {
 		Event pEvent = publishedEvent.join();
-		if (eventName.equals(EventType.USER_ACCOUNT_REGISTERED))
+		if (eventName.equals(AccountEventType.USER_ACCOUNT_REGISTERED))
 			userId = pEvent.getArgument(0, UUID.class);
-		else if(eventName.equals(EventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST))
+		else if(eventName.equals(AccountEventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST))
 			tokenCorrelationId = pEvent.getCorrelationId();
 		assertEquals(eventName, pEvent.getType());
 		publishedEvent = new CompletableFuture<>();

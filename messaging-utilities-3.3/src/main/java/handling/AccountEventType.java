@@ -11,7 +11,7 @@ package handling;
  *
  * Main: Thomas Rathsach Strange
  */
-public interface EventType {	
+public interface AccountEventType {	
 	final String ACCOUNT_REGISTRATION_REQUESTED = "AccountRegistrationRequested";
 	final String USER_ACCOUNT_INFO_REQUESTED = "UserAccountInfoRequested";
 	final String USER_ACCOUNT_INFO_RESPONSE = "UserAccountInfoResponse";

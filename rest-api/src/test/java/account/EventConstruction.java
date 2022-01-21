@@ -3,15 +3,21 @@ package account;
 import java.util.UUID;
 
 import adapters.AccountRestService;
-import handling.EventType;
+import handling.AccountEventType;
 import messaging.Event;
 import models.*;
 
 /**
-* @authors Thomas Rathsach Strange (s153390), 
-* 		   Simon Pontoppidan (s144213), 
-* 		   Niels Karsten Bisgaard-Bohr (s202745)
-*/
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Krikholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Simon Pontoppidan
+ */
 
 public class EventConstruction {
 	
@@ -42,22 +48,22 @@ public class EventConstruction {
 	public Object getEventObject(String eventName) {
 		Object obj = null;
 		switch (eventName) {
-			case EventType.ACCOUNT_REGISTRATION_REQUESTED:
+			case AccountEventType.ACCOUNT_REGISTRATION_REQUESTED:
 				obj = user;
 				break;
-			case EventType.USER_ACCOUNT_REGISTERED:
+			case AccountEventType.USER_ACCOUNT_REGISTERED:
 				obj = userId;
 				break;
-			case EventType.USER_ACCOUNT_INFO_REQUESTED:
+			case AccountEventType.USER_ACCOUNT_INFO_REQUESTED:
 				obj = userId;
 				break;
-			case EventType.USER_ACCOUNT_INFO_RESPONSE:
+			case AccountEventType.USER_ACCOUNT_INFO_RESPONSE:
 				obj = user.getAccountId();
 				break;
-			case EventType.ACCOUNT_CLOSED_REQUESTED:
+			case AccountEventType.ACCOUNT_CLOSED_REQUESTED:
 				obj = userId;
 				break;
-			case EventType.ACCOUNT_CLOSED_RESPONSE:
+			case AccountEventType.ACCOUNT_CLOSED_RESPONSE:
 				obj = true;
 				break;
 			default:
@@ -72,13 +78,13 @@ public class EventConstruction {
 		Object eventObject = getEventObject(eventName);
 		Event event = new Event(correlationID, eventName, new Object[] { eventObject });
 		switch (eventName) {
-			case EventType.USER_ACCOUNT_REGISTERED:
+			case AccountEventType.USER_ACCOUNT_REGISTERED:
 				service.genericHandler(event);
 				break;
-			case EventType.USER_ACCOUNT_INFO_RESPONSE:
+			case AccountEventType.USER_ACCOUNT_INFO_RESPONSE:
 				service.genericHandler(event);
 				break;
-			case EventType.ACCOUNT_CLOSED_RESPONSE:
+			case AccountEventType.ACCOUNT_CLOSED_RESPONSE:
 				service.genericHandler(event);
 				break;
 			default:
