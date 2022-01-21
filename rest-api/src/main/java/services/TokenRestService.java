@@ -20,8 +20,8 @@ public class TokenRestService extends GenericService{
 
 	public TokenRestService(MessageQueue q) {
 		super(q);
-		queue.addHandler("TokensIssued", this::handleTokensIssued);
-		queue.addHandler("TokenRequestInvalid", this::handleTokenRequestError);
+		addHandler("TokensIssued", this::handleTokensIssued);
+		addHandler("TokenRequestInvalid", this::handleTokenRequestError);
 	}
 
 	public List<UUID> issueTokens(TokenRequest tokenRequest) throws Exception {

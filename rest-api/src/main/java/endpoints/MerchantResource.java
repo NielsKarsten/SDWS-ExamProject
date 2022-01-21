@@ -18,22 +18,10 @@ import models.*;
 import services.*;
 
 @Path("/merchant")
-public class MerchantResource {
+public class MerchantResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
     TransactionRestService transactionService = factory.getTransactionService();
 
-	@POST
-	@Consumes("application/json")
-	@Produces("application/json")
-	public UUID registerUserAcount(User user) {
-		return factory.getAccountService().registerAsyncUserAccount(user);
-	}
-
-	@DELETE
-	public boolean deleteUserAccount(@QueryParam("merchantId") UUID merchantId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(merchantId);
-	}
-	
 	@Path("/transaction")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -60,5 +48,5 @@ public class MerchantResource {
 			return Response.status(400).entity(e.getMessage()).build();
 		}
     }
-	
+
 }

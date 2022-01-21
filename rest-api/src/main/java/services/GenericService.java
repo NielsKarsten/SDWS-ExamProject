@@ -4,13 +4,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 import messaging.Event;
 import messaging.MessageQueue;
 
-public class GenericService {
-	protected MessageQueue queue;
-	protected Map<UUID, CompletableFuture<Object>> completableFutures;
+public abstract class GenericService {
+	private MessageQueue queue;
+	private Map<UUID, CompletableFuture<Object>> completableFutures;
 
 	public GenericService(MessageQueue q) {
 		queue = q;
@@ -40,6 +41,10 @@ public class GenericService {
 		completableFutures.put(correlationId, completableFuture);
 		queue.publish(event);
 		return completableFutures.get(correlationId).join();
+	}
+	
+	protected void addHandler(String eventName, Consumer<Event> handler) {
+		this.queue.addHandler(eventName, handler);
 	}
 
 }

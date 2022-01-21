@@ -17,21 +17,9 @@ import models.Transaction;
 import models.User;
 import services.ServicesFactory;
 @Path("/admin")
-public class AdminResource {
+public class AdminResource extends UserResourceImpl {
     private ServicesFactory factory = new ServicesFactory();
 
-	@POST
-	@Consumes("application/json")
-	@Produces("application/json")
-	public UUID registerUserAcount(User user) {
-		return factory.getAccountService().registerAsyncUserAccount(user);
-	}
-
-	@DELETE
-	public boolean deleteUserAccount(@QueryParam("adminId") UUID adminId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(adminId);
-	}
-	
 	@Path("/transaction")
     @GET
     @Produces(MediaType.APPLICATION_JSON)

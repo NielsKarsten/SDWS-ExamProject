@@ -17,20 +17,8 @@ import models.*;
 import services.*;
 
 @Path("/customer")
-public class CustomerResource {
+public class CustomerResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
-
-	@POST
-	@Consumes("application/json")
-	@Produces("application/json")
-	public UUID registerUserAcount(User user) {
-		return factory.getAccountService().registerAsyncUserAccount(user);
-	}
-
-	@DELETE
-	public boolean deleteUserAccount(@QueryParam("customerId") UUID customerId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(customerId);
-	}
 
     @Path("/transaction")
     @GET

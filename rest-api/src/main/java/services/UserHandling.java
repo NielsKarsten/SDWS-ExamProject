@@ -9,7 +9,7 @@ public class UserHandling extends GenericService{
 
 	public UserHandling(MessageQueue q) {
 		super(q);
-		this.queue.addHandler("UserAccountExistsResponse", this::handleUserExistsResponse);
+		addHandler("UserAccountExistsResponse", this::handleUserExistsResponse);
 	}
 
 	protected boolean verifyUserExists(UUID userId) {

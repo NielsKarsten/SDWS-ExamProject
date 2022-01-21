@@ -18,11 +18,11 @@ public class TransactionRestService extends GenericService{
 
     public TransactionRestService(MessageQueue q) {
     	super(q);
-        this.queue.addHandler("TokenValidityResponse", this::handleTokenValidityResponse);
-    	this.queue.addHandler("TransactionRequestSuccesfull", this::handleTransactionRequestResponseSuccess);
-        this.queue.addHandler("TransactionRequestInvalid", this::handleTransactionRequestResponseInvalid);
-        this.queue.addHandler("ReportResponse", this::handleReportResponse);
-        this.queue.addHandler("ReportRequestInvalid", this::handleReportRequestInvalid);
+        addHandler("TokenValidityResponse", this::handleTokenValidityResponse);
+    	addHandler("TransactionRequestSuccesfull", this::handleTransactionRequestResponseSuccess);
+        addHandler("TransactionRequestInvalid", this::handleTransactionRequestResponseInvalid);
+        addHandler("ReportResponse", this::handleReportResponse);
+        addHandler("ReportRequestInvalid", this::handleReportRequestInvalid);
     }
     
 	protected boolean verifyTokenValidity(UUID token) {

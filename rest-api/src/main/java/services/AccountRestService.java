@@ -20,11 +20,11 @@ public class AccountRestService extends GenericService {
 
 	public AccountRestService(MessageQueue q) {
 		super(q);
-		queue.addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
-		queue.addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
-		queue.addHandler("UserAccountInvalid", this::handleUserAccountInvalid);
-		queue.addHandler("AccountClosedResponse", this::handleUserAccountResponse);
-		queue.addHandler("VerifyUserAccountExistsResponse", this::handleUserAccountResponse);
+		addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
+		addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
+		addHandler("UserAccountInvalid", this::handleUserAccountInvalid);
+		addHandler("AccountClosedResponse", this::handleUserAccountResponse);
+		addHandler("VerifyUserAccountExistsResponse", this::handleUserAccountResponse);
 	}
 
 	public UUID registerAsyncUserAccount(User user) {
