@@ -1,10 +1,11 @@
 package token.service.manager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-
+/**
+ * Main: Simon Pontoppidan
+ */
 public class ActiveTokenManager extends TokenManager {
 
     public ActiveTokenManager() {

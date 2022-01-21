@@ -1,10 +1,5 @@
-// Authors:
-// Theodor Guttesen s185121
-// Main: Christian Gernsøe s163552
-
 package token;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -13,20 +8,28 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import com.google.gson.Gson;
-
+import adapters.TokenRestAdapter;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import services.TokenRestService;
 import messaging.Event;
 import messaging.MessageQueue;
 import models.TokenRequest;
 
-
-public class TokenRestServiceSteps {
-	private TokenRestService service;
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Gustav Lintrup Kirkholt
+ */
+public class TokenRestAdapterSteps {
+	private TokenRestAdapter service;
     private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
     private CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
     private CompletableFuture<Boolean> errorRecieved = new CompletableFuture<>();
@@ -34,7 +37,7 @@ public class TokenRestServiceSteps {
     private UUID customerId;
     private UUID correlationId;
     private TokenRequest tokenRequest;
-    public TokenRestServiceSteps() {
+    public TokenRestAdapterSteps() {
     }
 
     @Before
@@ -51,7 +54,7 @@ public class TokenRestServiceSteps {
             }
 
         };
-        service = new TokenRestService(q);
+        service = new TokenRestAdapter(q);
     }
     @Given ("there is a customer with id")
     public void givenCustomer(){
@@ -90,7 +93,6 @@ public class TokenRestServiceSteps {
 	    		obj = new NullPointerException("");
 	    		break;
 	    	default:
-	    		System.out.println("No object for event: " + eventName);
 	    		break;
     	}
     	return obj;
@@ -101,13 +103,12 @@ public class TokenRestServiceSteps {
     	Event event = new Event(correlationId,eventName,new Object[] {eventObject});
     	switch(eventName) {
 	    	case "TokensIssued":
-	    		service.handleTokensIssued(event);
+	    		service.genericHandler(event);
 	    		break;
 	    	case "TokenRequestInvalid":
-	    		service.handleTokenRequestError(event);
+	    		service.genericErrorHandler(event);
 	    		break;
 	    	default:
-	    		System.out.println("No event handler for event: " + eventName);
 	    		break;
 	    	}
     }

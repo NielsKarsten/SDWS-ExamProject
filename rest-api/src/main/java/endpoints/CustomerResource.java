@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -13,26 +12,24 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import adapters.*;
 import models.*;
-import services.*;
-
-@Path("/customer")
-public class CustomerResource {
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Ghristian Gernsøe
+ */
+@Path("/customers")
+public class CustomerResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
 
-	@POST
-	@Consumes("application/json")
-	@Produces("application/json")
-	public UUID registerUserAcount(User user) {
-		return factory.getAccountService().registerAsyncUserAccount(user);
-	}
-
-	@DELETE
-	public boolean deleteUserAccount(@QueryParam("customerId") UUID customerId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(customerId);
-	}
-
-    @Path("/transaction")
+    @Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserTransactions(@QueryParam("customerId") UUID customerId) {
@@ -45,7 +42,7 @@ public class CustomerResource {
     	}
     }
 
-    @Path("/token")
+    @Path("/tokens")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

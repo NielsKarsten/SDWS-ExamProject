@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import services.AccountRestService;
+import adapters.AccountRestAdapter;
 import models.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
@@ -15,14 +15,19 @@ import messaging.MessageQueue;
 import static org.junit.Assert.*;
 
 /**
-* @authors Thomas Rathsach Strange (s153390), 
-* 		   Simon Pontoppidan (s144213), 
-* 		   Niels Karsten Bisgaard-Bohr (s202745)
-*/
-
-public class AccountRestServiceSteps {
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Niels Bisgaard-Bohr
+ */
+public class AccountRestAdapterSteps {
 	private MessageQueue queue;
-	private AccountRestService accountRestService;
+	private AccountRestAdapter accountRestService;
 	private CompletableFuture<UUID> registeredUser;
 	private CompletableFuture<String> userAccountId;
 	private CompletableFuture<Boolean> userAccountDeleted;
@@ -44,7 +49,7 @@ public class AccountRestServiceSteps {
 			}
 		};
 
-		accountRestService = new AccountRestService(queue);
+		accountRestService = new AccountRestAdapter(queue);
 		registeredUser = new CompletableFuture<>();
 		userAccountId = new CompletableFuture<>();
 		userAccountDeleted = new CompletableFuture<>();
@@ -83,7 +88,7 @@ public class AccountRestServiceSteps {
 		Event pEvent = publishedEvent.join();
 		correlationID = pEvent.getCorrelationId();
 		Event event = new Event(correlationID, eventName, new Object[] { eventConstruction.getEventObject(eventName) });
-		assertEquals(event, pEvent);
+		assertEquals(event.getType(), pEvent.getType());
 		publishedEvent = new CompletableFuture<>();
 	}
 

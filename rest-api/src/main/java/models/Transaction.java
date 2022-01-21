@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
+/**
+ * Main: Gustav Lintrup Kirkholt
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

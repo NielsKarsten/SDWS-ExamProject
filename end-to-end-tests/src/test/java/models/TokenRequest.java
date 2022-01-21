@@ -1,4 +1,4 @@
-package behaviourtests;
+package models;
 
 import java.util.UUID;
 

@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * Main: Simon Pontoppidan
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

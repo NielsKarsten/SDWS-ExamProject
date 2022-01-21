@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ *
+ * Main: Gustav Lintrup Kirkholt
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

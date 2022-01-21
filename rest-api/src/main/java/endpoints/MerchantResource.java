@@ -1,11 +1,9 @@
 package endpoints;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,27 +12,26 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import adapters.*;
 import models.*;
-import services.*;
 
-@Path("/merchant")
-public class MerchantResource {
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Gustav Utke Kauman
+ */
+@Path("/merchants")
+public class MerchantResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
-    TransactionRestService transactionService = factory.getTransactionService();
+    TransactionRestAdapter transactionService = factory.getTransactionService();
 
-	@POST
-	@Consumes("application/json")
-	@Produces("application/json")
-	public UUID registerUserAcount(User user) {
-		return factory.getAccountService().registerAsyncUserAccount(user);
-	}
-
-	@DELETE
-	public boolean deleteUserAccount(@QueryParam("merchantId") UUID merchantId) {
-		return factory.getAccountService().requestAsyncUserAccountDeletion(merchantId);
-	}
-	
-	@Path("/transaction")
+	@Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction(@QueryParam("merchantId") UUID merchantId) {
@@ -47,7 +44,7 @@ public class MerchantResource {
 		}
     }
 
-	@Path("/transaction")
+	@Path("/transactions")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -60,5 +57,5 @@ public class MerchantResource {
 			return Response.status(400).entity(e.getMessage()).build();
 		}
     }
-	
+
 }

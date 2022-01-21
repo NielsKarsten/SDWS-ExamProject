@@ -1,10 +1,14 @@
-# Authors:
-# Theodor Guttesen s185121
-# Christian Gernsøe s163552
-# Gustav Lintrup Kirkholt s164765
-# Niels Bisgaard-Bohr S202745
-# Simon 
-# Thomas
+# Authors
+# Christian Gernsøe - S163552
+# Gustav Utke Kauman - S195396
+# Gustav Lintrup Kirkholt - s164765
+# Niels Bisgaard-Bohr - S202745
+# Simon Pontoppidan - S144213
+# Theodor Peter Guttesen - S185121
+# Thomas Rathsach Strange - S153390
+# 
+# Main: Simon Pontoppidan
+#
 
 Feature: DTU Pay feature
 
@@ -98,7 +102,7 @@ Scenario: Unsuccesful payment due to invalid customer token
 	When merchant initiates a transaction for 100 with wrong token
 	Then customer has correct balance
 	And merchant has correct balance
-	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
+	And they receive an error message "java.lang.Exception: java.lang.Exception: Invalid token"
 	
 Scenario: Unsuccesful payment due to retired customer token
 	Given a customer "Johnny" "Bravo"
@@ -110,7 +114,7 @@ Scenario: Unsuccesful payment due to retired customer token
 	When merchant initiates a transaction for 100
 	And merchant initiates a transaction for 100 again
 	Then merchant has correct balance
-	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
+	And they receive an error message "java.lang.Exception: java.lang.Exception: Invalid token"
 	
 Scenario: Unsuccesful payment due to retired customer
 	Given a customer "Johnny" "Bravo"
@@ -122,7 +126,7 @@ Scenario: Unsuccesful payment due to retired customer
 	When customer account is retired
 	When merchant initiates a transaction for 100
 	Then merchant has correct balance
-	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
+	And they receive an error message "java.lang.Exception: java.lang.Exception: Invalid token"
 	
 Scenario: Unsuccesful payment due to unregistered merchant
 	Given a customer "Johnny" "Bravo"

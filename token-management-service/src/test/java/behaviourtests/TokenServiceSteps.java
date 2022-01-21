@@ -18,7 +18,10 @@ import messaging.Event;
 import messaging.MessageQueue;
 import org.junit.After;
 
+import handling.TokenEventType;
+
 import java.util.function.Consumer;
+
 import tokenmanagement.service.TokenRequest;
 import tokenmanagement.service.TokenService;
 
@@ -26,8 +29,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-public class TokenServiceSteps {
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Theodor Peter Guttesen
+ */
+public class TokenServiceSteps implements TokenEventType{
 	private MessageQueue queue;
 	private TokenService tokenService;
 
@@ -45,7 +58,6 @@ public class TokenServiceSteps {
 	
 	@Before
 	public void setUp() {
-		System.out.println("BEFORE!");
 		queue = new MessageQueue() {
 
 			@Override
@@ -75,19 +87,18 @@ public class TokenServiceSteps {
 	public Object createEventObject(String eventName) {
 		Object obj = null;
 		switch(eventName) {
-			case "TokensRequested":
+			case TOKENS_REQUESTED:
 				obj = tokenRequest;
 				break;
-			case "TokensIssued":
+			case TOKENS_ISSUED:
 				obj = new ArrayList<UUID>().add(token);
-			case "TokenToCustomerIdRequested":
+			case TOKEN_TO_CUSTOMER_ID_REQUESTED:
 				obj = tokens.get(0);
 				break;
-			case "TokenToCustomerIdResponse":
+			case TOKEN_TO_CUSTOMER_ID_RESPONSE:
 				obj = customerId;
 				break;
 			default:
-				System.out.println("No event object for event: " + eventName);
 				break;
 		}
 		return obj;
@@ -97,14 +108,13 @@ public class TokenServiceSteps {
 		Object eventObject = createEventObject(eventName);
 		Event event = new Event(correlationId, eventName ,new Object[] {eventObject});
 		switch(eventName) {
-			case "TokensRequested":
+			case TOKENS_REQUESTED:
 				tokenService.handleTokensRequested(event);
 				break;
-			case "TokenToCustomerIdRequested":
+			case TOKEN_TO_CUSTOMER_ID_REQUESTED:
 				tokenService.handleTokenToCustomerIdRequested(event);
 				break;
 			default:
-				System.out.println("No event recieved handler for event: " + eventName);
 				break;
 		}
 	}

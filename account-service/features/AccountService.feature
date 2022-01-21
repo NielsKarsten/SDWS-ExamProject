@@ -1,6 +1,14 @@
-# Authors:
-# Gustav Utke Kauman (s195396)
-
+# Authors
+# Christian Gernsøe - S163552
+# Gustav Utke Kauman - S195396
+# Gustav Lintrup Kirkholt - s164765
+# Niels Bisgaard-Bohr - S202745
+# Simon Pontoppidan - S144213
+# Theodor Peter Guttesen - S185121
+# Thomas Rathsach Strange - S153390
+# 
+# Main: Thomas Rathsach Strange
+#
 Feature: Account service
 
 Scenario: customer registers account

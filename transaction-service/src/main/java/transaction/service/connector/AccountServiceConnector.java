@@ -1,58 +1,43 @@
 package transaction.service.connector;
 
-import messaging.Event;
 import messaging.MessageQueue;
-import transaction.service.models.User;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
+import handling.AccountEventType;
+import handling.GenericHandler;
+import handling.TokenEventType;
+import handling.TransactionEventType;
 
-public class AccountServiceConnector {
 
-    MessageQueue queue;
-
-    private Map<UUID, CompletableFuture<Object>> correlations = new ConcurrentHashMap<>();
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Thomas Rathsach Strange
+ */
+public class AccountServiceConnector extends GenericHandler implements  AccountEventType, TokenEventType, TransactionEventType{
 
     public AccountServiceConnector(MessageQueue q) {
-        this.queue = q;
-        this.queue.addHandler("UserAccountInfoResponse", this::handleGetAccountFromIdResponse);
-        this.queue.addHandler("VerifyUserAccountExistsResponse", this::handleVerifyUserAccountExistsResponse);
-        this.queue.addHandler("UserAccountInvalid", this::handleVerifyUserAccountExistsResponse);
+    	super(q);
+        addHandler("UserAccountInfoResponse", this::genericHandler);
+        addHandler("VerifyUserAccountExistsResponse", this::genericHandler);
+        addHandler("UserAccountInvalid", this::genericHandler);
     }
 
     public boolean userExists(UUID userId) throws NullPointerException {
-    	if (userId == null)
-    		throw new NullPointerException("User Id was not specified");
-    	
-        UUID correlationId = UUID.randomUUID();
-        correlations.put(correlationId, new CompletableFuture<>());
-        Event e = new Event(correlationId, "VerifyUserAccountExistsRequest", new Object[]{userId});
-        this.queue.publish(e);
-        return (boolean) correlations.get(correlationId).join();    	
-    }
-    
-    public void handleVerifyUserAccountExistsResponse(Event event) {
-    	UUID correlationId = event.getCorrelationId();
-    	boolean success = event.getArgument(0, boolean.class);
-        correlations.get(correlationId).complete(success);
-    }
-    
-    public String getUserBankAccountFromId(UUID userId) throws NullPointerException {
-    	if (userId == null)
-    		throw new NullPointerException("User Id was not specified");
-    	
-        UUID correlationId = UUID.randomUUID();
-        correlations.put(correlationId, new CompletableFuture<>());
-        Event e = new Event(correlationId, "UserAccountInfoRequested", new Object[]{userId});
-        this.queue.publish(e);
-        return (String) correlations.get(correlationId).join();
+        if (userId == null)
+            throw new NullPointerException("User Id was not specified");
+        return (boolean) buildCompletableFutureEvent(userId, VERIFY_USER_ACCOUNT_EXISTS_REQUESTS);
     }
 
-    public void handleGetAccountFromIdResponse(Event event) {
-        String userBankAccountId = event.getArgument(0, String.class);
-        UUID correlationId = event.getCorrelationId();
-        correlations.get(correlationId).complete(userBankAccountId);
+    public String getUserBankAccountFromId(UUID userId) throws NullPointerException {
+        if (userId == null)
+            throw new NullPointerException("User Id was not specified");
+        return (String) buildCompletableFutureEvent(userId, USER_ACCOUNT_INFO_REQUESTED);
     }
 }

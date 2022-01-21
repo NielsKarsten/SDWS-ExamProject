@@ -25,6 +25,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+/**
+ * @author Christian Gerns�e - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Gustav Utke Kauman
+ */
 public class TransactionServiceSteps {
     BankService bank = mock(BankService.class);
     MessageQueue queue = mock(MessageQueue.class);
@@ -87,7 +98,6 @@ public class TransactionServiceSteps {
                 }
 				break;
             default:
-				System.out.println("No event object found for " + eventName);
 				obj = null;
 				break;
 		}
@@ -111,7 +121,6 @@ public class TransactionServiceSteps {
         	   transactionService.handleAdminReportRequest(event);
         	   break;
             default:
-                System.out.println("No event handler found for " + eventName);
                 break;
         }
     }
@@ -213,7 +222,6 @@ public class TransactionServiceSteps {
     @Then("a {string} event is sent with error message {string}")
     public void aEventIsSentWithErrorMessage(String eventName, String errorMsg) {
     	Event pEvent = publishedEvent.join();
-    	System.out.println(pEvent);
     	exception = pEvent.getArgument(0, NullPointerException.class);
         assertEquals(pEvent.getType(), eventName);
         assertEquals(errorMsg, exception.getMessage());

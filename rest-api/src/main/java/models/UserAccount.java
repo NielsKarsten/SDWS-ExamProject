@@ -4,6 +4,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * Main: Thomas Rathsach Strange
+ */
 @Data
 @AllArgsConstructor
 public class UserAccount {

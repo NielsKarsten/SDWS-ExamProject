@@ -6,36 +6,38 @@
 
 package tokenmanagement.service;
 
-import com.google.gson.Gson;
+import handling.AccountEventType;
+import handling.GenericHandler;
+import handling.TokenEventType;
 import messaging.Event;
 import messaging.MessageQueue;
 import token.service.manager.ActiveTokenManager;
 import token.service.manager.ArchivedTokenManager;
-import token.service.manager.TokenManager;
-
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 
-public class TokenService {
-    private MessageQueue queue;
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Christian Gernsøe
+ */
+public class TokenService extends GenericHandler implements AccountEventType, TokenEventType{
     private ArchivedTokenManager archivedTokens;
     private ActiveTokenManager activeTokens;
 
     public TokenService(MessageQueue q) {
-        queue = q;
+    	super(q);
         this.activeTokens = new ActiveTokenManager();
         this.archivedTokens = new ArchivedTokenManager();
 
-        queue.addHandler("TokensRequested", this::handleTokensRequested);
-        queue.addHandler("TokenToCustomerIdRequested", this::handleTokenToCustomerIdRequested);
-        queue.addHandler("RetireUserAccountTokensRequest", this::handleCustomerAccountClosed);
-    }
-
-    private void publishNewEvent(Event e, String topic, Object object) {
-        UUID correlationId = e.getCorrelationId();
-        Event event = new Event(correlationId, topic, new Object[] { object });
-        queue.publish(event);
+        addHandler(TOKENS_REQUESTED, this::handleTokensRequested);
+        addHandler(TOKEN_TO_CUSTOMER_ID_REQUESTED, this::handleTokenToCustomerIdRequested);
+        addHandler(RETIRE_USER_ACCOUNT_TOKENS_REQUEST, this::handleCustomerAccountClosed);
     }
 
     public void handleTokensRequested(Event e) {
@@ -46,34 +48,28 @@ public class TokenService {
     public List<UUID> requestTokens(TokenRequest tokenRequest) {
         UUID userId = tokenRequest.getUserId();
         int tokenAmount = tokenRequest.getAmount();
-    	return activeTokens.generateTokens(userId, tokenAmount);
+        return activeTokens.generateTokens(userId, tokenAmount);
     }
 
     private void tryRequestTokens(Event e, TokenRequest request) {
-    	System.out.println("Invoking tryRequestTokens");
-
-    	UUID userId = request.getUserId();
+        UUID userId = request.getUserId();
         int tokenAmount = request.getAmount();
-    	List<UUID> customerTokens;
-    	try{
-    		customerTokens = activeTokens.getUserTokens(userId);
-    	}
-    	catch(Exception ex) {
-    		customerTokens = null;
-    	}
-    	
-        if (tokenAmount > 5 || tokenAmount < 1) 
-        {
-        	publishNewEvent(e, "TokenRequestInvalid", new IllegalArgumentException("Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
+        List<UUID> customerTokens;
+        try {
+            customerTokens = activeTokens.getUserTokens(userId);
+        } catch (Exception ex) {
+            customerTokens = null;
         }
-        else if (customerTokens != null && customerTokens.size() > 1) 
-        {
-        	publishNewEvent(e, "TokenRequestInvalid", new IllegalArgumentException("Error: You can only request tokens when you have less than 2 active tokens"));
-        }
-        else 
-        {
-        	List<UUID> tokenList = requestTokens(request);
-            publishNewEvent(e, "TokensIssued", tokenList);    
+
+        if (tokenAmount > 5 || tokenAmount < 1) {
+            publishNewEvent(e, TOKEN_REQUEST_INVALID, new IllegalArgumentException(
+                    "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
+        } else if (customerTokens != null && customerTokens.size() > 1) {
+            publishNewEvent(e, TOKEN_REQUEST_INVALID, new IllegalArgumentException(
+                    "Error: You can only request tokens when you have less than 2 active tokens"));
+        } else {
+            List<UUID> tokenList = requestTokens(request);
+            publishNewEvent(e, TOKENS_ISSUED, tokenList);
         }
     }
 
@@ -85,24 +81,22 @@ public class TokenService {
             customerId = activeTokens.getTokenOwner(token);
             activeTokens.removeToken(customerId, token);
             archivedTokens.addToken(customerId, token);
-            this.publishNewEvent(e, "TokenToCustomerIdResponse", customerId);
-        } catch (NullPointerException tokenException) 
-        {
-        	this.publishNewEvent(e, "TokenToCustomerIdResponseInvalid", "Invalid token");
+            publishNewEvent(e, TOKEN_TO_CUSTOMER_ID_RESPONSE, customerId);
+        } catch (NullPointerException tokenException) {
+            publishNewEvent(e, TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, new IllegalArgumentException("Invalid token"));
         }
     }
 
     public void handleCustomerAccountClosed(Event e) {
-    	UUID userId = e.getArgument(0, UUID.class);
-    	try {
-    		List<UUID> userActiveTokens = activeTokens.getUserTokens(userId);
-    		activeTokens.removeTokens(userId, userActiveTokens);
-    		archivedTokens.addTokens(userId, userActiveTokens);
-    		this.publishNewEvent(e, "ClosedUserAccountTokensRetired", true);
-    	}
-    	catch(Exception ex) {
-    		this.publishNewEvent(e, "AccountClosedRetireTokenRequestInvalid", ex);
-    	}
-    	
+        UUID userId = e.getArgument(0, UUID.class);
+        try {
+            List<UUID> userActiveTokens = activeTokens.getUserTokens(userId);
+            activeTokens.removeTokens(userId, userActiveTokens);
+            archivedTokens.addTokens(userId, userActiveTokens);
+            this.publishNewEvent(e, CLOSED_USER_ACCOUNT_TOKENS_RETIRED, true);
+        } catch (Exception ex) {
+            this.publishNewEvent(e, ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID, ex);
+        }
+
     }
 }
