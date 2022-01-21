@@ -19,7 +19,8 @@ public abstract class GenericHandler {
 	}
 
 	public <T> void genericHandler(Event e) {
-		System.out.println("genericErrorHandler Invoked");
+		System.out.println("generic Invoked");
+		System.out.println(e.toString());
 		UUID correlationId = e.getCorrelationId();
 		Object arg = e.getArgument(0, Object.class);
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
@@ -27,9 +28,11 @@ public abstract class GenericHandler {
 	}
 
 	public <T> void genericErrorHandler(Event e) {
-		System.out.println("genericErrorHandler Invoked");
+		System.out.println("genericErrorHandler Invoked 2");
+		System.out.println(e.toString());
 		UUID correlationId = e.getCorrelationId();
 		Exception ex = e.getArgument(0, Exception.class);
+		System.out.println("ERROR: " + ex.getMessage());
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
 		completableFuture.completeExceptionally(ex);
 	}

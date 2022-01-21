@@ -3,6 +3,7 @@ package account;
 import java.util.UUID;
 
 import adapters.AccountRestService;
+import handling.EventType;
 import messaging.Event;
 import models.*;
 
@@ -41,22 +42,22 @@ public class EventConstruction {
 	public Object getEventObject(String eventName) {
 		Object obj = null;
 		switch (eventName) {
-			case "AccountRegistrationRequested":
+			case EventType.ACCOUNT_REGISTRATION_REQUESTED:
 				obj = user;
 				break;
-			case "UserAccountRegistered":
+			case EventType.USER_ACCOUNT_REGISTERED:
 				obj = userId;
 				break;
-			case "UserAccountInfoRequested":
+			case EventType.USER_ACCOUNT_INFO_REQUESTED:
 				obj = userId;
 				break;
-			case "UserAccountInfoResponse":
+			case EventType.USER_ACCOUNT_INFO_RESPONSE:
 				obj = user.getAccountId();
 				break;
-			case "AccountClosedRequested":
+			case EventType.ACCOUNT_CLOSED_REQUESTED:
 				obj = userId;
 				break;
-			case "AccountClosedResponse":
+			case EventType.ACCOUNT_CLOSED_RESPONSE:
 				obj = true;
 				break;
 			default:
@@ -71,13 +72,13 @@ public class EventConstruction {
 		Object eventObject = getEventObject(eventName);
 		Event event = new Event(correlationID, eventName, new Object[] { eventObject });
 		switch (eventName) {
-			case "UserAccountRegistered":
+			case EventType.USER_ACCOUNT_REGISTERED:
 				service.genericHandler(event);
 				break;
-			case "UserAccountInfoResponse":
+			case EventType.USER_ACCOUNT_INFO_RESPONSE:
 				service.genericHandler(event);
 				break;
-			case "AccountClosedResponse":
+			case EventType.ACCOUNT_CLOSED_RESPONSE:
 				service.genericHandler(event);
 				break;
 			default:

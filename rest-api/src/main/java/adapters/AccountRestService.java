@@ -31,7 +31,7 @@ public class AccountRestService extends GenericHandler {
 	public UUID registerAsyncUserAccount(User user) {
 		if (user.getFirstName() == null || user.getLastName() == null || user.getAccountId() == null)
 			throw new NullPointerException("Error - Missing information about user");
-		return (UUID) buildCompletableFutureEvent(user, "AccountRegistrationRequested");
+		return UUID.fromString((String) buildCompletableFutureEvent(user, "AccountRegistrationRequested")) ;
 	}
 
 	public String requestAsyncUserAccountInfo(UUID userId) {

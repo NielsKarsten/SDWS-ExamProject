@@ -6,10 +6,22 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import account.service.models.User;
+import handling.EventType;
 import handling.GenericHandler;
 import messaging.Event;
 import messaging.MessageQueue;
 
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Krikholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Niels Bisgaard-Bohr
+ */
 public class AccountService extends GenericHandler{
 	private HashMap<UUID, User> users;
 
