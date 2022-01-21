@@ -7,6 +7,7 @@ import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.BankServiceService;
 import handling.AccountEventType;
+import handling.GenericHandler;
 import handling.TokenEventType;
 import handling.TransactionEventType;
 import messaging.Event;
@@ -16,10 +17,8 @@ import transaction.service.connector.TokenServiceConnector;
 import transaction.service.models.*;
 import transaction.service.persistance.TransactionStore;
 
-public class TransactionService implements  AccountEventType, TokenEventType, TransactionEventType{
-
+public class TransactionService extends GenericHandler implements  AccountEventType, TokenEventType, TransactionEventType{
     private BankService bank;
-    private MessageQueue queue;
     private TokenServiceConnector tokenServiceConnector;
     private AccountServiceConnector accountServiceConnector;
 
@@ -32,22 +31,17 @@ public class TransactionService implements  AccountEventType, TokenEventType, Tr
     }
 
     public TransactionService(MessageQueue queue, BankService bank, TokenServiceConnector tokenServiceConnector, AccountServiceConnector accountServiceConnector) {
-        this.queue = queue;
+        super(queue);
         this.bank = bank;
         this.tokenServiceConnector = tokenServiceConnector;
         this.accountServiceConnector = accountServiceConnector;
 
         TransactionStore.reset();
 
-        this.queue.addHandler(TRANSACTION_REQUESTED, this::handleTransactionRequestEvent);
-        this.queue.addHandler(CUSTOMER_REPORT_REQUESTED, this::handleCustomerReportRequest);
-        this.queue.addHandler(MERCHANT_REPORT_REQUESTED, this::handleMerchantReportRequest);
-        this.queue.addHandler(ADMIN_REPORT_REQUESTED, this::handleAdminReportRequest);
-    }
-    
-    public void publishEvent(UUID correlationId, String eventName, Object eventData) {
-        Event event = new Event(correlationId, eventName, new Object[]{eventData});
-        this.queue.publish(event);
+        addHandler(TRANSACTION_REQUESTED, this::handleTransactionRequestEvent);
+        addHandler(CUSTOMER_REPORT_REQUESTED, this::handleCustomerReportRequest);
+        addHandler(MERCHANT_REPORT_REQUESTED, this::handleMerchantReportRequest);
+        addHandler(ADMIN_REPORT_REQUESTED, this::handleAdminReportRequest);
     }
     
     public void handleTransactionRequestEvent(Event event) {    	
@@ -66,12 +60,12 @@ public class TransactionService implements  AccountEventType, TokenEventType, Tr
         	if (amount == null || amount.compareTo(BigDecimal.valueOf(0)) <= 0)
         		throw new NullPointerException("Amount incorrectly specified");
         	this.tryPayment(customerId, merchantId, amount, userToken);
-        	this.publishEvent(correlationId, TRANSACTION_REQUEST_SUCCESFULL, "Transaction was completed succesfully");
+        	publishNewEvent(correlationId, TRANSACTION_REQUEST_SUCCESFULL, "Transaction was completed succesfully");
         }
         catch(Exception e)
         {
         	System.out.println("Error occoured during a transaction request: " + e.getMessage());
-        	this.publishEvent(correlationId, TRANSACTION_REQUEST_INVALID, e);
+        	publishNewEvent(correlationId, TRANSACTION_REQUEST_INVALID, e);
         }
     }
 
@@ -92,7 +86,7 @@ public class TransactionService implements  AccountEventType, TokenEventType, Tr
     public void handleAdminReportRequest(Event event) {
     	UUID correlationId = event.getCorrelationId();
     	List<Transaction> transactions = TransactionStore.getInstance().getAllTransactions();
-    	this.publishEvent(correlationId, REPORT_RESPONSE, transactions);
+    	publishNewEvent(correlationId, REPORT_RESPONSE, transactions);
     }
     
     public void handleCustomerReportRequest(Event event) {
@@ -102,16 +96,16 @@ public class TransactionService implements  AccountEventType, TokenEventType, Tr
     	{
         	if (accountServiceConnector.userExists(userId)) {
             	List<Transaction> transactions = TransactionStore.getInstance().getCustomerTransactions(userId);
-            	this.publishEvent(correlationId, REPORT_RESPONSE, transactions);        		
+            	publishNewEvent(correlationId, REPORT_RESPONSE, transactions);        		
         	}
         	else
         	{
-        		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, new NullPointerException("No customer with that ID exists"));
+        		publishNewEvent(correlationId, REPORT_REQUEST_INVALID, new NullPointerException("No customer with that ID exists"));
         	}
     	}
     	catch(NullPointerException e)
     	{
-    		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, e);
+    		publishNewEvent(correlationId, REPORT_REQUEST_INVALID, e);
     	}
     }
     
@@ -122,16 +116,16 @@ public class TransactionService implements  AccountEventType, TokenEventType, Tr
     	{
         	if (accountServiceConnector.userExists(merchantId)) {
             	List<Transaction> transactions = TransactionStore.getInstance().getMerchantTransactions(merchantId);
-            	this.publishEvent(correlationId, REPORT_RESPONSE, transactions);        		
+            	publishNewEvent(correlationId, REPORT_RESPONSE, transactions);        		
         	}
         	else
         	{
-        		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, new NullPointerException("No customer with that ID exists"));
+        		publishNewEvent(correlationId, REPORT_REQUEST_INVALID, new NullPointerException("No customer with that ID exists"));
         	}
     	}
     	catch(NullPointerException e)
     	{
-    		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, e);
+    		publishNewEvent(correlationId, REPORT_REQUEST_INVALID, e);
     	}
     }
 }
