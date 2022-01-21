@@ -1,0 +1,336 @@
+swagger: '2.0'
+info:
+  version: v1.0
+  title: DTU Pay
+host: fm-03.compute.dtu.dk:8080
+basePath: /
+schemes:
+  - http
+paths:
+  /merchant:
+    post:
+      tags:
+        - merchant
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Created
+          headers: {}
+          schema:
+            type: string
+        '400':
+          description: Bad Request
+          headers: {}
+          schema:
+            type: string
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+    delete:
+      tags:
+        - merchant
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchantId
+          required: true
+          type: string
+          description: The merchant with merchantId to be deleted
+      responses:
+        '200':
+          description: Deleted
+          headers: {}
+          schema:
+            type: boolean
+        '400':
+          description: Bad Request
+          headers: {}
+          schema:
+            type: string
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+  /merchant/transaction:
+    get:
+      tags:
+        - merchant
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: merchantId
+          required: true
+          type: string
+          description: The merchant id to get transactions for
+      responses:
+        '200':
+          description: Get list of transactions
+          headers: {}
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+    post:
+      tags:
+        - merchant
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/TransactionRequest'
+      responses:
+        '200':
+          description: Transaction successful
+          headers: {}
+          schema:
+            $ref: '#/definitions/TransactionRequestResponse'
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+  /customer:
+    post:
+      tags:
+        - customer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Created
+          headers: {}
+          schema:
+            type: string
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+    delete:
+      tags:
+        - customer
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: customerId
+          required: true
+          type: string
+          description: The customer with customerId to be deleted
+      responses:
+        '200':
+          description: Deleted
+          headers: {}
+          schema:
+            type: boolean
+        '400':
+          description: Bad Request
+          headers: {}
+          schema:
+            type: string
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+  /customer/token:
+    post:
+      tags:
+        - customer
+      consumes:
+        - application/json
+      produces:
+        - applicaiton/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+           $ref: '#/definitions/TokenRequest'
+      responses:
+        '200':
+          description: Creation of tokens successful
+          headers: {}
+          schema:
+            type: array
+            items:
+              type: string
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+  /customer/transaction:
+    get:
+      tags:
+        - customer
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: customerId
+          required: true
+          type: string
+          description: Customer id to get transactions for
+      responses:
+        '200':
+          description: List of transaction retrieved successfully
+          headers: {}
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+  /admin:
+    post:
+      tags:
+        - admin
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: Admin created
+          headers: {}
+          schema:
+            type: string
+        '500':
+          description: Interal Server Error
+          headers: {}
+          schema:
+            type: string
+    delete:
+      tags:
+        - admin
+      consumes: []
+      produces:
+        - application/json
+      parameters:
+        - in: query
+          name: adminId
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Admin deleted
+          headers: {}
+          schema:
+            type: boolean
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+  /admin/transaction:
+    get:
+      tags:
+        - admin
+      consumes: []
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: List of transactions successfully retrieved
+          headers: {}
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transaction'
+        '500':
+          description: Internal Server Error
+          headers: {}
+          schema:
+            type: string
+definitions:
+  User:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+      accountId:
+        type: string
+  Transaction:
+    type: object
+    properties:
+      merchant:
+        type: string
+      customer:
+        type: string
+      amount:
+        type: number
+      description:
+        type: string
+      token:
+        type: string
+  TransactionRequest:
+    type: object
+    properties:
+      merchantId:
+        type: string
+      userToken:
+        type: string
+      amount:
+        type: number
+  TransactionRequestResponse:
+      type: object
+      properties:
+        successful:
+          type: boolean
+        errorMessage:
+          type: string
+  TokenRequest:
+    type: object
+    properties:
+      userId:
+        type: string
+      amount:
+        type: integer 
