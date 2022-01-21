@@ -18,27 +18,35 @@ public class AccountServiceConnector {
 
     public AccountServiceConnector(MessageQueue q) {
         this.queue = q;
-        this.queue.addHandler(EventType.USER_ACCOUNT_INFO_RESPONSE, this::handleGetAccountFromIdResponse);
+        this.queue.addHandler("UserAccountInfoResponse", this::handleGetAccountFromIdResponse);
+        this.queue.addHandler("VerifyUserAccountExistsResponse", this::handleVerifyUserAccountExistsResponse);
+        this.queue.addHandler("UserAccountInvalid", this::handleVerifyUserAccountExistsResponse);
     }
 
     public boolean userExists(UUID userId) throws NullPointerException {
-    	if (userId == null)
-    		throw new NullPointerException("User Id was not specified");
-    	
+        if (userId == null)
+            throw new NullPointerException("User Id was not specified");
+
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event e = new Event(correlationId, EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUEST, new Object[]{userId});
+        Event e = new Event(correlationId, EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUEST, new Object[] { userId });
         this.queue.publish(e);
-        return (boolean) correlations.get(correlationId).join();    	
+        return (boolean) correlations.get(correlationId).join();
     }
-    
+
+    public void handleVerifyUserAccountExistsResponse(Event event) {
+        UUID correlationId = event.getCorrelationId();
+        boolean success = event.getArgument(0, boolean.class);
+        correlations.get(correlationId).complete(success);
+    }
+
     public String getUserBankAccountFromId(UUID userId) throws NullPointerException {
-    	if (userId == null)
-    		throw new NullPointerException("User Id was not specified");
-    	
+        if (userId == null)
+            throw new NullPointerException("User Id was not specified");
+
         UUID correlationId = UUID.randomUUID();
         correlations.put(correlationId, new CompletableFuture<>());
-        Event e = new Event(correlationId, EventType.USER_ACCOUNT_INFO_REQUESTED, new Object[]{userId});
+        Event e = new Event(correlationId, EventType.USER_ACCOUNT_INFO_REQUESTED, new Object[] { userId });
         this.queue.publish(e);
         return (String) correlations.get(correlationId).join();
     }

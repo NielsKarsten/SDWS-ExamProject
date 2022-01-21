@@ -6,6 +6,7 @@
 package behaviourtests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.gson.Gson;
@@ -187,34 +188,43 @@ public class DTUPaySteps {
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
 		String json = new Gson().toJson(transactionRequest);
 		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
-		customerBankBalance = customerBankBalance.subtract(transactionAmount);
-		merchantBankBalance = merchantBankBalance.add(transactionAmount);
+		int status = response.getStatus();
+		if (status == 400) 
+		{
+			serverError = response.readEntity(String.class);
+		}
+		else {
+			customerBankBalance = customerBankBalance.subtract(transactionAmount);
+			merchantBankBalance = merchantBankBalance.add(transactionAmount);			
+		}
 		response.close();
 	}
 	
 	@When("merchant initiates a transaction for {float} again")
-	public void theTransactionsIsInitiated(float amount) {
+	public void theTransactionsIsInitiatedAgain(float amount) {
 		System.out.println("Merchant initiates transaction is called");
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
 		String json = new Gson().toJson(transactionRequest);
 		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
+		serverError = response.readEntity(String.class);
 		response.close();
 	}
 	
 	@When("unregistered merchant initiates a transaction for {float}")
-	public void theTransactionsIsInitiated(float amount) {
+	public void UnregisteredMerchantInitiatesATransactionFor(float amount) {
 		merchantId = UUID.randomUUID();
 		System.out.println("Merchant initiates transaction is called");
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, transactionToken, transactionAmount);
 		String json = new Gson().toJson(transactionRequest);
 		Response response = merchantTarget.path("/transaction").request().post(Entity.json(json));
+		serverError = response.readEntity(String.class);
 		response.close();
 	}
 	
 	@When("merchant initiates a transaction for {float} with wrong token")
-	public void theTransactionsIsInitiated(float amount) {
+	public void theTransactionsIsInitiatedWrongToken(float amount) {
 		System.out.println("Merchant initiates transaction with wrong token is called");
 		transactionAmount = BigDecimal.valueOf(amount);
 		TransactionRequest transactionRequest = new TransactionRequest(merchantId, UUID.randomUUID(), transactionAmount);
@@ -236,14 +246,21 @@ public class DTUPaySteps {
 	}
 	
 	@When("another customer requests transactions")
-	public void theCustomerRequestsTransactions() {
+	public void anotherTheCustomerRequestsTransactions() {
 		System.out.println("Another customer initiates transactions list is called");
 		UUID anotherCustomerId = UUID.randomUUID();
 		Response response = customerTarget.queryParam("customerId", UUID.randomUUID()).path("/transaction").request().get();
 		System.out.println("Response = ");
 		System.out.println(response);
-		List<Transaction> customerRecievedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
-		transactionList.addAll(customerRecievedTransactions);
+		if (response.getStatus() == 200)
+		{
+			List<Transaction> customerRecievedTransactions = response.readEntity(new GenericType<List<Transaction>>() {});
+			transactionList.addAll(customerRecievedTransactions);			
+		}
+		else
+		{
+			serverError = response.readEntity(String.class);
+		}
 		response.close();
 	}
 
@@ -273,9 +290,9 @@ public class DTUPaySteps {
 	}
 	
 	@Then("user gets no transactions")
-	public void theUserGetsTransactions() {
+	public void theUserGetsNoTransactions() {
 		System.out.println("User gets no transactions verification is called");
-		assertFalse(transactionList.size() < 1);
+		assertTrue(transactionList.isEmpty());
 	}
 	
 	@Then("merchant cannot identify customer identity")
@@ -295,7 +312,7 @@ public class DTUPaySteps {
 	public void theMerchantHasBalance() throws BankServiceException_Exception {
 		System.out.println("Merchant has balance verification is called");
 		BigDecimal actual = bankService.getAccount(merchant.getAccountId()).getBalance();
-		assertEquals(merchantBankBalance, actual);
+		assertEquals(actual, merchantBankBalance);
 	}
 
 	@When("customer account is retired")
@@ -341,6 +358,7 @@ public class DTUPaySteps {
 	@Then("they receive an error message {string}")
 	public void verifyErrorMessage(String errorMessage) {
 		assertEquals(errorMessage, serverError);
+		assertNotNull(serverError);
 	}
 
 	@After

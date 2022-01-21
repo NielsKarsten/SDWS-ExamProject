@@ -27,9 +27,9 @@ public class TokenService {
         this.activeTokens = new ActiveTokenManager();
         this.archivedTokens = new ArchivedTokenManager();
 
-        queue.addHandler(EventType.TOKENS_REQUESTED, this::handleTokensRequested);
-        queue.addHandler(EventType.TOKEN_TO_CUSTOMER_ID_REQUESTED, this::handleTokenToCustomerIdRequested);
-        queue.addHandler(EventType.ACCOUNT_CLOSED_REQUESTED, this::handleCustomerAccountClosed);
+        queue.addHandler("TokensRequested", this::handleTokensRequested);
+        queue.addHandler("TokenToCustomerIdRequested", this::handleTokenToCustomerIdRequested);
+        queue.addHandler("RetireUserAccountTokensRequest", this::handleCustomerAccountClosed);
     }
 
     private void publishNewEvent(Event e, String topic, Object object) {
@@ -46,28 +46,30 @@ public class TokenService {
     public List<UUID> requestTokens(TokenRequest tokenRequest) {
         UUID userId = tokenRequest.getUserId();
         int tokenAmount = tokenRequest.getAmount();
-    	return activeTokens.generateTokens(userId, tokenAmount);
+        return activeTokens.generateTokens(userId, tokenAmount);
     }
 
     private void tryRequestTokens(Event e, TokenRequest request) {
-    	System.out.println("Invoking tryRequestTokens");
+        System.out.println("Invoking tryRequestTokens");
 
-    	UUID userId = request.getUserId();
+        UUID userId = request.getUserId();
         int tokenAmount = request.getAmount();
-    	List<UUID> customerTokens = activeTokens.getUserTokens(userId);
-    	
-        if (tokenAmount > 5 || tokenAmount < 1) 
-        {
-        	publishNewEvent(e, EventType.TOKEN_REQUEST_INVALID, new IllegalArgumentException("Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
+        List<UUID> customerTokens;
+        try {
+            customerTokens = activeTokens.getUserTokens(userId);
+        } catch (Exception ex) {
+            customerTokens = null;
         }
-        else if (customerTokens != null && customerTokens.size() > 1) 
-        {
-        	publishNewEvent(e, EventType.TOKEN_REQUEST_INVALID, new IllegalArgumentException("Error: You can only request tokens when you have less than 2 active tokens"));
-        }
-        else 
-        {
-        	List<UUID> tokenList = requestTokens(request);
-            publishNewEvent(e, EventType.TOKENS_ISSUED, tokenList);    
+
+        if (tokenAmount > 5 || tokenAmount < 1) {
+            publishNewEvent(e, EventType.TOKEN_REQUEST_INVALID, new IllegalArgumentException(
+                    "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"));
+        } else if (customerTokens != null && customerTokens.size() > 1) {
+            publishNewEvent(e, EventType.TOKEN_REQUEST_INVALID, new IllegalArgumentException(
+                    "Error: You can only request tokens when you have less than 2 active tokens"));
+        } else {
+            List<UUID> tokenList = requestTokens(request);
+            publishNewEvent(e, EventType.TOKENS_ISSUED, tokenList);
         }
     }
 
@@ -80,14 +82,21 @@ public class TokenService {
             activeTokens.removeToken(customerId, token);
             archivedTokens.addToken(customerId, token);
             this.publishNewEvent(e, EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE, customerId);
-        } catch (NullPointerException tokenException) 
-        {
-        	this.publishNewEvent(e, EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, "Invalid token");
+        } catch (NullPointerException tokenException) {
+            this.publishNewEvent(e, EventType.TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, "Invalid token");
         }
     }
-    
-    //TODO
+
     public void handleCustomerAccountClosed(Event e) {
-    	
+        UUID userId = e.getArgument(0, UUID.class);
+        try {
+            List<UUID> userActiveTokens = activeTokens.getUserTokens(userId);
+            activeTokens.removeTokens(userId, userActiveTokens);
+            archivedTokens.addTokens(userId, userActiveTokens);
+            this.publishNewEvent(e, "ClosedUserAccountTokensRetired", true);
+        } catch (Exception ex) {
+            this.publishNewEvent(e, "AccountClosedRetireTokenRequestInvalid", ex);
+        }
+
     }
 }

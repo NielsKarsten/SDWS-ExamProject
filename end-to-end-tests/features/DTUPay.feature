@@ -33,13 +33,13 @@ Scenario: Customer requests too many tokens
 	Then customer has 5 tokens
 	When customer requests 5 tokens
 	Then customer has 5 tokens
-	And they receive an error message ""
+	And they receive an error message "java.lang.Exception: Error: You can only request tokens when you have less than 2 active tokens"
 	
 Scenario: Customer requests too many tokens
 	Given a customer "Johnny" "Bravo"
 	When customer is being registered
 	When customer requests 10 tokens
-	Then they receive an error message "Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"
+	Then they receive an error message "java.lang.Exception: Error: Invalid token amount - you can only request between 1 and 5 tokens at a time"
 	
 Scenario: Succesfully register a merchant
 	Given a merchant "Bravo" "Johnny"
@@ -98,7 +98,7 @@ Scenario: Unsuccesful payment due to invalid customer token
 	When merchant initiates a transaction for 100 with wrong token
 	Then customer has correct balance
 	And merchant has correct balance
-	And they receive an error message ""
+	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
 	
 Scenario: Unsuccesful payment due to retired customer token
 	Given a customer "Johnny" "Bravo"
@@ -108,8 +108,9 @@ Scenario: Unsuccesful payment due to retired customer token
 	When customer requests 5 tokens
 	Then customer has 5 tokens
 	When merchant initiates a transaction for 100
+	And merchant initiates a transaction for 100 again
 	Then merchant has correct balance
-	And they receive an error message ""
+	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
 	
 Scenario: Unsuccesful payment due to retired customer
 	Given a customer "Johnny" "Bravo"
@@ -121,7 +122,7 @@ Scenario: Unsuccesful payment due to retired customer
 	When customer account is retired
 	When merchant initiates a transaction for 100
 	Then merchant has correct balance
-	And they receive an error message ""
+	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
 	
 Scenario: Unsuccesful payment due to unregistered merchant
 	Given a customer "Johnny" "Bravo"
@@ -132,7 +133,7 @@ Scenario: Unsuccesful payment due to unregistered merchant
 	When unregistered merchant initiates a transaction for 100
 	Then customer has correct balance
 	And merchant has correct balance
-	And they receive an error message ""
+	And they receive an error message "java.lang.Exception: Merchant does not exists"
 
 Scenario: Customer gets transaction
 	Given a customer "Johnny" "Bravo"
@@ -200,3 +201,4 @@ Scenario: Admin creates and deletes
 	When admin is being registered
 	When admin account is retired
 	Then account does not exist
+	

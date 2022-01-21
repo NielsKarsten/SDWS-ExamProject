@@ -16,8 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TransactionRestService extends GenericService{
 
-    private CompletableFuture<TransactionRequestResponse> response;
-
     public TransactionRestService(MessageQueue q) {
     	super(q);
         this.queue.addHandler("TokenValidityResponse", this::handleTokenValidityResponse);
@@ -56,7 +54,7 @@ public class TransactionRestService extends GenericService{
     }
     
     public void handleTransactionRequestResponseInvalid(Event event) {
-        genericHandler(event,Exception.class);
+    	genericErrorHandler(event);
     }
 
     public void handleReportResponse(Event event) {

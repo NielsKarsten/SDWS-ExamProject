@@ -32,14 +32,9 @@ public class TokenManager {
     }
 
     public List<UUID> getUserTokens(UUID userId) {
-    	try 
-    	{
-            return tokens.get(userId);    		
-    	}
-    	catch(NullPointerException e)
-    	{
-    		return null;
-    	}
+        if (tokens.get(userId) != null)
+            return tokens.get(userId);
+        return new ArrayList<>();
     }
 
     public UUID getTokenOwner(UUID token) throws NullPointerException {
@@ -55,6 +50,14 @@ public class TokenManager {
     public void removeToken(UUID customerId, UUID tokenId) throws NullPointerException {
         try {
             tokens.get(customerId).remove(tokenId);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("ERROR: Customer does not have any tokens");
+        }
+    }
+    public void removeTokens(UUID customerId, List<UUID> tokensToBeRemoved) throws NullPointerException {
+        try {
+        	if(tokens.containsKey(customerId))
+        		tokens.get(customerId).removeAll(tokensToBeRemoved);
         } catch (NullPointerException e) {
             throw new NullPointerException("ERROR: Customer does not have any tokens");
         }
