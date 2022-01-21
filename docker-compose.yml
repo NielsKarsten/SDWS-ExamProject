@@ -2,25 +2,25 @@ version: '3'
 services:
   account-service:
     image: accounts 
-    container_name: account-service-test
+    container_name: account-service
 
   token-management-service:
     image: token-management-service
-    container_name: token-management-service-test
+    container_name: token-management-service
 
   transaction-service:
     image: transactions
-    container_name: transaction-service-test
+    container_name: transaction-service
 
   rest-api:
     image: rest-api
-    container_name: rest-api-test
+    container_name: rest-api
     ports:
-      - "5000:8080"
+      - "8080:8080"
 
   rabbitMq:
     image: rabbitmq:3-management
-    container_name: rabbitMq_container-test
+    container_name: rabbitMq_container
     ports:
-      - "5500:5672"
+      - "5672:5672"
 

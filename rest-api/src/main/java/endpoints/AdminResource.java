@@ -20,11 +20,11 @@ import models.Transaction;
  *
  * Main: Gustav Lintrup Kirkholt
  */
-@Path("/admin")
+@Path("/admins")
 public class AdminResource extends UserResourceImpl {
     private ServicesFactory factory = new ServicesFactory();
 
-	@Path("/transaction")
+	@Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction() {

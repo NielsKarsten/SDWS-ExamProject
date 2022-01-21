@@ -102,7 +102,7 @@ Scenario: Unsuccesful payment due to invalid customer token
 	When merchant initiates a transaction for 100 with wrong token
 	Then customer has correct balance
 	And merchant has correct balance
-	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
+	And they receive an error message "java.lang.Exception: java.lang.Exception: Invalid token"
 	
 Scenario: Unsuccesful payment due to retired customer token
 	Given a customer "Johnny" "Bravo"
@@ -114,7 +114,7 @@ Scenario: Unsuccesful payment due to retired customer token
 	When merchant initiates a transaction for 100
 	And merchant initiates a transaction for 100 again
 	Then merchant has correct balance
-	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
+	And they receive an error message "java.lang.Exception: java.lang.Exception: Invalid token"
 	
 Scenario: Unsuccesful payment due to retired customer
 	Given a customer "Johnny" "Bravo"
@@ -126,7 +126,7 @@ Scenario: Unsuccesful payment due to retired customer
 	When customer account is retired
 	When merchant initiates a transaction for 100
 	Then merchant has correct balance
-	And they receive an error message "java.lang.Exception: java.lang.IllegalArgumentException: Invalid token"
+	And they receive an error message "java.lang.Exception: java.lang.Exception: Invalid token"
 	
 Scenario: Unsuccesful payment due to unregistered merchant
 	Given a customer "Johnny" "Bravo"

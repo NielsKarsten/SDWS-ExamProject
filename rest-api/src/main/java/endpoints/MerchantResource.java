@@ -26,12 +26,12 @@ import models.*;
  *
  * Main: Gustav Utke Kauman
  */
-@Path("/merchant")
+@Path("/merchants")
 public class MerchantResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
     TransactionRestAdapter transactionService = factory.getTransactionService();
 
-	@Path("/transaction")
+	@Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTransaction(@QueryParam("merchantId") UUID merchantId) {
@@ -44,7 +44,7 @@ public class MerchantResource extends UserResourceImpl{
 		}
     }
 
-	@Path("/transaction")
+	@Path("/transactions")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

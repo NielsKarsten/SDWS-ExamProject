@@ -83,7 +83,7 @@ public class TokenService extends GenericHandler implements AccountEventType, To
             archivedTokens.addToken(customerId, token);
             publishNewEvent(e, TOKEN_TO_CUSTOMER_ID_RESPONSE, customerId);
         } catch (NullPointerException tokenException) {
-            publishNewEvent(e, TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, "Invalid token");
+            publishNewEvent(e, TOKEN_TO_CUSTOMER_ID_RESPONSE_INVALID, new IllegalArgumentException("Invalid token"));
         }
     }
 

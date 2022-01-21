@@ -25,11 +25,11 @@ import models.*;
  *
  * Main: Ghristian Gernsøe
  */
-@Path("/customer")
+@Path("/customers")
 public class CustomerResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
 
-    @Path("/transaction")
+    @Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserTransactions(@QueryParam("customerId") UUID customerId) {
@@ -42,7 +42,7 @@ public class CustomerResource extends UserResourceImpl{
     	}
     }
 
-    @Path("/token")
+    @Path("/tokens")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
