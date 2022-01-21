@@ -16,11 +16,11 @@ services:
     image: rest-api
     container_name: rest-api-test
     ports:
-      - "8080:8080"
+      - "5000:8080"
 
   rabbitMq:
     image: rabbitmq:3-management
     container_name: rabbitMq_container-test
     ports:
-      - "5672:5672"
+      - "5500:5672"
 
