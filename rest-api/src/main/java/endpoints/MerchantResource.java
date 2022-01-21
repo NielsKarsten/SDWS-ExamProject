@@ -29,7 +29,7 @@ import models.*;
 @Path("/merchant")
 public class MerchantResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();
-    TransactionRestService transactionService = factory.getTransactionService();
+    TransactionRestAdapter transactionService = factory.getTransactionService();
 
 	@Path("/transaction")
     @GET

@@ -21,8 +21,8 @@ import models.TokenRequest;
  *
  * Main: Christian Gernsøe
  */
-public class TokenRestService extends GenericHandler implements TokenEventType{
-	public TokenRestService(MessageQueue q) {
+public class TokenRestAdapter extends GenericHandler implements TokenEventType{
+	public TokenRestAdapter(MessageQueue q) {
 		super(q);
 		addHandler(TOKENS_ISSUED, this::genericHandler);
 		addHandler(TOKEN_REQUEST_INVALID, this::genericErrorHandler);

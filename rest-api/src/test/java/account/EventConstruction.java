@@ -2,7 +2,7 @@ package account;
 
 import java.util.UUID;
 
-import adapters.AccountRestService;
+import adapters.AccountRestAdapter;
 import handling.AccountEventType;
 import messaging.Event;
 import models.*;
@@ -21,12 +21,12 @@ import models.*;
 
 public class EventConstruction {
 	
-	private AccountRestService service;
+	private AccountRestAdapter service;
 	private User user;
 	private UUID userId;
 	
 
-	public EventConstruction(AccountRestService service) {
+	public EventConstruction(AccountRestAdapter service) {
 		this.service = service;
 		this.userId = UUID.randomUUID();
 	}

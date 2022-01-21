@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import adapters.TokenRestService;
+import adapters.TokenRestAdapter;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -29,7 +29,7 @@ import models.TokenRequest;
  * Main: Gustav Lintrup Kirkholt
  */
 public class TokenRestAdapterSteps {
-	private TokenRestService service;
+	private TokenRestAdapter service;
     private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
     private CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
     private CompletableFuture<Boolean> errorRecieved = new CompletableFuture<>();
@@ -54,7 +54,7 @@ public class TokenRestAdapterSteps {
             }
 
         };
-        service = new TokenRestService(q);
+        service = new TokenRestAdapter(q);
     }
     @Given ("there is a customer with id")
     public void givenCustomer(){

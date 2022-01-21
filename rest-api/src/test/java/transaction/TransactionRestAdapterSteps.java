@@ -15,8 +15,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import adapters.AccountRestService;
-import adapters.TransactionRestService;
+import adapters.AccountRestAdapter;
+import adapters.TransactionRestAdapter;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TransactionRestAdapterSteps {
     MessageQueue queue;;
     CompletableFuture<Event> publishedEvent;
-    TransactionRestService transactionRestService;
+    TransactionRestAdapter transactionRestService;
 
     UUID correlationId;
     CompletableFuture<Object> actual;
@@ -72,7 +72,7 @@ public class TransactionRestAdapterSteps {
 			}
 		};
 		
-		transactionRestService = new TransactionRestService(queue);
+		transactionRestService = new TransactionRestAdapter(queue);
 		publishedEvent = new CompletableFuture<Event>();
 		actual = new CompletableFuture<>();
 		customerId = UUID.randomUUID();

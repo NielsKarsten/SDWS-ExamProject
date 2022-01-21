@@ -15,36 +15,36 @@ import messaging.implementations.RabbitMqQueue;
  */
 public class ServicesFactory {
 	static RabbitMqQueue messageQueue = null;
-	static TokenRestService tokenservice = null;
-	static AccountRestService accountService = null;
-	static TransactionRestService transactionService = null;
+	static TokenRestAdapter tokenservice = null;
+	static AccountRestAdapter accountService = null;
+	static TransactionRestAdapter transactionService = null;
 
 	public ServicesFactory() {
 		messageQueue = new RabbitMqQueue("rabbitMq");
 	}
 	
 	
-	public TokenRestService getTokenService() {
+	public TokenRestAdapter getTokenService() {
 		if (tokenservice != null)
 			return tokenservice;
 
-		tokenservice = new TokenRestService(messageQueue);
+		tokenservice = new TokenRestAdapter(messageQueue);
 		return tokenservice;
 	}
 	
-	public AccountRestService getAccountService() {
+	public AccountRestAdapter getAccountService() {
 		if (accountService != null) 
 			return accountService;
 
-		accountService = new AccountRestService(messageQueue);
+		accountService = new AccountRestAdapter(messageQueue);
 		return accountService;
 	}
 	
-	public TransactionRestService getTransactionService() {
+	public TransactionRestAdapter getTransactionService() {
 		if (transactionService != null) 
 			return transactionService;
 
-		transactionService = new TransactionRestService(messageQueue);
+		transactionService = new TransactionRestAdapter(messageQueue);
 		return transactionService;
 	}	
 }

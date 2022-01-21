@@ -1,35 +1,32 @@
 package adapters;
 
-import messaging.Event;
 import messaging.MessageQueue;
 import models.Transaction;
 import models.TransactionRequest;
-import models.TransactionRequestResponse;
-
-import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-
 import handling.GenericHandler;
+import handling.TransactionEventType;
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Niels Bisgaard-Bohr
+ */
+public class TransactionRestAdapter extends GenericHandler implements TransactionEventType{
 
-public class TransactionRestService extends GenericHandler{
-
-    public TransactionRestService(MessageQueue q) {
+    public TransactionRestAdapter(MessageQueue q) {
     	super(q);
-        addHandler("TokenValidityResponse", this::genericHandler);
-    	addHandler("TransactionRequestSuccesfull", this::genericHandler);
-        addHandler("TransactionRequestInvalid", this::genericErrorHandler);
-        addHandler("ReportResponse", this::genericHandler);
-        addHandler("ReportRequestInvalid", this::genericErrorHandler);
+    	addHandler(TRANSACTION_REQUEST_SUCCESFULL, this::genericHandler);
+        addHandler(TRANSACTION_REQUEST_INVALID, this::genericErrorHandler);
+        addHandler(REPORT_RESPONSE, this::genericHandler);
+        addHandler(REPORT_REQUEST_INVALID, this::genericErrorHandler);
     }
-    
-	protected boolean verifyTokenValidity(UUID token) {
-		return (boolean) buildCompletableFutureEvent(token, "VerifyTokenRequest");
-	}
 
 	public String createTransactionRequest(TransactionRequest request) throws Exception {
     	return (String) buildCompletableFutureEvent(request,"TransactionRequested");

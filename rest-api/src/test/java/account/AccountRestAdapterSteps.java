@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import adapters.AccountRestService;
+import adapters.AccountRestAdapter;
 import models.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  */
 public class AccountRestAdapterSteps {
 	private MessageQueue queue;
-	private AccountRestService accountRestService;
+	private AccountRestAdapter accountRestService;
 	private CompletableFuture<UUID> registeredUser;
 	private CompletableFuture<String> userAccountId;
 	private CompletableFuture<Boolean> userAccountDeleted;
@@ -49,7 +49,7 @@ public class AccountRestAdapterSteps {
 			}
 		};
 
-		accountRestService = new AccountRestService(queue);
+		accountRestService = new AccountRestAdapter(queue);
 		registeredUser = new CompletableFuture<>();
 		userAccountId = new CompletableFuture<>();
 		userAccountDeleted = new CompletableFuture<>();

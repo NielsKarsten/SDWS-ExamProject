@@ -19,9 +19,9 @@ import messaging.MessageQueue;
  * Main: Niels Bisgaard-Bohr
  */
 
-public class AccountRestService extends GenericHandler implements AccountEventType {
+public class AccountRestAdapter extends GenericHandler implements AccountEventType {
 
-	public AccountRestService(MessageQueue q) {
+	public AccountRestAdapter(MessageQueue q) {
 		super(q);
 		addHandler(USER_ACCOUNT_REGISTERED, this::genericHandler);
 		addHandler(USER_ACCOUNT_INFO_RESPONSE, this::genericHandler);
