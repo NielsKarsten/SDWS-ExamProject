@@ -13,9 +13,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import adapters.ServicesFactory;
 import models.Transaction;
 import models.User;
-import services.ServicesFactory;
 @Path("/admin")
 public class AdminResource extends UserResourceImpl {
     private ServicesFactory factory = new ServicesFactory();

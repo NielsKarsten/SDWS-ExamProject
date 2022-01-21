@@ -6,14 +6,13 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import account.service.models.User;
+import handling.GenericHandler;
 import messaging.Event;
 import messaging.MessageQueue;
 
-public class AccountService {
+public class AccountService extends GenericHandler{
 
-	private MessageQueue queue;
 	private HashMap<UUID, User> users;
-	protected Map<UUID, CompletableFuture<Object>> completableFutures = new HashMap<>();
 
 	// test
 	public HashMap<UUID, User> getUsers() {
@@ -21,27 +20,21 @@ public class AccountService {
 	}
 
 	public AccountService(MessageQueue q) {
+		super(q);
 		users = new HashMap<UUID, User>();
-		queue = q;
-		queue.addHandler(EventType.ACCOUNT_REGISTRATION_REQUESTED, this::handleUserAccountRegistration);
-		queue.addHandler(EventType.USER_ACCOUNT_INFO_REQUESTED, this::handleUserAccountInfoRequested);
-		queue.addHandler(EventType.ACCOUNT_CLOSED_REQUESTED, this::handleUserAccountClosedRequested);
-		queue.addHandler(EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS, this::handleVerifyUserAccountExistsRequest);
-		queue.addHandler("ClosedUserAccountTokensRetired", this::handleRetireUserAccountTokensResponse);
-		queue.addHandler("AccountClosedRetireTokenRequestInvalid", this::handleRetireUserAccountTokensError);
-	}
-
-	private void publishNewEvent(Event e, String topic, Object object) {
-		UUID correlationId = e.getCorrelationId();
-		Event event = new Event(correlationId, topic, new Object[] { object });
-		queue.publish(event);
+		addHandler(EventType.ACCOUNT_REGISTRATION_REQUESTED, this::handleUserAccountRegistration);
+		addHandler(EventType.USER_ACCOUNT_INFO_REQUESTED, this::handleUserAccountInfoRequested);
+		addHandler(EventType.ACCOUNT_CLOSED_REQUESTED, this::handleUserAccountClosedRequested);
+		addHandler(EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS, this::handleVerifyUserAccountExistsRequest);
+		addHandler(EventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED, this::handleRetireUserAccountTokensResponse);
+		addHandler(EventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID, this::handleRetireUserAccountTokensError);
 	}
 
 	public void handleUserAccountRegistration(Event e) {
 		User user = e.getArgument(0, User.class);
 		UUID userId = user.assignUserId();
 		users.put(userId, user);
-		publishNewEvent(e, EventType.USER_ACCOUNT_ACCOUNT_REGISTERED, userId);
+		publishNewEvent(e, EventType.USER_ACCOUNT_REGISTERED, userId);
 	}
 
 	public void handleUserAccountInfoRequested(Event e) {
@@ -73,25 +66,15 @@ public class AccountService {
 
 	private boolean retireUserAccountToken(Event e, UUID userId) throws Exception {
 		UUID correlationId = e.getCorrelationId();
-		Event event = new Event(correlationId, "RetireUserAccountTokensRequest", new Object[] { userId });
-		CompletableFuture<Object> tokensRetired = new CompletableFuture<>();
-		completableFutures.put(correlationId, tokensRetired);
-		this.publishNewEvent(event, "RetireUserAccountTokensRequest", userId);
-		return (boolean) completableFutures.get(correlationId).join();
+		return (boolean) buildCompletableFutureEvent(correlationId, userId, EventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST);
 	}
 
 	public void handleRetireUserAccountTokensResponse(Event event) {
-		System.out.println("handleRetireUserAccountTokensResponse");
-		UUID correlationId = event.getCorrelationId();
-		boolean status = event.getArgument(0, boolean.class);
-		completableFutures.get(correlationId).complete(status);
+		genericHandler(event);
 	}
 
 	public void handleRetireUserAccountTokensError(Event event) {
-		System.out.println("handleRetireUserAccountTokensError");
-		UUID correlationId = event.getCorrelationId();
-		Exception exception = event.getArgument(0, Exception.class);
-		completableFutures.get(correlationId).completeExceptionally(exception);
+		genericErrorHandler(event);
 	}
 
 	public void handleVerifyUserAccountExistsRequest(Event e) {

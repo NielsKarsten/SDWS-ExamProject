@@ -1,7 +1,8 @@
 package account;
 
 import java.util.UUID;
-import services.AccountRestService;
+
+import adapters.AccountRestService;
 import messaging.Event;
 import models.*;
 
@@ -71,13 +72,13 @@ public class EventConstruction {
 		Event event = new Event(correlationID, eventName, new Object[] { eventObject });
 		switch (eventName) {
 			case "UserAccountRegistered":
-				service.handleUserAccountAssigned(event);
+				service.genericHandler(event);
 				break;
 			case "UserAccountInfoResponse":
-				service.handleUserAccountInfoResponse(event);
+				service.genericHandler(event);
 				break;
 			case "AccountClosedResponse":
-				service.handleUserAccountResponse(event);
+				service.genericHandler(event);
 				break;
 			default:
 				System.out.println("No event handler found for " + eventName);

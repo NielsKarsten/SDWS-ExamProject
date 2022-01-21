@@ -7,8 +7,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import messaging.Event;
 import messaging.MessageQueue;
-import services.AccountRestService;
-import services.TransactionRestService;
 import models.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,6 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+
+import adapters.AccountRestService;
+import adapters.TransactionRestService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -107,10 +108,10 @@ public class TransactionRestServiceSteps {
         Event event = new Event(correlationId, eventName, new Object[]{eventObject});
         switch (eventName) {
             case "TransactionRequestSuccesfull":
-                transactionRestService.handleTransactionRequestResponseSuccess(event);
+                transactionRestService.genericHandler(event);
                 break;
             case "ReportResponse":
-        	   transactionRestService.handleReportResponse(event);
+        	   transactionRestService.genericHandler(event);
         	   break;
             default:
                 System.out.println("No event handler found for " + eventName);

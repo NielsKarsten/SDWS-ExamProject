@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import services.AccountRestService;
+import adapters.AccountRestService;
 import models.*;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;

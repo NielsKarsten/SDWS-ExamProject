@@ -5,8 +5,8 @@ import java.util.UUID;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.QueryParam;
 
+import adapters.ServicesFactory;
 import models.User;
-import services.ServicesFactory;
 
 public abstract class UserResourceImpl implements UserResource{
 	private ServicesFactory factory = new ServicesFactory();

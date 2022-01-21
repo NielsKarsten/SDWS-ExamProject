@@ -1,4 +1,4 @@
-package services;
+package handling;
 
 import java.util.Map;
 import java.util.UUID;
@@ -9,23 +9,23 @@ import java.util.function.Consumer;
 import messaging.Event;
 import messaging.MessageQueue;
 
-public abstract class GenericService {
+public abstract class GenericHandler {
 	private MessageQueue queue;
 	private Map<UUID, CompletableFuture<Object>> completableFutures;
 
-	public GenericService(MessageQueue q) {
+	public GenericHandler(MessageQueue q) {
 		queue = q;
 		completableFutures = new ConcurrentHashMap<UUID, CompletableFuture<Object>>();
 	}
 
-	protected <T> void genericHandler(Event e, Class<T> argType) {
+	public <T> void genericHandler(Event e) {
 		UUID correlationId = e.getCorrelationId();
-		T arg = e.getArgument(0, argType);
+		Object arg = e.getArgument(0, Object.class);
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
 		completableFuture.complete(arg);
 	}
 
-	protected <T> void genericErrorHandler(Event e) {
+	public <T> void genericErrorHandler(Event e) {
 		UUID correlationId = e.getCorrelationId();
 		Exception ex = e.getArgument(0, Exception.class);
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
@@ -33,14 +33,24 @@ public abstract class GenericService {
 	}
 
 	protected Object buildCompletableFutureEvent(Object eventObject, String eventTopic) {
+		UUID correlationId = UUID.randomUUID();
+		return buildCompletableFutureEvent(correlationId,eventObject,eventTopic);
+	}
+	
+	protected Object buildCompletableFutureEvent(UUID correlationId, Object eventObject, String eventTopic) {
 		CompletableFuture<Object> completableFuture = new CompletableFuture<Object>();
 
-		UUID correlationId = UUID.randomUUID();
 		Event event = new Event(correlationId, eventTopic, new Object[] { eventObject });
-
+		
 		completableFutures.put(correlationId, completableFuture);
 		queue.publish(event);
 		return completableFutures.get(correlationId).join();
+	}
+	
+	protected void publishNewEvent(Event e, String topic, Object object) {
+		UUID correlationId = e.getCorrelationId();
+		Event event = new Event(correlationId, topic, new Object[] { object });
+		queue.publish(event);
 	}
 	
 	protected void addHandler(String eventName, Consumer<Event> handler) {

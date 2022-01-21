@@ -1,4 +1,4 @@
-package services;
+package adapters;
 
 import messaging.implementations.RabbitMqQueue; 
 

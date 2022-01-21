@@ -15,11 +15,11 @@ import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 
+import adapters.TokenRestService;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import services.TokenRestService;
 import messaging.Event;
 import messaging.MessageQueue;
 import models.TokenRequest;
@@ -101,10 +101,10 @@ public class TokenRestServiceSteps {
     	Event event = new Event(correlationId,eventName,new Object[] {eventObject});
     	switch(eventName) {
 	    	case "TokensIssued":
-	    		service.handleTokensIssued(event);
+	    		service.genericHandler(event);
 	    		break;
 	    	case "TokenRequestInvalid":
-	    		service.handleTokenRequestError(event);
+	    		service.genericErrorHandler(event);
 	    		break;
 	    	default:
 	    		System.out.println("No event handler for event: " + eventName);

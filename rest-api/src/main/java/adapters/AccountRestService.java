@@ -1,4 +1,4 @@
-package services;
+package adapters;
 
 import java.util.UUID;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import handling.GenericHandler;
 import models.*;
 import messaging.Event;
 import messaging.MessageQueue;
@@ -16,15 +17,15 @@ import messaging.MessageQueue;
  *          Niels Karsten Bisgaard-Bohr (s202745)
  */
 
-public class AccountRestService extends GenericService {
+public class AccountRestService extends GenericHandler {
 
 	public AccountRestService(MessageQueue q) {
 		super(q);
-		addHandler("UserAccountRegistered", this::handleUserAccountAssigned);
-		addHandler("UserAccountInfoResponse", this::handleUserAccountInfoResponse);
-		addHandler("UserAccountInvalid", this::handleUserAccountInvalid);
-		addHandler("AccountClosedResponse", this::handleUserAccountResponse);
-		addHandler("VerifyUserAccountExistsResponse", this::handleUserAccountResponse);
+		addHandler("UserAccountRegistered", this::genericHandler);
+		addHandler("UserAccountInfoResponse", this::genericHandler);
+		addHandler("UserAccountInvalid", this::genericErrorHandler);
+		addHandler("AccountClosedResponse", this::genericHandler);
+		addHandler("VerifyUserAccountExistsResponse", this::genericHandler);
 	}
 
 	public UUID registerAsyncUserAccount(User user) {
@@ -33,28 +34,19 @@ public class AccountRestService extends GenericService {
 		return (UUID) buildCompletableFutureEvent(user, "AccountRegistrationRequested");
 	}
 
-	public void handleUserAccountAssigned(Event e) {
-		genericHandler(e, UUID.class);
-	}
-
 	public String requestAsyncUserAccountInfo(UUID userId) {
 		return (String) buildCompletableFutureEvent(userId, "UserAccountInfoRequested");
-	}
-
-	public void handleUserAccountInfoResponse(Event e) {
-		genericHandler(e, String.class);
-	}
-
-	public void handleUserAccountResponse(Event e) {
-		genericHandler(e, Boolean.class);
-	}
-
-	public void handleUserAccountInvalid(Event e) {
-		genericErrorHandler(e);
 	}
 
 	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
 		return (Boolean) buildCompletableFutureEvent(userId, "AccountClosedRequested");
 	}
-
+	
+	public void handleSuccess(Event e) {
+		genericHandler(e);
+	}
+	
+	public void handleError(Event e) {
+		genericErrorHandler(e);
+	}
 }
