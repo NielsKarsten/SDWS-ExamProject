@@ -15,6 +15,17 @@ import token.service.manager.ActiveTokenManager;
 import token.service.manager.ArchivedTokenManager;
 import java.util.*;
 
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Christian Gernsøe
+ */
 public class TokenService extends GenericHandler implements AccountEventType, TokenEventType{
     private ArchivedTokenManager archivedTokens;
     private ActiveTokenManager activeTokens;

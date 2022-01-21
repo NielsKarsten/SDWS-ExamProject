@@ -6,6 +6,10 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+/**
+ *
+ * Main: Gustav Utke Kauman
+ */
 @Data
 @AllArgsConstructor
 public class TransactionRequest {

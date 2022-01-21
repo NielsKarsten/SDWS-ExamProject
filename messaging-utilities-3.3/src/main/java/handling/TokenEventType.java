@@ -1,5 +1,8 @@
 package handling;
 
+/**
+ * Main: Niels Bisgaard-Bohr
+ */
 public interface TokenEventType {
 	String TOKENS_REQUESTED = "TokensRequested";
 	String TOKEN_TO_CUSTOMER_ID_REQUESTED = "TokenToCustomerIdRequested";

@@ -1,11 +1,7 @@
 package adapters;
 
 import java.util.UUID;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-
+import handling.AccountEventType;
 import handling.GenericHandler;
 import models.*;
 import messaging.Event;
@@ -23,29 +19,29 @@ import messaging.MessageQueue;
  * Main: Niels Bisgaard-Bohr
  */
 
-public class AccountRestService extends GenericHandler {
+public class AccountRestService extends GenericHandler implements AccountEventType {
 
 	public AccountRestService(MessageQueue q) {
 		super(q);
-		addHandler("UserAccountRegistered", this::genericHandler);
-		addHandler("UserAccountInfoResponse", this::genericHandler);
-		addHandler("UserAccountInvalid", this::genericErrorHandler);
-		addHandler("AccountClosedResponse", this::genericHandler);
-		addHandler("VerifyUserAccountExistsResponse", this::genericHandler);
+		addHandler(USER_ACCOUNT_REGISTERED, this::genericHandler);
+		addHandler(USER_ACCOUNT_INFO_RESPONSE, this::genericHandler);
+		addHandler(USER_ACCOUNT_INVALID, this::genericErrorHandler);
+		addHandler(ACCOUNT_CLOSED_RESPONSE, this::genericHandler);
+		addHandler(VERIFY_USER_ACCOUNT_EXISTS_RESPONSE, this::genericHandler);
 	}
 
 	public UUID registerAsyncUserAccount(User user) {
 		if (user.getFirstName() == null || user.getLastName() == null || user.getAccountId() == null)
 			throw new NullPointerException("Error - Missing information about user");
-		return UUID.fromString((String) buildCompletableFutureEvent(user, "AccountRegistrationRequested")) ;
+		return UUID.fromString((String) buildCompletableFutureEvent(user, ACCOUNT_REGISTRATION_REQUESTED)) ;
 	}
 
 	public String requestAsyncUserAccountInfo(UUID userId) {
-		return (String) buildCompletableFutureEvent(userId, "UserAccountInfoRequested");
+		return (String) buildCompletableFutureEvent(userId, USER_ACCOUNT_INFO_REQUESTED);
 	}
 
 	public Boolean requestAsyncUserAccountDeletion(UUID userId) {
-		return (Boolean) buildCompletableFutureEvent(userId, "AccountClosedRequested");
+		return (Boolean) buildCompletableFutureEvent(userId, ACCOUNT_CLOSED_REQUESTED);
 	}
 	
 	public void handleSuccess(Event e) {

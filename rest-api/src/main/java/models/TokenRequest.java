@@ -5,7 +5,9 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * Main: Theodor Peter Guttensen
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

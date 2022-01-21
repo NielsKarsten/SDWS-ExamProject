@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Main: Niels Bisgaard-Bohr
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,5 +1,8 @@
 package handling;
 
+/**
+ * Main: Niels Bisgaard-Bohr
+ */
 public interface TransactionEventType {
 	final String TRANSACTION_REQUESTED = "TransactionRequested";
 	final String CUSTOMER_REPORT_REQUESTED = "CustomerReportRequested";

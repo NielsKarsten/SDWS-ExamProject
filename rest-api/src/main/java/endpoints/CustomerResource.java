@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -15,7 +14,17 @@ import javax.ws.rs.core.Response;
 
 import adapters.*;
 import models.*;
-
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Ghristian Gernsøe
+ */
 @Path("/customer")
 public class CustomerResource extends UserResourceImpl{
     private ServicesFactory factory = new ServicesFactory();

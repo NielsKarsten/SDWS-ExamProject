@@ -17,6 +17,17 @@ import transaction.service.connector.TokenServiceConnector;
 import transaction.service.models.*;
 import transaction.service.persistance.TransactionStore;
 
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Gustav Utke Kauman
+ */
 public class TransactionService extends GenericHandler implements  AccountEventType, TokenEventType, TransactionEventType{
     private BankService bank;
     private TokenServiceConnector tokenServiceConnector;

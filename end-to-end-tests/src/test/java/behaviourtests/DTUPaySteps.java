@@ -16,6 +16,10 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import models.DTUPayUser;
+import models.TokenRequest;
+import models.Transaction;
+import models.TransactionRequest;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.Client;

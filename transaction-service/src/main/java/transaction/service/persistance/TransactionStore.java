@@ -8,12 +8,15 @@ import java.util.UUID;
 import transaction.service.models.Transaction;
 
 /**
- * Pseudo database to keep track of all transactions
- * made in the system. Using the singleton pattern we ensure
- * that the hashmap of transactions is coherent across rest calls,
- * transactions and the like
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
  *
- * Author: Gustav Utke Kauman (s195396)
+ * Main: Gustav Utke Kauman
  */
 public class TransactionStore {
 

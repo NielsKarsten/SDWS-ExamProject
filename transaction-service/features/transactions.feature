@@ -1,3 +1,14 @@
+# Authors
+# Christian Gernsøe - S163552
+# Gustav Utke Kauman - S195396
+# Gustav Lintrup Kirkholt - s164765
+# Niels Bisgaard-Bohr - S202745
+# Simon Pontoppidan - S144213
+# Theodor Peter Guttesen - S185121
+# Thomas Rathsach Strange - S153390
+# 
+# Main: Gustav Utke Kauman
+#
 Feature: Transaction Service
   Scenario: a payment is successful
     Given a merchant with an account with a balance of 1000

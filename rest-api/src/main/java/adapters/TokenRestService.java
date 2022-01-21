@@ -5,25 +5,27 @@
 package adapters;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.google.gson.Gson;
-
 import handling.GenericHandler;
-import messaging.Event;
+import handling.TokenEventType;
 import messaging.MessageQueue;
 import models.TokenRequest;
 
-import javax.ws.rs.core.GenericType;
-
-public class TokenRestService extends GenericHandler{
-
+/**
+ * @author Christian Gernsøe - S163552
+ * @author Gustav Utke Kauman - S195396
+ * @author Gustav Lintrup Kirkholt - s164765
+ * @author Niels Bisgaard-Bohr - S202745
+ * @author Simon Pontoppidan - S144213
+ * @author Theodor Peter Guttesen - S185121
+ * @author Thomas Rathsach Strange - S153390
+ *
+ * Main: Christian Gernsøe
+ */
+public class TokenRestService extends GenericHandler implements TokenEventType{
 	public TokenRestService(MessageQueue q) {
 		super(q);
-		addHandler("TokensIssued", this::genericHandler);
-		addHandler("TokenRequestInvalid", this::genericErrorHandler);
+		addHandler(TOKENS_ISSUED, this::genericHandler);
+		addHandler(TOKEN_REQUEST_INVALID, this::genericErrorHandler);
 	}
 
 	public List<UUID> issueTokens(TokenRequest tokenRequest) throws Exception {

@@ -1,10 +1,5 @@
-// Authors:
-// Theodor Guttesen s185121
-// Main: Christian Gernsøe s163552
-
 package token;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -12,8 +7,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-
-import com.google.gson.Gson;
 
 import adapters.TokenRestService;
 import io.cucumber.java.Before;
@@ -27,15 +20,15 @@ import models.TokenRequest;
 /**
  * @author Christian Gernsøe - S163552
  * @author Gustav Utke Kauman - S195396
- * @author Gustav Lintrup Krikholt - s164765
+ * @author Gustav Lintrup Kirkholt - s164765
  * @author Niels Bisgaard-Bohr - S202745
  * @author Simon Pontoppidan - S144213
  * @author Theodor Peter Guttesen - S185121
  * @author Thomas Rathsach Strange - S153390
  *
- * Main: Theodor Peter Guttensen
+ * Main: Gustav Lintrup Kirkholt
  */
-public class TokenRestServiceSteps {
+public class TokenRestAdapterSteps {
 	private TokenRestService service;
     private CompletableFuture<Event> publishedEvent = new CompletableFuture<>();
     private CompletableFuture<Object> issuedTokens = new CompletableFuture<>();
@@ -44,7 +37,7 @@ public class TokenRestServiceSteps {
     private UUID customerId;
     private UUID correlationId;
     private TokenRequest tokenRequest;
-    public TokenRestServiceSteps() {
+    public TokenRestAdapterSteps() {
     }
 
     @Before
