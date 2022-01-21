@@ -6,6 +6,9 @@ import java.util.*;
 import dtu.ws.fastmoney.BankService;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.BankServiceService;
+import handling.AccountEventType;
+import handling.TokenEventType;
+import handling.TransactionEventType;
 import messaging.Event;
 import messaging.MessageQueue;
 import transaction.service.connector.AccountServiceConnector;
@@ -13,7 +16,7 @@ import transaction.service.connector.TokenServiceConnector;
 import transaction.service.models.*;
 import transaction.service.persistance.TransactionStore;
 
-public class TransactionService {
+public class TransactionService implements  AccountEventType, TokenEventType, TransactionEventType{
 
     private BankService bank;
     private MessageQueue queue;
@@ -36,10 +39,10 @@ public class TransactionService {
 
         TransactionStore.reset();
 
-        this.queue.addHandler("TransactionRequested", this::handleTransactionRequestEvent);
-        this.queue.addHandler("CustomerReportRequested", this::handleCustomerReportRequest);
-        this.queue.addHandler("MerchantReportRequested", this::handleMerchantReportRequest);
-        this.queue.addHandler("AdminReportRequested", this::handleAdminReportRequest);
+        this.queue.addHandler(TRANSACTION_REQUESTED, this::handleTransactionRequestEvent);
+        this.queue.addHandler(CUSTOMER_REPORT_REQUESTED, this::handleCustomerReportRequest);
+        this.queue.addHandler(MERCHANT_REPORT_REQUESTED, this::handleMerchantReportRequest);
+        this.queue.addHandler(ADMIN_REPORT_REQUESTED, this::handleAdminReportRequest);
     }
     
     public void publishEvent(UUID correlationId, String eventName, Object eventData) {
@@ -47,10 +50,7 @@ public class TransactionService {
         this.queue.publish(event);
     }
     
-    public void handleTransactionRequestEvent(Event event) {
-    	System.out.println("handleTransactionRequestEvent");
-    	System.out.println("handleTransactionRequestEvent invoked");
-    	
+    public void handleTransactionRequestEvent(Event event) {    	
         TransactionRequest request = event.getArgument(0, TransactionRequest.class);
         UUID correlationId = event.getCorrelationId();
         UUID merchantId = request.getMerchantId();
@@ -58,29 +58,24 @@ public class TransactionService {
         BigDecimal amount = request.getAmount();
         try 
         {
-        	System.out.println("Get uset account from token");
         	UUID customerId = tokenServiceConnector.getUserIdFromToken(userToken);
-        	System.out.println("Verify customer exists");
         	if(!accountServiceConnector.userExists(customerId))
         		throw new NullPointerException("Customer does not exists");
-        	System.out.println("Verify Merchant exists");
         	if(!accountServiceConnector.userExists(merchantId))
         		throw new NullPointerException("Merchant does not exists");
-        	System.out.println("Verify Correct amount");
         	if (amount == null || amount.compareTo(BigDecimal.valueOf(0)) <= 0)
         		throw new NullPointerException("Amount incorrectly specified");
         	this.tryPayment(customerId, merchantId, amount, userToken);
-        	this.publishEvent(correlationId, "TransactionRequestSuccesfull", "Transaction was completed succesfully");
+        	this.publishEvent(correlationId, TRANSACTION_REQUEST_SUCCESFULL, "Transaction was completed succesfully");
         }
         catch(Exception e)
         {
         	System.out.println("Error occoured during a transaction request: " + e.getMessage());
-        	this.publishEvent(correlationId, "TransactionRequestInvalid", e);
+        	this.publishEvent(correlationId, TRANSACTION_REQUEST_INVALID, e);
         }
     }
 
     public void tryPayment(UUID customer, UUID merchant, BigDecimal amount, UUID token) throws BankServiceException_Exception, NullPointerException {
-    	System.out.println("tryPayment");
     	String customerBankAccount = accountServiceConnector.getUserBankAccountFromId(customer);
         String merchantBankAccount = accountServiceConnector.getUserBankAccountFromId(merchant);
         String description = "Payment of " + amount + " to merchant " + merchantBankAccount;
@@ -91,15 +86,13 @@ public class TransactionService {
     }
 
 	private void bankTransfer(String userBank, String merchantBank, BigDecimal amount, String description) throws BankServiceException_Exception {
-        System.out.println("bankTransfer");
 		bank.transferMoneyFromTo(userBank, merchantBank, amount, description);
     }
     
     public void handleAdminReportRequest(Event event) {
-    	System.out.println("handleAdminReportRequest");
     	UUID correlationId = event.getCorrelationId();
     	List<Transaction> transactions = TransactionStore.getInstance().getAllTransactions();
-    	this.publishEvent(correlationId, "ReportResponse", transactions);
+    	this.publishEvent(correlationId, REPORT_RESPONSE, transactions);
     }
     
     public void handleCustomerReportRequest(Event event) {
@@ -109,16 +102,16 @@ public class TransactionService {
     	{
         	if (accountServiceConnector.userExists(userId)) {
             	List<Transaction> transactions = TransactionStore.getInstance().getCustomerTransactions(userId);
-            	this.publishEvent(correlationId, "ReportResponse", transactions);        		
+            	this.publishEvent(correlationId, REPORT_RESPONSE, transactions);        		
         	}
         	else
         	{
-        		this.publishEvent(correlationId, "ReportRequestInvalid", new NullPointerException("No customer with that ID exists"));
+        		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, new NullPointerException("No customer with that ID exists"));
         	}
     	}
     	catch(NullPointerException e)
     	{
-    		this.publishEvent(correlationId, "ReportRequestInvalid", e);
+    		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, e);
     	}
     }
     
@@ -129,16 +122,16 @@ public class TransactionService {
     	{
         	if (accountServiceConnector.userExists(merchantId)) {
             	List<Transaction> transactions = TransactionStore.getInstance().getMerchantTransactions(merchantId);
-            	this.publishEvent(correlationId, "ReportResponse", transactions);        		
+            	this.publishEvent(correlationId, REPORT_RESPONSE, transactions);        		
         	}
         	else
         	{
-        		this.publishEvent(correlationId, "ReportRequestInvalid", new NullPointerException("No customer with that ID exists"));
+        		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, new NullPointerException("No customer with that ID exists"));
         	}
     	}
     	catch(NullPointerException e)
     	{
-    		this.publishEvent(correlationId, "ReportRequestInvalid", e);
+    		this.publishEvent(correlationId, REPORT_REQUEST_INVALID, e);
     	}
     }
 }
