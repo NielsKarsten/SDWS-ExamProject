@@ -19,6 +19,7 @@ public abstract class GenericHandler {
 	}
 
 	public <T> void genericHandler(Event e) {
+		System.out.println("genericErrorHandler Invoked");
 		UUID correlationId = e.getCorrelationId();
 		Object arg = e.getArgument(0, Object.class);
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
@@ -26,6 +27,7 @@ public abstract class GenericHandler {
 	}
 
 	public <T> void genericErrorHandler(Event e) {
+		System.out.println("genericErrorHandler Invoked");
 		UUID correlationId = e.getCorrelationId();
 		Exception ex = e.getArgument(0, Exception.class);
 		CompletableFuture<Object> completableFuture = completableFutures.get(correlationId);
@@ -33,18 +35,25 @@ public abstract class GenericHandler {
 	}
 
 	protected Object buildCompletableFutureEvent(Object eventObject, String eventTopic) {
+		System.out.println("buildCompletableFutureEvent NO CORRELATION ID Invoked");
 		UUID correlationId = UUID.randomUUID();
 		return buildCompletableFutureEvent(correlationId,eventObject,eventTopic);
 	}
 	
 	protected Object buildCompletableFutureEvent(UUID correlationId, Object eventObject, String eventTopic) {
-		CompletableFuture<Object> completableFuture = new CompletableFuture<Object>();
-
-		Event event = new Event(correlationId, eventTopic, new Object[] { eventObject });
-		
+		System.out.println("buildCompletableFutureEvent Invoked");
+		CompletableFuture<Object> completableFuture = new CompletableFuture<Object>();		
+		System.out.println("buildCompletableFutureEvent 2");
 		completableFutures.put(correlationId, completableFuture);
-		queue.publish(event);
+		System.out.println("buildCompletableFutureEvent 3");
+		publishNewEvent(correlationId, eventTopic, eventObject);
+		System.out.println("buildCompletableFutureEvent 4");
 		return completableFutures.get(correlationId).join();
+	}
+	
+	protected void publishNewEvent(UUID correlationId, String topic, Object object) {
+		Event event = new Event(correlationId, topic, new Object[] { object });
+		queue.publish(event);
 	}
 	
 	protected void publishNewEvent(Event e, String topic, Object object) {

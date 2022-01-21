@@ -11,10 +11,9 @@ import messaging.Event;
 import messaging.MessageQueue;
 
 public class AccountService extends GenericHandler{
-
 	private HashMap<UUID, User> users;
 
-	// test
+
 	public HashMap<UUID, User> getUsers() {
 		return users;
 	}
@@ -22,15 +21,15 @@ public class AccountService extends GenericHandler{
 	public AccountService(MessageQueue q) {
 		super(q);
 		users = new HashMap<UUID, User>();
-		addHandler(EventType.ACCOUNT_REGISTRATION_REQUESTED, this::handleUserAccountRegistration);
+		addHandler(EventType.ACCOUNT_REGISTRATION_REQUESTED, this::handleUserAccountRegistrationRequested);
 		addHandler(EventType.USER_ACCOUNT_INFO_REQUESTED, this::handleUserAccountInfoRequested);
 		addHandler(EventType.ACCOUNT_CLOSED_REQUESTED, this::handleUserAccountClosedRequested);
 		addHandler(EventType.VERIFY_USER_ACCOUNT_EXISTS_REQUESTS, this::handleVerifyUserAccountExistsRequest);
-		addHandler(EventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED, this::handleRetireUserAccountTokensResponse);
-		addHandler(EventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID, this::handleRetireUserAccountTokensError);
+		addHandler(EventType.CLOSED_USER_ACCOUNT_TOKENS_RETIRED, this::genericHandler);
+		addHandler(EventType.ACCOUNT_CLOSED_RETIRE_TOKEN_REQUEST_INVALID, this::genericErrorHandler);
 	}
 
-	public void handleUserAccountRegistration(Event e) {
+	public void handleUserAccountRegistrationRequested(Event e) {
 		User user = e.getArgument(0, User.class);
 		UUID userId = user.assignUserId();
 		users.put(userId, user);
@@ -52,29 +51,20 @@ public class AccountService extends GenericHandler{
 			UUID userId = e.getArgument(0, UUID.class);
 			if (users.get(userId) == null)
 				throw new NullPointerException("No user with ID exists");
-			boolean success = retireUserAccountToken(e, userId) && users.remove(userId) != null;
-			if (success) {
-				publishNewEvent(e, EventType.ACCOUNT_CLOSED_RESPONSE, success);
+			boolean RetiredTokens = retireUserAccountToken(e, userId);
+			boolean removedUser = users.remove(userId) != null;
+			if (RetiredTokens && removedUser) {
+				publishNewEvent(e, EventType.ACCOUNT_CLOSED_RESPONSE, true);
 			} else {
-				publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, success);
+				publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, false);
 			}
 		} catch (Exception exception) {
-			System.out.println("Ending up in exception " + exception.getMessage());
 			publishNewEvent(e, EventType.USER_ACCOUNT_INVALID, false);
 		}
 	}
 
 	private boolean retireUserAccountToken(Event e, UUID userId) throws Exception {
-		UUID correlationId = e.getCorrelationId();
-		return (boolean) buildCompletableFutureEvent(correlationId, userId, EventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST);
-	}
-
-	public void handleRetireUserAccountTokensResponse(Event event) {
-		genericHandler(event);
-	}
-
-	public void handleRetireUserAccountTokensError(Event event) {
-		genericErrorHandler(event);
+		return (boolean) buildCompletableFutureEvent(userId, EventType.RETIRE_USER_ACCOUNT_TOKENS_REQUEST);
 	}
 
 	public void handleVerifyUserAccountExistsRequest(Event e) {

@@ -1,8 +1,6 @@
 package account.service.services;
 
-public interface EventType {
-	
-	final String USER_ACCOUNT_REGISTRATION = "UserAccountRegistration";
+public interface EventType {	
 	final String ACCOUNT_REGISTRATION_REQUESTED = "AccountRegistrationRequested";
 	final String USER_ACCOUNT_INFO_REQUESTED = "UserAccountInfoRequested";
 	final String USER_ACCOUNT_INFO_RESPONSE = "UserAccountInfoResponse";
